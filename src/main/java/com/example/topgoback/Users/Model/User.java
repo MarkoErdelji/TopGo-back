@@ -3,10 +3,15 @@ package com.example.topgoback.Users.Model;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+
+import static jakarta.persistence.InheritanceType.TABLE_PER_CLASS;
+
 @Entity
+@Inheritance(strategy=TABLE_PER_CLASS)
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "mySeqGenV1", sequenceName = "mySeqV1", initialValue = 1, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenV1")
     private Integer id;
     @Column(name = "firstName", nullable = false)
     private String firstName;
@@ -24,8 +29,7 @@ public class User {
     private boolean isBlocked;
 
     public User(){};
-    public User(int id, String firstName, String lastName, String email, String password, String phoneNumber, String address) {
-        this.id = id;
+    public User(String firstName, String lastName, String email, String password, String phoneNumber, String address) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
