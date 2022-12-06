@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 @Service
 public class UserService {
@@ -25,9 +26,14 @@ public class UserService {
         }
     }
 
+    public User findOne(int id){
+        return userRepository.findById(id).orElse(null);
+    }
+
     public User addOne(CreateUserDTO userDTO) {
         User u = new User(userDTO);
         userRepository.save(u);
         return u;}
+
 
 }

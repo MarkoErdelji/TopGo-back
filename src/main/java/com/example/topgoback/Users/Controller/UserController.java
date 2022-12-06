@@ -1,5 +1,7 @@
 package com.example.topgoback.Users.Controller;
 
+import com.example.topgoback.Messages.Model.Message;
+import com.example.topgoback.Messages.Service.MessageService;
 import com.example.topgoback.Rides.Model.Ride;
 import com.example.topgoback.Rides.Service.RideService;
 import com.example.topgoback.Users.DTO.*;
@@ -21,6 +23,8 @@ public class UserController {
 
     @Autowired
     private RideService rideService;
+    @Autowired
+    private MessageService messageService;
 
     @GetMapping(value = "/{id}/ride")
     public ResponseEntity<?> getUserRides(@PathVariable Integer id,
@@ -31,10 +35,14 @@ public class UserController {
                                                      @RequestParam(required = false) String endDateInterval)
     {
         UserRidesListDTO userRidesDTO = new UserRidesListDTO();
+        User user = userService.findOne(id);
+        if(user == null){
+            return new ResponseEntity<>("User does not exist!",HttpStatus.BAD_REQUEST);
+        }
         List<Ride> rides = rideService.findRidesByUserId(id);
 
         if(rides == null){
-            return new ResponseEntity<>("User does not exist",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("User has no rides!",HttpStatus.NOT_FOUND);
         }
         else {
             userRidesDTO.setTotalCount(rides.size());
@@ -70,6 +78,21 @@ public class UserController {
         jwtTokenDTO.setRefreshToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
 
         return new ResponseEntity<>(jwtTokenDTO, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "{id}/message")
+    public ResponseEntity<UserMessagesListDTO> getUsersMessages(@PathVariable Integer id)
+    {
+        User user = userService.findOne(id);
+
+        List<Message> userMessages = messageService.findBySenderOrReceiver(user);
+
+        UserMessagesListDTO userMessagesListDTO = new UserMessagesListDTO();
+        userMessagesListDTO.setTotalCount(10);
+        userMessagesListDTO.setResults((ArrayList<Message>) userMessages);
+
+        return new ResponseEntity<>(userMessagesListDTO,HttpStatus.OK);
+
     }
 
 

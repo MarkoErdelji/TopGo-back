@@ -8,11 +8,13 @@ import java.time.LocalDate;
 import static jakarta.persistence.InheritanceType.TABLE_PER_CLASS;
 
 @Entity
+@Table(name="users")
 @Inheritance(strategy=TABLE_PER_CLASS)
 public class User {
     @Id
     @SequenceGenerator(name = "mySeqGenV1", sequenceName = "mySeqV1", initialValue = 1, allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenV1")
+    @Column(name="id")
     private Integer id;
     @Column(name = "firstName", nullable = false)
     private String firstName;
@@ -32,6 +34,9 @@ public class User {
     @Column(name = "isBlocked", nullable = false)
     private boolean isBlocked;
 
+    @Column(name = "isActive", nullable = false)
+    private boolean isActive;
+
     public User(){};
 
     public User(CreateUserDTO userDTO){
@@ -43,6 +48,7 @@ public class User {
         this.phoneNumber = userDTO.getTelephoneNumber();
         this.address = userDTO.getAddress();
         this.isBlocked = false;
+        this.isActive = false;
     }
     public User(String firstName, String lastName, String profilePicture, String email, String password, String phoneNumber, String address) {
         this.firstName = firstName;
@@ -53,6 +59,7 @@ public class User {
         this.phoneNumber = phoneNumber;
         this.address = address;
         this.isBlocked = false;
+        this.isActive = false;
     }
 
     public int getId() {

@@ -4,19 +4,27 @@ import com.example.topgoback.Enums.MessageType;
 import com.example.topgoback.Users.Model.User;
 import jakarta.persistence.*;
 
-@Entity
+import java.time.LocalDateTime;
+import java.util.List;
 
+@Entity
 public class Message {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String message;
+    @Column(columnDefinition = "TIMESTAMP")
+    private LocalDateTime timeOfSending;
     private MessageType type;
-    @OneToOne(optional=false)
-    @JoinColumn(name="receiver_id", unique=false, nullable=false)
+
+    @ManyToOne(optional=false,cascade = CascadeType.ALL,fetch = FetchType.LAZY,targetEntity = User.class)
+    @JoinColumn(name="receiver_id",referencedColumnName = "id")
     private User receiver;
-    @OneToOne(optional=false)
-    @JoinColumn(name="sender_id", unique=false, nullable=false)
+    @ManyToOne(optional=false,cascade = CascadeType.ALL,fetch = FetchType.LAZY,targetEntity = User.class)
+    @JoinColumn(name="sender_id",referencedColumnName = "id")
     private User sender;
+
+    @Column(nullable = true)
+    private Integer rideId;
 }

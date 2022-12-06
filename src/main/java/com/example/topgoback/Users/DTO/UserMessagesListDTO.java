@@ -1,34 +1,32 @@
 package com.example.topgoback.Users.DTO;
 
-import com.example.topgoback.Rides.Model.Ride;
+import com.example.topgoback.Messages.Model.Message;
 import com.example.topgoback.Tools.PaginatedResponse;
-import com.example.topgoback.Users.Model.User;
 
 import java.util.ArrayList;
 
-public class UserListDTO {
-
+public class UserMessagesListDTO {
     private PaginatedResponse totalCount;
 
-    private ArrayList<UserListResponseDTO> results;
+    private ArrayList<Message> results;
 
-    public UserListDTO(){
+
+    public UserMessagesListDTO(){
         totalCount = new PaginatedResponse();
     }
-
-    public PaginatedResponse getTotalCount() {
-        return totalCount;
+    public int getTotalCount() {
+        return totalCount.getTotalCount();
     }
 
     public void setTotalCount(int totalCount) {
         this.totalCount.setTotalCount(totalCount);
     }
 
-    public ArrayList<UserListResponseDTO> getResults() {
+    public ArrayList<Message> getResults() {
         return results;
     }
 
-    public void setResults(ArrayList<UserListResponseDTO> results) {
+    public void setResults(ArrayList<Message> results) {
         this.results = results;
     }
 }

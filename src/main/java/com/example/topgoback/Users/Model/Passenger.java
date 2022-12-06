@@ -22,7 +22,7 @@ public class Passenger extends  User{
     }
 
     public Passenger(String firstName, String lastName, String profilePicture,String email, String password, String phoneNumber, String address, List<Payment> payments, List<Ride> rides, List<Route> favouriteRoutes) {
-        super(firstName, lastName, email,profilePicture,password, phoneNumber, address);
+        super(firstName, lastName, email,profilePicture, password, phoneNumber, address);
         this.payments = payments;
         this.rides = rides;
         this.favouriteRoutes = favouriteRoutes;
