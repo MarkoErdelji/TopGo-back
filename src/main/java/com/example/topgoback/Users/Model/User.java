@@ -18,6 +18,9 @@ public class User {
     private String firstName;
     @Column(name = "lastName", nullable = false)
     private String lastName;
+
+    @Column(name = "profilePicture", nullable = false)
+    private String profilePicture;
     @Column(name = "email", nullable = false)
     private String email;
     @Column(name = "password", nullable = false)
@@ -36,14 +39,16 @@ public class User {
         this.lastName = userDTO.getSurname();
         this.email = userDTO.getEmail();
         this.password = userDTO.getPassword();
+        this.profilePicture = userDTO.getProfilePicture();
         this.phoneNumber = userDTO.getTelephoneNumber();
         this.address = userDTO.getAddress();
         this.isBlocked = false;
     }
-    public User(String firstName, String lastName, String email, String password, String phoneNumber, String address) {
+    public User(String firstName, String lastName, String profilePicture, String email, String password, String phoneNumber, String address) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.profilePicture = profilePicture;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.address = address;
@@ -80,6 +85,14 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 
     public String getPassword() {

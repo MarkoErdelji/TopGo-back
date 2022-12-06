@@ -2,12 +2,11 @@ package com.example.topgoback.Users.Controller;
 
 import com.example.topgoback.Rides.Model.Ride;
 import com.example.topgoback.Rides.Service.RideService;
-import com.example.topgoback.Users.DTO.CreatePassengerDTO;
-import com.example.topgoback.Users.DTO.CreateUserDTO;
-import com.example.topgoback.Users.DTO.UserRidesDTO;
+import com.example.topgoback.Users.DTO.UserListDTO;
+import com.example.topgoback.Users.DTO.UserListResponseDTO;
+import com.example.topgoback.Users.DTO.UserRidesListDTO;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Service.UserService;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "api/users/")
+@RequestMapping(value = "api/user/")
 public class UserController {
     @Autowired
     private UserService userService;
@@ -33,7 +32,7 @@ public class UserController {
                                                      @RequestParam(required = false) String beginDateInterval,
                                                      @RequestParam(required = false) String endDateInterval)
     {
-        UserRidesDTO userRidesDTO = new UserRidesDTO();
+        UserRidesListDTO userRidesDTO = new UserRidesListDTO();
         List<Ride> rides = rideService.findRidesByUserId(id);
 
         if(rides == null){
@@ -43,6 +42,23 @@ public class UserController {
             userRidesDTO.setTotalCount(rides.size());
             userRidesDTO.setResults((ArrayList<Ride>) rides);
             return new ResponseEntity<>(userRidesDTO, HttpStatus.OK);
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getUsers(@RequestParam(required = false) Integer page,
+                                      @RequestParam(required = false) Integer size)
+    {
+        UserListDTO userListDTO = new UserListDTO();
+        List<User> users = userService.findAll();
+
+        if(users == null){
+            return new ResponseEntity<>("No users in database",HttpStatus.NOT_FOUND);
+        }
+        else {
+            userListDTO.setTotalCount(users.size());
+            userListDTO.setResults((ArrayList<UserListResponseDTO>) UserListResponseDTO.convertToUserListResponseDTO(users));
+            return new ResponseEntity<>(userListDTO, HttpStatus.OK);
         }
     }
 

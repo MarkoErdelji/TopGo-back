@@ -4,7 +4,7 @@ import com.example.topgoback.Rides.Model.Ride;
 
 import java.util.ArrayList;
 
-public class UserRidesDTO {
+public class UserRidesListDTO {
 
     private int totalCount;
 

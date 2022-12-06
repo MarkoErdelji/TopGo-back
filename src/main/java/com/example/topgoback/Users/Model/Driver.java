@@ -18,8 +18,8 @@ public class Driver extends User{
     public Driver() {
     }
 
-    public Driver(String firstName, String lastName, String email, String password, String phoneNumber, String address, String driversLicense, boolean isActive, List<Ride> rides) {
-        super(firstName, lastName, email, password, phoneNumber, address);
+    public Driver(String firstName, String lastName, String email,String profilePicture, String password, String phoneNumber, String address, String driversLicense, boolean isActive, List<Ride> rides) {
+        super(firstName, lastName, email,profilePicture, password, phoneNumber, address);
         this.driversLicense = driversLicense;
         this.isActive = isActive;
         this.rides = rides;
