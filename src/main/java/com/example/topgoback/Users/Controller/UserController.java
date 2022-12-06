@@ -2,9 +2,7 @@ package com.example.topgoback.Users.Controller;
 
 import com.example.topgoback.Rides.Model.Ride;
 import com.example.topgoback.Rides.Service.RideService;
-import com.example.topgoback.Users.DTO.UserListDTO;
-import com.example.topgoback.Users.DTO.UserListResponseDTO;
-import com.example.topgoback.Users.DTO.UserRidesListDTO;
+import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +58,18 @@ public class UserController {
             userListDTO.setResults((ArrayList<UserListResponseDTO>) UserListResponseDTO.convertToUserListResponseDTO(users));
             return new ResponseEntity<>(userListDTO, HttpStatus.OK);
         }
+    }
+
+    @PostMapping(value = "/login")
+    public ResponseEntity<?> login(@RequestBody LoginCredentialDTO loginCredentialDTO)
+    {
+        //Dodati logiku za kreiranje tokena za usera
+        JWTTokenDTO jwtTokenDTO = new JWTTokenDTO();
+
+        jwtTokenDTO.setAccessToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
+        jwtTokenDTO.setRefreshToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
+
+        return new ResponseEntity<>(jwtTokenDTO, HttpStatus.OK);
     }
 
 
