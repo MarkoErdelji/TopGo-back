@@ -25,6 +25,11 @@ public class RideService {
            }
 
         }
-       return userRides;
+       if (userRides.isEmpty()){
+           return null;
+       }
+       else {
+           return userRides;
+       }
         }
 }

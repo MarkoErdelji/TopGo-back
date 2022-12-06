@@ -1,5 +1,6 @@
 package com.example.topgoback.Users.Service;
 
+import com.example.topgoback.Users.DTO.CreateUserDTO;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,9 @@ public class UserService {
 
     public List<User> findAll() { return userRepository.findAll();}
 
-    public void addOne(User user) { userRepository.save(user);}
+    public User addOne(CreateUserDTO userDTO) {
+        User u = new User(userDTO);
+        userRepository.save(u);
+        return u;}
 
 }

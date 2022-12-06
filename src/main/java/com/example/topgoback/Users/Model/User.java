@@ -1,5 +1,6 @@
 package com.example.topgoback.Users.Model;
 
+import com.example.topgoback.Users.DTO.CreateUserDTO;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -29,6 +30,16 @@ public class User {
     private boolean isBlocked;
 
     public User(){};
+
+    public User(CreateUserDTO userDTO){
+        this.firstName = userDTO.getName();
+        this.lastName = userDTO.getSurname();
+        this.email = userDTO.getEmail();
+        this.password = userDTO.getPassword();
+        this.phoneNumber = userDTO.getTelephoneNumber();
+        this.address = userDTO.getAddress();
+        this.isBlocked = false;
+    }
     public User(String firstName, String lastName, String email, String password, String phoneNumber, String address) {
         this.firstName = firstName;
         this.lastName = lastName;
