@@ -4,7 +4,6 @@ import com.example.topgoback.Documents.DTO.CreateDocumentDTO;
 import com.example.topgoback.Documents.DTO.DocumentInfoDTO;
 import com.example.topgoback.Documents.DocumentRepository;
 import com.example.topgoback.Documents.Model.Document;
-import com.example.topgoback.GeoLocations.DTO.GeoLocationDTO;
 import com.example.topgoback.GeoLocations.Model.GeoLocation;
 import com.example.topgoback.GeoLocations.Repository.GeoLocationRepository;
 import com.example.topgoback.Users.DTO.AllDriversDTO;

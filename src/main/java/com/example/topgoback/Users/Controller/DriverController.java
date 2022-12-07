@@ -9,6 +9,8 @@ import com.example.topgoback.Users.Model.Driver;
 import com.example.topgoback.Users.Service.DriverService;
 import com.example.topgoback.Vehicles.DTO.CreateVehicleDTO;
 import com.example.topgoback.Vehicles.DTO.VehicleInfoDTO;
+import com.example.topgoback.WorkHours.DTO.DriverWorkHoursDTO;
+import com.example.topgoback.WorkHours.Service.WorkHoursService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,9 @@ import java.util.List;
 public class DriverController {
     @Autowired
     private DriverService driverService;
+
+    @Autowired
+    WorkHoursService workHoursService;
 
     @PostMapping(consumes = "application/json")
     public ResponseEntity<DriverInfoDTO> saveDriver(@RequestBody CreateDriverDTO ddriver) {
@@ -93,6 +98,14 @@ public class DriverController {
         VehicleInfoDTO response = driverService.updateDriverVehicle(driverId,newVehicle);
         return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
     }
+
+    @GetMapping(value = "{driverId}/working-hours")
+    public ResponseEntity<DriverWorkHoursDTO> getDriverWorkingHours(@PathVariable Integer driverId)
+    {
+        DriverWorkHoursDTO response = workHoursService.getAllWorkHours(driverId);
+        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+    }
+
 
 
 
