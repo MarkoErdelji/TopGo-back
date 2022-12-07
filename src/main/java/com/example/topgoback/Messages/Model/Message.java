@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
+@Table(name="messages")
 public class Message {
 
     @Id
@@ -18,11 +19,11 @@ public class Message {
     private LocalDateTime timeOfSending;
     private MessageType type;
 
-    @ManyToOne(optional=false,cascade = CascadeType.ALL,fetch = FetchType.LAZY,targetEntity = User.class)
-    @JoinColumn(name="receiver_id",referencedColumnName = "id")
+    @ManyToOne(optional = false,cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @JoinColumn(name="receiver_id",referencedColumnName = "id",nullable = false)
     private User receiver;
-    @ManyToOne(optional=false,cascade = CascadeType.ALL,fetch = FetchType.LAZY,targetEntity = User.class)
-    @JoinColumn(name="sender_id",referencedColumnName = "id")
+    @ManyToOne(optional=false,cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @JoinColumn(name="sender_id",referencedColumnName = "id",nullable = false)
     private User sender;
 
     @Column(nullable = true)
