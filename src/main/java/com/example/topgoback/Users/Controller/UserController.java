@@ -4,6 +4,9 @@ import com.example.topgoback.Enums.MessageType;
 import com.example.topgoback.Messages.DTOS.SendMessageDTO;
 import com.example.topgoback.Messages.Model.Message;
 import com.example.topgoback.Messages.Service.MessageService;
+import com.example.topgoback.Notes.DTOS.NoteResponseDTO;
+import com.example.topgoback.Notes.Model.Note;
+import com.example.topgoback.Notes.Service.NoteService;
 import com.example.topgoback.Rides.Model.Ride;
 import com.example.topgoback.Rides.Service.RideService;
 import com.example.topgoback.Users.DTO.*;
@@ -14,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +31,9 @@ public class UserController {
     private RideService rideService;
     @Autowired
     private MessageService messageService;
+
+    @Autowired
+    private NoteService noteService;
 
     @GetMapping(value = "/{id}/ride")
     public ResponseEntity<?> getUserRides(@PathVariable Integer id,
@@ -145,6 +152,24 @@ public class UserController {
 
         userService.unblockUser(user);
         return new ResponseEntity<>("User successfuly unblocked",HttpStatus.OK);
+
+    }
+
+    @PostMapping(value = "{id}/note")
+    public ResponseEntity<?> addNote(@PathVariable Integer id,@RequestBody Note note)
+    {
+        User user = userService.findOne(id);
+        if(user == null){
+            return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
+        }
+
+        noteService.addOne(note);
+        NoteResponseDTO noteResponseDTO = new NoteResponseDTO();
+        noteResponseDTO.setTimeOfPosting(LocalDateTime.now());
+        noteResponseDTO.setId(note.getId());
+        noteResponseDTO.setMessage(note.getMessage());
+
+        return new ResponseEntity<>(noteResponseDTO,HttpStatus.OK);
 
     }
 
