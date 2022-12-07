@@ -1,5 +1,7 @@
 package com.example.topgoback.Users.Controller;
 
+import com.example.topgoback.Enums.MessageType;
+import com.example.topgoback.Messages.DTOS.SendMessageDTO;
 import com.example.topgoback.Messages.Model.Message;
 import com.example.topgoback.Messages.Service.MessageService;
 import com.example.topgoback.Rides.Model.Ride;
@@ -81,11 +83,18 @@ public class UserController {
     }
 
     @GetMapping(value = "{id}/message")
-    public ResponseEntity<UserMessagesListDTO> getUsersMessages(@PathVariable Integer id)
+    public ResponseEntity<?> getUsersMessages(@PathVariable Integer id)
     {
         User user = userService.findOne(id);
 
+        if(user == null){
+            return new ResponseEntity<>("No users in database",HttpStatus.NOT_FOUND);
+        }
         List<Message> userMessages = messageService.findBySenderIdOrReceiverId(user.getId());
+
+        if(userMessages == null){
+            return new ResponseEntity<>("No messages found for user with id " + id,HttpStatus.NOT_FOUND);
+        }
 
         UserMessagesListDTO userMessagesListDTO = new UserMessagesListDTO();
         userMessagesListDTO.setTotalCount(userMessages.size());
@@ -95,6 +104,23 @@ public class UserController {
 
     }
 
+
+    @PostMapping(value = "{id}/message")
+    public ResponseEntity<?> sendUsersMessage(@PathVariable Integer id, @RequestBody SendMessageDTO sendMessageDTO)
+    {
+        User receiver = userService.findOne(sendMessageDTO.getReceiverId());
+        if(receiver == null){
+            return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
+        }
+
+        if (sendMessageDTO.getType().compareTo(MessageType.RIDE) != 0){
+            sendMessageDTO.setRideId(null);
+        }
+
+        Message message = messageService.addOne(id,sendMessageDTO);
+        return new ResponseEntity<>(message,HttpStatus.OK);
+
+    }
 
 
 
