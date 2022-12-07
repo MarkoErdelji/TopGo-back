@@ -16,8 +16,8 @@ public class UserListDTO {
         totalCount = new PaginatedResponse();
     }
 
-    public PaginatedResponse getTotalCount() {
-        return totalCount;
+    public Integer getTotalCount() {
+        return totalCount.getTotalCount();
     }
 
     public void setTotalCount(int totalCount) {

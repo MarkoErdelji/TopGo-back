@@ -15,6 +15,7 @@ public class UserListResponseDTO {
     private String address;
 
     public UserListResponseDTO(User u) {
+        id = u.getId();
         name = u.getFirstName();
         surname = u.getLastName();
         profilePicture = u.getProfilePicture();

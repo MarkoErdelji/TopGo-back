@@ -47,4 +47,6 @@ public class MessageService {
         message.setRideId(sendMessageDTO.getRideId());
         return messageRepository.save(message);
     }
+
+
 }

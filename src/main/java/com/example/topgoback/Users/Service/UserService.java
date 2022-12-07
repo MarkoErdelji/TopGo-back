@@ -1,5 +1,6 @@
 package com.example.topgoback.Users.Service;
 
+import com.example.topgoback.Messages.Model.Message;
 import com.example.topgoback.Users.DTO.CreateUserDTO;
 import com.example.topgoback.Users.DTO.UserListResponseDTO;
 import com.example.topgoback.Users.Model.User;
@@ -36,4 +37,9 @@ public class UserService {
         return u;}
 
 
+    public void blockUser(User user) {
+        user.setBlocked(true);
+
+        userRepository.save(user);
+    }
 }

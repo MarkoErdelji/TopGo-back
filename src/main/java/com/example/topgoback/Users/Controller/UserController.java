@@ -122,6 +122,19 @@ public class UserController {
 
     }
 
+    @PutMapping(value = "{id}/block")
+    public ResponseEntity<?> blockUser(@PathVariable Integer id)
+    {
+        User user = userService.findOne(id);
+        if(user == null){
+            return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
+        }
+
+        userService.blockUser(user);
+        return new ResponseEntity<>("User successfuly blocked",HttpStatus.OK);
+
+    }
+
 
 
 
