@@ -25,12 +25,12 @@ public class MessageService {
         }
     }
 
-    public List<Message> findBySenderOrReceiver(User user){
-        if (messageRepository.findBySenderOrReceiver(user,user).isEmpty()){
+    public List<Message> findBySenderIdOrReceiverId(int userId){
+        if (messageRepository.findBySenderIdOrReceiverId(userId,userId).isEmpty()){
             return null;
         }
         else {
-            return messageRepository.findBySenderOrReceiver(user,user);
+            return messageRepository.findBySenderIdOrReceiverId(userId,userId);
         }
     }
 

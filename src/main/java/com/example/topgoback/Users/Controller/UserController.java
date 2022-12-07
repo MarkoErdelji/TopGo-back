@@ -85,10 +85,10 @@ public class UserController {
     {
         User user = userService.findOne(id);
 
-        List<Message> userMessages = messageService.findBySenderOrReceiver(user);
+        List<Message> userMessages = messageService.findBySenderIdOrReceiverId(user.getId());
 
         UserMessagesListDTO userMessagesListDTO = new UserMessagesListDTO();
-        userMessagesListDTO.setTotalCount(10);
+        userMessagesListDTO.setTotalCount(userMessages.size());
         userMessagesListDTO.setResults((ArrayList<Message>) userMessages);
 
         return new ResponseEntity<>(userMessagesListDTO,HttpStatus.OK);

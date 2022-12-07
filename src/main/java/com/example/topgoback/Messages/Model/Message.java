@@ -1,11 +1,9 @@
 package com.example.topgoback.Messages.Model;
 
 import com.example.topgoback.Enums.MessageType;
-import com.example.topgoback.Users.Model.User;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name="messages")
@@ -19,13 +17,68 @@ public class Message {
     private LocalDateTime timeOfSending;
     private MessageType type;
 
-    @ManyToOne(optional = false,cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    @JoinColumn(name="receiver_id",referencedColumnName = "id",nullable = false)
-    private User receiver;
-    @ManyToOne(optional=false,cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    @JoinColumn(name="sender_id",referencedColumnName = "id",nullable = false)
-    private User sender;
+    private int receiverId;
+
+    private int senderId;
 
     @Column(nullable = true)
     private Integer rideId;
+
+    public Message(){}
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public LocalDateTime getTimeOfSending() {
+        return timeOfSending;
+    }
+
+    public void setTimeOfSending(LocalDateTime timeOfSending) {
+        this.timeOfSending = timeOfSending;
+    }
+
+    public MessageType getType() {
+        return type;
+    }
+
+    public void setType(MessageType type) {
+        this.type = type;
+    }
+
+    public int getReceiverId() {
+        return receiverId;
+    }
+
+    public void setReceiverId(int receiver_id) {
+        this.receiverId = receiver_id;
+    }
+
+    public int getSenderId() {
+        return senderId;
+    }
+
+    public void setSenderId(int sender_id) {
+        this.senderId = sender_id;
+    }
+
+    public Integer getRideId() {
+        return rideId;
+    }
+
+    public void setRideId(Integer rideId) {
+        this.rideId = rideId;
+    }
 }
