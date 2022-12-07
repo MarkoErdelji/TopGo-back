@@ -42,4 +42,10 @@ public class UserService {
 
         userRepository.save(user);
     }
+
+    public void unblockUser(User user) {
+        user.setBlocked(false);
+
+        userRepository.save(user);
+    }
 }

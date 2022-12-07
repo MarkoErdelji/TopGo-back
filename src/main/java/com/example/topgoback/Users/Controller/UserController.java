@@ -135,6 +135,19 @@ public class UserController {
 
     }
 
+    @PutMapping(value = "{id}/unblock")
+    public ResponseEntity<?> unblockUser(@PathVariable Integer id)
+    {
+        User user = userService.findOne(id);
+        if(user == null){
+            return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
+        }
+
+        userService.unblockUser(user);
+        return new ResponseEntity<>("User successfuly unblocked",HttpStatus.OK);
+
+    }
+
 
 
 
