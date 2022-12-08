@@ -1,4 +1,4 @@
-package com.example.topgoback.RejectionLetters.DTOS;
+package com.example.topgoback.RejectionLetters.DTO;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

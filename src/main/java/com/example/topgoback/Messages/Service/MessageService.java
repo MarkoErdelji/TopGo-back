@@ -1,15 +1,13 @@
 package com.example.topgoback.Messages.Service;
 
-import com.example.topgoback.Messages.DTOS.SendMessageDTO;
-import com.example.topgoback.Messages.DTOS.UserMessagesDTO;
+import com.example.topgoback.Messages.DTO.SendMessageDTO;
+import com.example.topgoback.Messages.DTO.UserMessagesDTO;
 import com.example.topgoback.Messages.Model.Message;
 import com.example.topgoback.Messages.Repository.MessageRepository;
 import com.example.topgoback.Users.DTO.UserMessagesListDTO;
-import com.example.topgoback.Users.Model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 

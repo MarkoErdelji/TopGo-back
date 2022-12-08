@@ -1,9 +1,7 @@
 package com.example.topgoback.Rides.DTO;
 
 import com.example.topgoback.GeoLocations.DTO.DepartureDestinationDTO;
-import com.example.topgoback.GeoLocations.DTO.GeoLocationDTO;
-import com.example.topgoback.RejectionLetters.DTOS.UserRejectionLetterDTO;
-import com.example.topgoback.RejectionLetters.Model.RejectionLetter;
+import com.example.topgoback.RejectionLetters.DTO.UserRejectionLetterDTO;
 import com.example.topgoback.Users.DTO.UserRef;
 
 import java.time.LocalDateTime;

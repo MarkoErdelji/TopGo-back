@@ -1,8 +1,7 @@
-package com.example.topgoback.Messages.DTOS;
+package com.example.topgoback.Messages.DTO;
 
 import com.example.topgoback.Enums.MessageType;
 
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 

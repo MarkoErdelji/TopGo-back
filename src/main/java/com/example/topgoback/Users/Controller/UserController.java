@@ -1,12 +1,10 @@
 package com.example.topgoback.Users.Controller;
 
-import com.example.topgoback.Enums.MessageType;
-import com.example.topgoback.Messages.DTOS.SendMessageDTO;
-import com.example.topgoback.Messages.DTOS.UserMessagesDTO;
-import com.example.topgoback.Messages.Model.Message;
+import com.example.topgoback.Messages.DTO.SendMessageDTO;
+import com.example.topgoback.Messages.DTO.UserMessagesDTO;
 import com.example.topgoback.Messages.Service.MessageService;
-import com.example.topgoback.Notes.DTOS.NoteResponseDTO;
-import com.example.topgoback.Notes.DTOS.UserNoteListDTO;
+import com.example.topgoback.Notes.DTO.NoteResponseDTO;
+import com.example.topgoback.Notes.DTO.UserNoteListDTO;
 import com.example.topgoback.Notes.Model.Note;
 import com.example.topgoback.Notes.Service.NoteService;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
@@ -18,10 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping(value = "api/user/")
