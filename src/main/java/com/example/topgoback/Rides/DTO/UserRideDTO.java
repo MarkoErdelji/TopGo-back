@@ -40,7 +40,7 @@ public class UserRideDTO {
     public static UserRideDTO getMockupData(){
         UserRideDTO userRideDTO = new UserRideDTO();
         userRideDTO.setId(123);
-        String str = "2017-07-21T17:32:28Z";
+        String str = "2017-07-21T17:45:14Z";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX");
         LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
         userRideDTO.setStartTime(dateTime);
@@ -53,6 +53,9 @@ public class UserRideDTO {
         userRideDTO.setEstimatedTimeInMinutes(5);
         userRideDTO.setRejection(UserRejectionLetterDTO.getMockupData());
         List<DepartureDestinationDTO> locations = new ArrayList<>();
+        userRideDTO.setBabyTransport(true);
+        userRideDTO.setPetTransport(true);
+        userRideDTO.setVehicleType("STANDARDNO");
         locations.add(DepartureDestinationDTO.getMockedData());
         userRideDTO.setLocations((ArrayList<DepartureDestinationDTO>) locations);
 
