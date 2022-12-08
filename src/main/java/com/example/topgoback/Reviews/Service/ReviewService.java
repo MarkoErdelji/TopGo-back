@@ -1,9 +1,6 @@
 package com.example.topgoback.Reviews.Service;
 
-import com.example.topgoback.Reviews.DTO.CreateReviewDTO;
-import com.example.topgoback.Reviews.DTO.CreateReviewResponseDTO;
-import com.example.topgoback.Reviews.DTO.DriverReviewListDTO;
-import com.example.topgoback.Reviews.DTO.VehicleReviewListDTO;
+import com.example.topgoback.Reviews.DTO.*;
 import com.example.topgoback.Reviews.Repository.ReviewRepository;
 import com.example.topgoback.Users.DTO.UserRef;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,5 +68,29 @@ public class ReviewService {
         driverReviewListDTO.setResults(reviewResponseDTOList);
 
         return driverReviewListDTO;
+    }
+
+    public List<RideReviewsDTO> getRideReviews(Integer id) {
+        RideReviewsDTO rideReviewsDTO = new RideReviewsDTO();
+
+        CreateReviewResponseDTO vehicleReviewResponseDTO = new CreateReviewResponseDTO();
+        vehicleReviewResponseDTO.setId(123);
+        vehicleReviewResponseDTO.setRating(3);
+        vehicleReviewResponseDTO.setComment("The vehicle was bad and dirty");
+        vehicleReviewResponseDTO.setPassenger(UserRef.getMockupData());
+
+        CreateReviewResponseDTO driverReviewResponseDTO = new CreateReviewResponseDTO();
+        driverReviewResponseDTO.setId(123);
+        driverReviewResponseDTO.setRating(3);
+        driverReviewResponseDTO.setComment("The driver was driving too fast");
+        driverReviewResponseDTO.setPassenger(UserRef.getMockupData());
+
+        rideReviewsDTO.setVehicleReview(vehicleReviewResponseDTO);
+        rideReviewsDTO.setDriverReview(vehicleReviewResponseDTO);
+
+        List<RideReviewsDTO> rideReviewsDTOS = new ArrayList<>();
+        rideReviewsDTOS.add(rideReviewsDTO);
+
+        return rideReviewsDTOS;
     }
 }

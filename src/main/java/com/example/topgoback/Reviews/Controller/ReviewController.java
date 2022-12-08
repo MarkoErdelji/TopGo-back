@@ -1,14 +1,13 @@
 package com.example.topgoback.Reviews.Controller;
 
-import com.example.topgoback.Reviews.DTO.CreateReviewDTO;
-import com.example.topgoback.Reviews.DTO.CreateReviewResponseDTO;
-import com.example.topgoback.Reviews.DTO.DriverReviewListDTO;
-import com.example.topgoback.Reviews.DTO.VehicleReviewListDTO;
+import com.example.topgoback.Reviews.DTO.*;
 import com.example.topgoback.Reviews.Service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "api/review/")
@@ -50,6 +49,13 @@ public class ReviewController {
 
         DriverReviewListDTO driverReviewListDTO = reviewService.getDriverReviews(id);
         return new ResponseEntity<>(driverReviewListDTO, HttpStatus.CREATED);
+    }
+
+    @GetMapping(value = "{id}")
+    public ResponseEntity<List<RideReviewsDTO>> getRideReviews(@PathVariable(name="id") Integer id) {
+
+        List<RideReviewsDTO> rideReviews = reviewService.getRideReviews(id);
+        return new ResponseEntity<>(rideReviews, HttpStatus.CREATED);
     }
 
 }
