@@ -2,6 +2,7 @@ package com.example.topgoback.Reviews.Controller;
 
 import com.example.topgoback.Reviews.DTO.CreateReviewDTO;
 import com.example.topgoback.Reviews.DTO.CreateReviewResponseDTO;
+import com.example.topgoback.Reviews.DTO.DriverReviewListDTO;
 import com.example.topgoback.Reviews.DTO.VehicleReviewListDTO;
 import com.example.topgoback.Reviews.Service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,14 @@ public class ReviewController {
 
         CreateReviewResponseDTO createReviewResponseDTO = reviewService.addDriverReview(rideId,id,createReviewDTO);
         return new ResponseEntity<>(createReviewResponseDTO, HttpStatus.CREATED);
+    }
+
+    @GetMapping(value = "driver/{id}")
+    public ResponseEntity<DriverReviewListDTO> getDriverReviews(@PathVariable(name="id") Integer id) {
+
+
+        DriverReviewListDTO driverReviewListDTO = reviewService.getDriverReviews(id);
+        return new ResponseEntity<>(driverReviewListDTO, HttpStatus.CREATED);
     }
 
 }
