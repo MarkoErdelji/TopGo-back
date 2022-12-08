@@ -30,6 +30,10 @@ public class Route {
         this.price = price;
     }
 
+    public Route() {
+
+    }
+
     public int getId() {
         return id;
     }
