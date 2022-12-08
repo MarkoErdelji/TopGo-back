@@ -44,15 +44,23 @@ public class MessageService {
     }
 
 
-    public Message addOne(User sender,User receiver,SendMessageDTO sendMessageDTO) {
-        Message message = new Message();
-        message.setMessage(sendMessageDTO.getMessage());
-        message.setType(sendMessageDTO.getType());
-        message.setReceiver(receiver);
-        message.setSender(sender);
-        message.setTimeOfSending(LocalDateTime.now());
-        message.setRideId(sendMessageDTO.getRideId());
-        return messageRepository.save(message);
+    public UserMessagesDTO addOne(SendMessageDTO sendMessageDTO) {
+//        Message message = new Message();
+        UserMessagesDTO userMessagesDTO = UserMessagesDTO.getMockupData();
+        userMessagesDTO.setMessage(sendMessageDTO.getMessage());
+        userMessagesDTO.setRideId(sendMessageDTO.getRideId());
+        userMessagesDTO.setReceiverId(sendMessageDTO.getReceiverId());
+        userMessagesDTO.setType(sendMessageDTO.getType().toString());
+        userMessagesDTO.setId(123);
+        return userMessagesDTO;
+//
+//        message.setMessage(sendMessageDTO.getMessage());
+//        message.setType(sendMessageDTO.getType());
+//        message.setReceiver(receiver);
+//        message.setSender(sender);
+//        message.setTimeOfSending(LocalDateTime.now());
+//        message.setRideId(sendMessageDTO.getRideId());
+        //return messageRepository.save(message);
     }
 
 

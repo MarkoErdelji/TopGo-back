@@ -2,9 +2,11 @@ package com.example.topgoback.Users.Controller;
 
 import com.example.topgoback.Enums.MessageType;
 import com.example.topgoback.Messages.DTOS.SendMessageDTO;
+import com.example.topgoback.Messages.DTOS.UserMessagesDTO;
 import com.example.topgoback.Messages.Model.Message;
 import com.example.topgoback.Messages.Service.MessageService;
 import com.example.topgoback.Notes.DTOS.NoteResponseDTO;
+import com.example.topgoback.Notes.DTOS.UserNoteListDTO;
 import com.example.topgoback.Notes.Model.Note;
 import com.example.topgoback.Notes.Service.NoteService;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
@@ -109,17 +111,17 @@ public class UserController {
     @PostMapping(value = "{id}/message")
     public ResponseEntity<?> sendUsersMessage(@PathVariable Integer id, @RequestBody SendMessageDTO sendMessageDTO)
     {
-        User sender = userService.findOne(id);
-        User receiver = userService.findOne(sendMessageDTO.getReceiverId());
-        if(receiver == null){
-            return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
-        }
+//        User sender = userService.findOne(id);
+//        User receiver = userService.findOne(sendMessageDTO.getReceiverId());
+//        if(receiver == null){
+//            return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
+//        }
+//
+//        if (sendMessageDTO.getType().compareTo(MessageType.RIDE) != 0){
+//            sendMessageDTO.setRideId(null);
+//        }
 
-        if (sendMessageDTO.getType().compareTo(MessageType.RIDE) != 0){
-            sendMessageDTO.setRideId(null);
-        }
-
-        Message message = messageService.addOne(sender,receiver,sendMessageDTO);
+        UserMessagesDTO message = messageService.addOne(sendMessageDTO);
         return new ResponseEntity<>(message,HttpStatus.OK);
 
     }
@@ -133,7 +135,7 @@ public class UserController {
         }
 
         userService.blockUser(user);
-        return new ResponseEntity<>("User successfuly blocked",HttpStatus.OK);
+        return new ResponseEntity<>("User is successfuly blocked",HttpStatus.OK);
 
     }
 
@@ -146,26 +148,39 @@ public class UserController {
         }
 
         userService.unblockUser(user);
-        return new ResponseEntity<>("User successfuly unblocked",HttpStatus.OK);
+        return new ResponseEntity<>("User is successfuly unblocked",HttpStatus.OK);
 
     }
 
     @PostMapping(value = "{id}/note")
     public ResponseEntity<?> addNote(@PathVariable Integer id,@RequestBody Note note)
     {
-        User user = userService.findOne(id);
-        if(user == null){
-            return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
-        }
+//        User user = userService.findOne(id);
+//        if(user == null){
+//            return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
+//        }
 
-        noteService.addOne(note);
-        NoteResponseDTO noteResponseDTO = new NoteResponseDTO();
-        noteResponseDTO.setTimeOfPosting(LocalDateTime.now());
-        noteResponseDTO.setId(note.getId());
-        noteResponseDTO.setMessage(note.getMessage());
+        NoteResponseDTO noteResponseDTO = noteService.addOne(note);
 
         return new ResponseEntity<>(noteResponseDTO,HttpStatus.OK);
 
+    }
+
+
+    @GetMapping(value = "{id}/note")
+    public ResponseEntity<?> getUserNotes(@PathVariable Integer id,
+                                        @RequestParam(required = false) Integer page,
+                                      @RequestParam(required = false) Integer size)
+    {
+
+        UserNoteListDTO userNotes = noteService.findUsersNotes(id);
+
+        if(userNotes == null){
+            return new ResponseEntity<>("No notes in database",HttpStatus.NOT_FOUND);
+        }
+        else {
+            return new ResponseEntity<>(userNotes, HttpStatus.OK);
+        }
     }
 
 
