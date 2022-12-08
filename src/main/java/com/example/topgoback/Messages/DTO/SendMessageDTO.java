@@ -1,4 +1,4 @@
-package com.example.topgoback.Messages.DTOS;
+package com.example.topgoback.Messages.DTO;
 
 import com.example.topgoback.Enums.MessageType;
 

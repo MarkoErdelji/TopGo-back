@@ -1,8 +1,7 @@
-package com.example.topgoback.Messages.DTOS;
+package com.example.topgoback.Messages.DTO;
 
 import com.example.topgoback.Enums.MessageType;
 
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -31,7 +30,6 @@ public class UserMessagesDTO {
         userMessagesDTO.setTimeOfSending(dateTime);
         userMessagesDTO.setMessage("The driver is going on a longer route on purpoes");
         userMessagesDTO.setType("RIDE");
-        userMessagesDTO.setMessage(MessageType.RIDE.toString());
         userMessagesDTO.setRideId(123);
 
         return userMessagesDTO;

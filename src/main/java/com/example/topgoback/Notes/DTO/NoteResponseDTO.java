@@ -1,6 +1,5 @@
-package com.example.topgoback.Notes.DTOS;
+package com.example.topgoback.Notes.DTO;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class NoteResponseDTO {

@@ -1,7 +1,7 @@
 package com.example.topgoback.Notes.Service;
 
-import com.example.topgoback.Notes.DTOS.NoteResponseDTO;
-import com.example.topgoback.Notes.DTOS.UserNoteListDTO;
+import com.example.topgoback.Notes.DTO.NoteResponseDTO;
+import com.example.topgoback.Notes.DTO.UserNoteListDTO;
 import com.example.topgoback.Notes.Model.Note;
 import com.example.topgoback.Notes.Repository.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;

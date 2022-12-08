@@ -1,4 +1,4 @@
-package com.example.topgoback.Notes.DTOS;
+package com.example.topgoback.Notes.DTO;
 
 import com.example.topgoback.Tools.PaginatedResponse;
 
