@@ -21,7 +21,7 @@ public class ReviewController {
                                                                     @RequestBody CreateReviewDTO createReviewDTO) {
 
 
-        CreateReviewResponseDTO createReviewResponseDTO = reviewService.addOne(rideId,id,createReviewDTO);
+        CreateReviewResponseDTO createReviewResponseDTO = reviewService.addVehicleReview(rideId,id,createReviewDTO);
         return new ResponseEntity<>(createReviewResponseDTO, HttpStatus.CREATED);
     }
 
@@ -39,7 +39,7 @@ public class ReviewController {
                                                                    @RequestBody CreateReviewDTO createReviewDTO) {
 
 
-        CreateReviewResponseDTO createReviewResponseDTO = reviewService.addOne(rideId,id,createReviewDTO);
+        CreateReviewResponseDTO createReviewResponseDTO = reviewService.addDriverReview(rideId,id,createReviewDTO);
         return new ResponseEntity<>(createReviewResponseDTO, HttpStatus.CREATED);
     }
 

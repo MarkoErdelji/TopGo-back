@@ -17,7 +17,7 @@ public class ReviewService {
     ReviewRepository reviewRepository;
 
 
-    public CreateReviewResponseDTO addOne(int rideId, int id, CreateReviewDTO createReviewDTO) {
+    public CreateReviewResponseDTO addVehicleReview(int rideId, int id, CreateReviewDTO createReviewDTO) {
         CreateReviewResponseDTO createReviewResponseDTO = new CreateReviewResponseDTO();
         createReviewResponseDTO.setId(123);
         createReviewResponseDTO.setRating(3);
@@ -42,5 +42,15 @@ public class ReviewService {
         vehicleReviewListDTO.setResults(reviewResponseDTOList);
 
         return vehicleReviewListDTO;
+    }
+
+
+    public CreateReviewResponseDTO addDriverReview(int rideId, int id, CreateReviewDTO createReviewDTO) {
+        CreateReviewResponseDTO createReviewResponseDTO = new CreateReviewResponseDTO();
+        createReviewResponseDTO.setId(123);
+        createReviewResponseDTO.setRating(3);
+        createReviewResponseDTO.setComment(createReviewDTO.getComment());
+        createReviewResponseDTO.setPassenger(UserRef.getMockupData());
+        return createReviewResponseDTO;
     }
 }
