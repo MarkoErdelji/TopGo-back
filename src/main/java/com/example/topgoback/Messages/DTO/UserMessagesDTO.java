@@ -30,7 +30,6 @@ public class UserMessagesDTO {
         userMessagesDTO.setTimeOfSending(dateTime);
         userMessagesDTO.setMessage("The driver is going on a longer route on purpoes");
         userMessagesDTO.setType("RIDE");
-        userMessagesDTO.setMessage(MessageType.RIDE.toString());
         userMessagesDTO.setRideId(123);
 
         return userMessagesDTO;
