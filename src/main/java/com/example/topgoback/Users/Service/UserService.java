@@ -2,6 +2,7 @@ package com.example.topgoback.Users.Service;
 
 import com.example.topgoback.Messages.Model.Message;
 import com.example.topgoback.Users.DTO.CreateUserDTO;
+import com.example.topgoback.Users.DTO.UserListDTO;
 import com.example.topgoback.Users.DTO.UserListResponseDTO;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Repository.UserRepository;
@@ -18,12 +19,17 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public List<User> findAll() {
-        List<User> users =  userRepository.findAll();
-        if(users.isEmpty()){
+    public UserListDTO findAll() {
+
+        UserListDTO userListDTo = new UserListDTO();
+        userListDTo.setTotalCount(243);
+        ArrayList<UserListResponseDTO> userListResponseDTOS = new ArrayList<>();
+        userListResponseDTOS.add(UserListResponseDTO.getMockupData());
+        userListDTo.setResults(userListResponseDTOS);
+        if(userListDTo.getResults().isEmpty()){
         return null;}
         else{
-            return users;
+            return userListDTo;
         }
     }
 

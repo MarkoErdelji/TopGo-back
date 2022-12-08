@@ -1,6 +1,6 @@
-package com.example.topgoback.Users.DTO;
+package com.example.topgoback.Rides.DTO;
 
-import com.example.topgoback.Rides.Model.Ride;
+import com.example.topgoback.Rides.DTO.UserRideDTO;
 
 import java.util.ArrayList;
 
@@ -8,7 +8,7 @@ public class UserRidesListDTO {
 
     private int totalCount;
 
-    private ArrayList<Ride> results;
+    private ArrayList<UserRideDTO> results;
 
     public int getTotalCount() {
         return totalCount;
@@ -18,11 +18,11 @@ public class UserRidesListDTO {
         this.totalCount = totalCount;
     }
 
-    public ArrayList<Ride> getResults() {
+    public ArrayList<UserRideDTO> getResults() {
         return results;
     }
 
-    public void setResults(ArrayList<Ride> results) {
+    public void setResults(ArrayList<UserRideDTO> results) {
         this.results = results;
     }
 }

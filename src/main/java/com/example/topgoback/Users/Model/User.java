@@ -1,9 +1,13 @@
 package com.example.topgoback.Users.Model;
 
+import com.example.topgoback.Messages.Model.Message;
 import com.example.topgoback.Users.DTO.CreateUserDTO;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import static jakarta.persistence.InheritanceType.TABLE_PER_CLASS;
 
@@ -11,6 +15,7 @@ import static jakarta.persistence.InheritanceType.TABLE_PER_CLASS;
 @Table(name="users")
 @Inheritance(strategy=TABLE_PER_CLASS)
 public class User {
+
     @Id
     @SequenceGenerator(name = "mySeqGenV1", sequenceName = "mySeqV1", initialValue = 1, allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenV1")
@@ -33,9 +38,9 @@ public class User {
     private String address;
     @Column(name = "isBlocked", nullable = false)
     private boolean isBlocked;
-
     @Column(name = "isActive", nullable = false)
     private boolean isActive;
+
 
     public User(){};
 
@@ -62,11 +67,11 @@ public class User {
         this.isActive = false;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -86,20 +91,20 @@ public class User {
         this.lastName = lastName;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getProfilePicture() {
         return profilePicture;
     }
 
     public void setProfilePicture(String profilePicture) {
         this.profilePicture = profilePicture;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
@@ -118,8 +123,6 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-
-
     public String getAddress() {
         return address;
     }
@@ -135,4 +138,13 @@ public class User {
     public void setBlocked(boolean blocked) {
         isBlocked = blocked;
     }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
 }

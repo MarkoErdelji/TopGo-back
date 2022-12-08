@@ -1,9 +1,11 @@
 package com.example.topgoback.Messages.Model;
 
 import com.example.topgoback.Enums.MessageType;
+import com.example.topgoback.Users.Model.User;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 @Entity
 @Table(name="messages")
@@ -17,12 +19,14 @@ public class Message {
     private LocalDateTime timeOfSending;
     private MessageType type;
 
-    private int receiverId;
-
-    private int senderId;
-
     @Column(nullable = true)
     private Integer rideId;
+
+    @ManyToOne(optional = false)
+    private User sender;
+    @ManyToOne(optional = false)
+    private User receiver;
+
 
     public Message(){}
 
@@ -58,27 +62,31 @@ public class Message {
         this.type = type;
     }
 
-    public int getReceiverId() {
-        return receiverId;
+
+
+    public void setRideId(Integer rideId) {
+        this.rideId = rideId;
     }
 
-    public void setReceiverId(int receiver_id) {
-        this.receiverId = receiver_id;
+
+    public User getSender() {
+        return sender;
     }
 
-    public int getSenderId() {
-        return senderId;
+    public void setSender(User sender) {
+        this.sender = sender;
     }
 
-    public void setSenderId(int sender_id) {
-        this.senderId = sender_id;
+    public User getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(User receiver) {
+        this.receiver = receiver;
     }
 
     public Integer getRideId() {
         return rideId;
     }
 
-    public void setRideId(Integer rideId) {
-        this.rideId = rideId;
-    }
 }

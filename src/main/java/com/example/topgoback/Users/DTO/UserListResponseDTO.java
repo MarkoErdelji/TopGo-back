@@ -14,6 +14,9 @@ public class UserListResponseDTO {
     private String email;
     private String address;
 
+    public UserListResponseDTO() {
+    }
+
     public UserListResponseDTO(User u) {
         id = u.getId();
         name = u.getFirstName();
@@ -22,6 +25,21 @@ public class UserListResponseDTO {
         telephoneNumber = u.getPhoneNumber();
         email = u.getEmail();
         address = u.getAddress();
+    }
+
+    public static UserListResponseDTO getMockupData(){
+        UserListResponseDTO userListResponseDTO = new UserListResponseDTO();
+
+        userListResponseDTO.setId(10);
+        userListResponseDTO.setName("Pera");
+        userListResponseDTO.setSurname("Peric");
+        userListResponseDTO.setProfilePicture("U3dhZ2dlciByb2Nrcw==");
+        userListResponseDTO.setTelephoneNumber("+381123123");
+        userListResponseDTO.setEmail("pera.peric@email.com");
+        userListResponseDTO.setAddress("Bulevar Oslobodjenja 74");
+
+        return userListResponseDTO;
+
     }
 
     public static List<UserListResponseDTO> convertToUserListResponseDTO(List<User> users){

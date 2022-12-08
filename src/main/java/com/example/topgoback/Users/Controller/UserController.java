@@ -7,7 +7,7 @@ import com.example.topgoback.Messages.Service.MessageService;
 import com.example.topgoback.Notes.DTOS.NoteResponseDTO;
 import com.example.topgoback.Notes.Model.Note;
 import com.example.topgoback.Notes.Service.NoteService;
-import com.example.topgoback.Rides.Model.Ride;
+import com.example.topgoback.Rides.DTO.UserRidesListDTO;
 import com.example.topgoback.Rides.Service.RideService;
 import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.User;
@@ -43,37 +43,35 @@ public class UserController {
                                                      @RequestParam(required = false) String beginDateInterval,
                                                      @RequestParam(required = false) String endDateInterval)
     {
-        UserRidesListDTO userRidesDTO = new UserRidesListDTO();
-        User user = userService.findOne(id);
-        if(user == null){
-            return new ResponseEntity<>("User does not exist!",HttpStatus.BAD_REQUEST);
-        }
-        List<Ride> rides = rideService.findRidesByUserId(id);
+//        User user = userService.findOne(id);
+//        if(user == null){
+//            return new ResponseEntity<>("User does not exist!",HttpStatus.BAD_REQUEST);
+//        }
+
+        UserRidesListDTO rides = rideService.findRidesByUserId(id);
+
 
         if(rides == null){
             return new ResponseEntity<>("User has no rides!",HttpStatus.NOT_FOUND);
         }
         else {
-            userRidesDTO.setTotalCount(rides.size());
-            userRidesDTO.setResults((ArrayList<Ride>) rides);
-            return new ResponseEntity<>(userRidesDTO, HttpStatus.OK);
+            return new ResponseEntity<>(rides, HttpStatus.OK);
         }
+
     }
 
     @GetMapping
     public ResponseEntity<?> getUsers(@RequestParam(required = false) Integer page,
                                       @RequestParam(required = false) Integer size)
     {
-        UserListDTO userListDTO = new UserListDTO();
-        List<User> users = userService.findAll();
+
+        UserListDTO users = userService.findAll();
 
         if(users == null){
             return new ResponseEntity<>("No users in database",HttpStatus.NOT_FOUND);
         }
         else {
-            userListDTO.setTotalCount(users.size());
-            userListDTO.setResults((ArrayList<UserListResponseDTO>) UserListResponseDTO.convertToUserListResponseDTO(users));
-            return new ResponseEntity<>(userListDTO, HttpStatus.OK);
+            return new ResponseEntity<>(users, HttpStatus.OK);
         }
     }
 
@@ -92,22 +90,18 @@ public class UserController {
     @GetMapping(value = "{id}/message")
     public ResponseEntity<?> getUsersMessages(@PathVariable Integer id)
     {
-        User user = userService.findOne(id);
-
-        if(user == null){
-            return new ResponseEntity<>("No users in database",HttpStatus.NOT_FOUND);
-        }
-        List<Message> userMessages = messageService.findBySenderIdOrReceiverId(user.getId());
+//        User user = userService.findOne(id);
+//
+//        if(user == null){
+//            return new ResponseEntity<>("No users in database",HttpStatus.NOT_FOUND);
+//        }
+        UserMessagesListDTO userMessages = messageService.findBySenderOrReceiver(id);
 
         if(userMessages == null){
             return new ResponseEntity<>("No messages found for user with id " + id,HttpStatus.NOT_FOUND);
         }
 
-        UserMessagesListDTO userMessagesListDTO = new UserMessagesListDTO();
-        userMessagesListDTO.setTotalCount(userMessages.size());
-        userMessagesListDTO.setResults((ArrayList<Message>) userMessages);
-
-        return new ResponseEntity<>(userMessagesListDTO,HttpStatus.OK);
+        return new ResponseEntity<>(userMessages,HttpStatus.OK);
 
     }
 
@@ -115,6 +109,7 @@ public class UserController {
     @PostMapping(value = "{id}/message")
     public ResponseEntity<?> sendUsersMessage(@PathVariable Integer id, @RequestBody SendMessageDTO sendMessageDTO)
     {
+        User sender = userService.findOne(id);
         User receiver = userService.findOne(sendMessageDTO.getReceiverId());
         if(receiver == null){
             return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
@@ -124,7 +119,7 @@ public class UserController {
             sendMessageDTO.setRideId(null);
         }
 
-        Message message = messageService.addOne(id,sendMessageDTO);
+        Message message = messageService.addOne(sender,receiver,sendMessageDTO);
         return new ResponseEntity<>(message,HttpStatus.OK);
 
     }
