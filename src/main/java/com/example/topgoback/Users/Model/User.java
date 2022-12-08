@@ -17,6 +17,8 @@ public class User {
     private String firstName;
     @Column(name = "lastName", nullable = false)
     private String lastName;
+    @Column(name = "profilePicture", nullable = true)
+    private String profilePicture;
     @Column(name = "email", nullable = false)
     private String email;
     @Column(name = "password", nullable = false)
@@ -25,17 +27,22 @@ public class User {
     private String phoneNumber;
     @Column(name = "address", nullable = false)
     private String address;
+
+    @Column(name = "isActive", nullable = false)
+    private boolean isActive;
     @Column(name = "isBlocked", nullable = false)
     private boolean isBlocked;
 
     public User(){};
-    public User(String firstName, String lastName, String email, String password, String phoneNumber, String address) {
+    public User(String firstName, String lastName, String profilePicture, String email, String password, String phoneNumber, String address) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.profilePicture = profilePicture;
         this.email = email;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.address = address;
+        this.isActive = true;
         this.isBlocked = false;
     }
 
@@ -51,6 +58,11 @@ public class User {
         return firstName;
     }
 
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -61,6 +73,14 @@ public class User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 
     public String getEmail() {
@@ -96,6 +116,14 @@ public class User {
     public void setAddress(String address) {
         this.address = address;
     }
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
 
     public boolean isBlocked() {
         return isBlocked;
