@@ -86,7 +86,7 @@ public class ReviewService {
         driverReviewResponseDTO.setPassenger(UserRef.getMockupData());
 
         rideReviewsDTO.setVehicleReview(vehicleReviewResponseDTO);
-        rideReviewsDTO.setDriverReview(vehicleReviewResponseDTO);
+        rideReviewsDTO.setDriverReview(driverReviewResponseDTO);
 
         List<RideReviewsDTO> rideReviewsDTOS = new ArrayList<>();
         rideReviewsDTOS.add(rideReviewsDTO);
