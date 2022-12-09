@@ -1,7 +1,6 @@
 package com.example.topgoback.Users.Service;
 
-import com.example.topgoback.Users.DTO.CreatePassengerDTO;
-import com.example.topgoback.Users.DTO.CreatePassengerResponseDTO;
+import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.Passenger;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Repository.PassengerRepository;
@@ -55,16 +54,17 @@ public class PassengerService {
         return passenger;
     }
 
-    public List<Passenger> findAll(){
-        return passengerRepository.findAll();
-    }
-    public List<CreatePassengerResponseDTO> convertToDTOList(List<Passenger> passengers){
-        List<CreatePassengerResponseDTO> passengersResponse = new ArrayList<CreatePassengerResponseDTO>();
-        for(Passenger passenger : passengers){
-            CreatePassengerResponseDTO createPassengerResponseDTO = new CreatePassengerResponseDTO(passenger);
-            passengersResponse.add(createPassengerResponseDTO);
+    public PassengerListDTO findAll(){
+        PassengerListDTO passengerListDTo = new PassengerListDTO();
+        passengerListDTo.setTotalCount(243);
+        ArrayList<PassengerListResponseDTO> passengerListResponseDTOS = new ArrayList<>();
+        passengerListResponseDTOS.add(PassengerListResponseDTO.getMockupData());
+        passengerListDTo.setResults(passengerListResponseDTOS);
+        if(passengerListDTo.getResults().isEmpty()){
+            return null;}
+        else{
+            return passengerListDTo;
         }
-        return passengersResponse;
-    };
+    }
 
 }

@@ -1,8 +1,6 @@
 package com.example.topgoback.Users.Controller;
 
-import com.example.topgoback.Users.DTO.CreatePassengerDTO;
-import com.example.topgoback.Users.DTO.CreatePassengerResponseDTO;
-import com.example.topgoback.Users.DTO.PassengerListResponseDTO;
+import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.Passenger;
 import com.example.topgoback.Users.Service.PassengerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,13 +40,13 @@ public class PassengerController {
 
         return new ResponseEntity<>(new CreatePassengerResponseDTO(passenger), HttpStatus.OK);
     }
-    @GetMapping(consumes = "application/json")
-    public  ResponseEntity<PassengerListResponseDTO> getPaginated(@RequestParam Integer page,
+    @GetMapping
+    public  ResponseEntity<?> getPaginated(@RequestParam Integer page,
                                                                   @RequestParam Integer size){
-        List<Passenger> passengers = passengerService.findAll();
-        List<CreatePassengerResponseDTO> passengerListResponseDTOS = passengerService.convertToDTOList(passengers);
+        PassengerListDTO passengers = passengerService.findAll();
 
-        return new ResponseEntity<>(new PassengerListResponseDTO(passengerListResponseDTOS), HttpStatus.OK);
+
+        return new ResponseEntity<>(passengers, HttpStatus.OK);
 
     }
 }
