@@ -1,8 +1,11 @@
 package com.example.topgoback.Users.Service;
 
 import com.example.topgoback.Users.DTO.CreatePassengerDTO;
+import com.example.topgoback.Users.DTO.CreatePassengerResponseDTO;
 import com.example.topgoback.Users.Model.Passenger;
+import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Repository.PassengerRepository;
+import com.example.topgoback.Users.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +16,9 @@ import java.util.List;
 public class PassengerService {
     @Autowired
     private PassengerRepository passengerRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     public Passenger addOne(CreatePassengerDTO passengerDTO)
     {
@@ -25,6 +31,7 @@ public class PassengerService {
         passenger.setAddress(passengerDTO.getAddress());
         passenger.setPassword(passengerDTO.getPassword());
 
+        userRepository.save((User) passenger);
         passengerRepository.save(passenger);
         return passenger;
     }
@@ -51,13 +58,13 @@ public class PassengerService {
     public List<Passenger> findAll(){
         return passengerRepository.findAll();
     }
-
-    public List<Passenger> getPaginated(Integer page, Integer size){
-        List<Passenger> allPassengers = findAll();
-        List<Passenger> filteredPassengers = new ArrayList<Passenger>();
-        for(Integer i = page; i <=size; i ++){
-            filteredPassengers.add(allPassengers.get(i));
+    public List<CreatePassengerResponseDTO> convertToDTOList(List<Passenger> passengers){
+        List<CreatePassengerResponseDTO> passengersResponse = new ArrayList<CreatePassengerResponseDTO>();
+        for(Passenger passenger : passengers){
+            CreatePassengerResponseDTO createPassengerResponseDTO = new CreatePassengerResponseDTO(passenger);
+            passengersResponse.add(createPassengerResponseDTO);
         }
-        return filteredPassengers;
-    }
+        return passengersResponse;
+    };
+
 }

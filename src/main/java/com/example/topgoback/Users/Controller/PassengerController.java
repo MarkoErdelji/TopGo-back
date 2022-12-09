@@ -43,10 +43,12 @@ public class PassengerController {
         return new ResponseEntity<>(new CreatePassengerResponseDTO(passenger), HttpStatus.OK);
     }
     @GetMapping(consumes = "application/json")
-    public  ResponseEntity<PassengerListResponseDTO> getPaginated(@RequestParam Integer page, @RequestParam Integer size){
-        List<Passenger> passengers = passengerService.getPaginated(page, size);
+    public  ResponseEntity<PassengerListResponseDTO> getPaginated(@RequestParam Integer page,
+                                                                  @RequestParam Integer size){
+        List<Passenger> passengers = passengerService.findAll();
+        List<CreatePassengerResponseDTO> passengerListResponseDTOS = passengerService.convertToDTOList(passengers);
 
-        return new ResponseEntity<>(new PassengerListResponseDTO(passengers), HttpStatus.OK);
+        return new ResponseEntity<>(new PassengerListResponseDTO(passengerListResponseDTOS), HttpStatus.OK);
 
     }
 }

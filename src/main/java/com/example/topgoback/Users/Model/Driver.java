@@ -20,6 +20,7 @@ public class Driver extends User{
 
     public Driver(String firstName, String lastName, String profilePicture, String email, String password, String phoneNumber, String address, String driversLicense, boolean isActive, List<Ride> rides) {
         super(firstName, lastName, profilePicture,email, password, phoneNumber, address);
+
         this.driversLicense = driversLicense;
         this.isActive = isActive;
         this.rides = rides;

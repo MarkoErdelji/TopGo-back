@@ -1,36 +1,23 @@
 package com.example.topgoback.Users.DTO;
 
+import com.example.topgoback.Tools.PaginatedResponse;
 import com.example.topgoback.Users.Model.Passenger;
 
 import java.util.List;
 
-public class PassengerListResponseDTO {
-    private Integer count;
-    private List<Passenger> passengers;
+public class PassengerListResponseDTO extends PaginatedResponse {
+    private List<CreatePassengerResponseDTO> results;
 
-    public PassengerListResponseDTO(List<Passenger> passengers){
-        this.count = passengers.size();
-        this.passengers = passengers;
+    public PassengerListResponseDTO(List<CreatePassengerResponseDTO> passengers){
+        this.setTotalCount(passengers.size());
+        this.results = passengers;
+    }
+    public PassengerListResponseDTO (){};
+    public List<CreatePassengerResponseDTO> getPassengers() {
+        return results;
     }
 
-    public PassengerListResponseDTO(Integer count, List<Passenger> passengers) {
-        this.count = count;
-        this.passengers = passengers;
-    }
-
-    public Integer getCount() {
-        return count;
-    }
-
-    public void setCount(Integer count) {
-        this.count = count;
-    }
-
-    public List<Passenger> getPassengers() {
-        return passengers;
-    }
-
-    public void setPassengers(List<Passenger> passengers) {
-        this.passengers = passengers;
+    public void setPassengers(List<CreatePassengerResponseDTO> passengers) {
+        this.results = passengers;
     }
 }
