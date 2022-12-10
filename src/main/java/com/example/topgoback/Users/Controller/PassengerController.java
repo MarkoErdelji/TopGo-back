@@ -1,5 +1,7 @@
 package com.example.topgoback.Users.Controller;
 
+import com.example.topgoback.Rides.DTO.UserRidesListDTO;
+import com.example.topgoback.Rides.Service.RideService;
 import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.Passenger;
 import com.example.topgoback.Users.Service.PassengerService;
@@ -16,6 +18,9 @@ import java.util.List;
 public class PassengerController {
     @Autowired
     private PassengerService passengerService;
+
+    @Autowired
+    private RideService rideService;
 
     @PostMapping(consumes = "application/json")
     public ResponseEntity<CreatePassengerResponseDTO> create(@RequestBody CreatePassengerDTO createPassengerDTO){
@@ -48,5 +53,27 @@ public class PassengerController {
 
         return new ResponseEntity<>(passengers, HttpStatus.OK);
 
+    }
+
+    @GetMapping(value = "/activate/{activationId}")
+    public ResponseEntity<?> getActivation(){
+        return new ResponseEntity<>("Succesfull account activation", HttpStatus.OK);
+    }
+
+    @GetMapping(value = "{id}/ride")
+    public ResponseEntity<?> getRides(@PathVariable Integer id,
+                                          @RequestParam(required = false) Integer page,
+                                          @RequestParam(required = false) Integer size,
+                                          @RequestParam(required = false) String sort,
+                                          @RequestParam(required = false) String beginDateInterval,
+                                          @RequestParam(required = false) String endDateInterval) {
+
+        UserRidesListDTO rides = rideService.findRidesByPassengerId(id);
+        if(rides == null){
+            return new ResponseEntity<>("Passenger has no rides!",HttpStatus.NOT_FOUND);
+        }
+        else {
+            return new ResponseEntity<>(rides, HttpStatus.OK);
+        }
     }
 }

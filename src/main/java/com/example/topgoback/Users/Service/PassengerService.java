@@ -29,16 +29,25 @@ public class PassengerService {
         passenger.setEmail(passengerDTO.getEmail());
         passenger.setAddress(passengerDTO.getAddress());
         passenger.setPassword(passengerDTO.getPassword());
+        passenger.setId(123);
 
-        userRepository.save((User) passenger);
-        passengerRepository.save(passenger);
+        //userRepository.save((User) passenger);
+        //passengerRepository.save(passenger);
         return passenger;
     }
 
     public Passenger findById(Integer id)
     {
-
-        return (passengerRepository.findById(id).orElseGet(null));
+        Passenger passenger = new Passenger();
+        passenger.setFirstName("Pera");
+        passenger.setLastName("Peric");
+        passenger.setProfilePicture("U3dhZ2dlciByb2Nrcw==");
+        passenger.setPhoneNumber("+381123123");
+        passenger.setEmail("pera.peric@email.com");
+        passenger.setAddress("Bulevar Oslobodjenja 74");
+        passenger.setId(123);
+        //return (passengerRepository.findById(id).orElseGet(null));
+        return passenger;
     }
 
     public Passenger update(CreatePassengerDTO createPassengerDTO, Passenger passenger){
@@ -49,8 +58,8 @@ public class PassengerService {
         passenger.setEmail(createPassengerDTO.getEmail());
         passenger.setAddress(createPassengerDTO.getAddress());
         passenger.setPassword(createPassengerDTO.getPassword());
-
-        passengerRepository.save(passenger);
+        passenger.setId(123);
+        // passengerRepository.save(passenger);
         return passenger;
     }
 
