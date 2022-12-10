@@ -41,4 +41,14 @@ public class RideService {
 //           return userRides;
 //       }
         }
+    public UserRidesListDTO findRidesByPassengerId(int passengerId) {
+
+        UserRidesListDTO userRidesListDTO = new UserRidesListDTO();
+        userRidesListDTO.setTotalCount(243);
+        ArrayList<UserRideDTO> userRides = new ArrayList<>();
+        userRides.add(UserRideDTO.getMockupData());
+        userRidesListDTO.setResults(userRides);
+
+        return userRidesListDTO;
+    }
 }

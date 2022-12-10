@@ -26,7 +26,7 @@ public class User {
     @Column(name = "lastName", nullable = false)
     private String lastName;
 
-    @Column(name = "profilePicture", nullable = false)
+    @Column(name = "profilePicture", nullable = true)
     private String profilePicture;
     @Column(name = "email", nullable = false)
     private String email;
@@ -36,14 +36,14 @@ public class User {
     private String phoneNumber;
     @Column(name = "address", nullable = false)
     private String address;
-    @Column(name = "isBlocked", nullable = false)
-    private boolean isBlocked;
+
     @Column(name = "isActive", nullable = false)
     private boolean isActive;
+    @Column(name = "isBlocked", nullable = false)
+    private boolean isBlocked;
 
 
     public User(){};
-
     public User(CreateUserDTO userDTO){
         this.firstName = userDTO.getName();
         this.lastName = userDTO.getSurname();
@@ -55,14 +55,17 @@ public class User {
         this.isBlocked = false;
         this.isActive = false;
     }
+
     public User(String firstName, String lastName, String profilePicture, String email, String password, String phoneNumber, String address) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.profilePicture = profilePicture;
         this.email = email;
         this.profilePicture = profilePicture;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.address = address;
+        this.isActive = true;
         this.isBlocked = false;
         this.isActive = false;
     }
@@ -77,6 +80,11 @@ public class User {
 
     public String getFirstName() {
         return firstName;
+    }
+
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     public void setFirstName(String firstName) {
@@ -131,6 +139,7 @@ public class User {
         this.address = address;
     }
 
+
     public boolean isBlocked() {
         return isBlocked;
     }
@@ -143,8 +152,5 @@ public class User {
         return isActive;
     }
 
-    public void setActive(boolean active) {
-        isActive = active;
-    }
 
 }
