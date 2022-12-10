@@ -6,6 +6,7 @@ import com.example.topgoback.Users.DTO.AllDriversDTO;
 import com.example.topgoback.Users.DTO.CreateDriverDTO;
 import com.example.topgoback.Users.DTO.DriverInfoDTO;
 import com.example.topgoback.Users.Model.Driver;
+import com.example.topgoback.Users.Service.DriverMokupService;
 import com.example.topgoback.Users.Service.DriverService;
 import com.example.topgoback.Vehicles.DTO.CreateVehicleDTO;
 import com.example.topgoback.Vehicles.DTO.VehicleInfoDTO;
@@ -23,7 +24,7 @@ import java.util.List;
 @RequestMapping(value = "api/driver")
 public class DriverController {
     @Autowired
-    private DriverService driverService;
+    private DriverMokupService driverService;
 
     @Autowired
     WorkHoursService workHoursService;

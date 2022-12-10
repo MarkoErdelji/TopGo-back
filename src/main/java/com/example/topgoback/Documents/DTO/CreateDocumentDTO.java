@@ -4,7 +4,6 @@ public class CreateDocumentDTO {
 
     private String name;
     private String documentImage;
-    private Integer driverId;
 
     public CreateDocumentDTO() {
     }
@@ -25,11 +24,4 @@ public class CreateDocumentDTO {
         this.documentImage = documentImage;
     }
 
-    public Integer getDriverId() {
-        return driverId;
-    }
-
-    public void setDriverId(Integer driverId) {
-        this.driverId = driverId;
-    }
 }

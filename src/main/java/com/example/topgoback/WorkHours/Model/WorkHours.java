@@ -3,20 +3,17 @@ package com.example.topgoback.WorkHours.Model;
 import com.example.topgoback.Users.Model.Driver;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 @Entity
 public class WorkHours {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private LocalDateTime start;
-    private LocalDateTime end;
+    private LocalDateTime startHours;
+    private LocalDateTime endHours;
     @OneToOne
-    @JoinColumn(name="driver_id", unique=false, nullable=true)
+    @JoinColumn(name = "driver_id")
     private Driver driver;
-    public WorkHours() {
-    }
 
     public Integer getId() {
         return id;
@@ -26,20 +23,20 @@ public class WorkHours {
         this.id = id;
     }
 
-    public LocalDateTime getStart() {
-        return start;
+    public LocalDateTime getStartHours() {
+        return startHours;
     }
 
-    public void setStart(LocalDateTime start) {
-        this.start = start;
+    public void setStartHours(LocalDateTime startHours) {
+        this.startHours = startHours;
     }
 
-    public LocalDateTime getEnd() {
-        return end;
+    public LocalDateTime getEndHours() {
+        return endHours;
     }
 
-    public void setEnd(LocalDateTime end) {
-        this.end = end;
+    public void setEndHours(LocalDateTime endHours) {
+        this.endHours = endHours;
     }
 
     public Driver getDriver() {

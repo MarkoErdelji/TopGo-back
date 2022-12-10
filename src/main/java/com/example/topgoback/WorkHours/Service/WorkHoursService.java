@@ -1,5 +1,7 @@
 package com.example.topgoback.WorkHours.Service;
 
+import com.example.topgoback.Users.Model.Driver;
+import com.example.topgoback.Users.Repository.DriverRepository;
 import com.example.topgoback.WorkHours.DTO.DriverWorkHoursDTO;
 import com.example.topgoback.WorkHours.DTO.WorkHoursDTO;
 import com.example.topgoback.WorkHours.Model.WorkHours;
@@ -14,16 +16,19 @@ public class WorkHoursService {
 
     @Autowired
     WorkHoursRepository workHoursRepository;
+    @Autowired
+    DriverRepository driverRepository;
 
     public DriverWorkHoursDTO getAllWorkHours(Integer driverId) {
+        Driver driver = driverRepository.findById(driverId).orElse(null);
         DriverWorkHoursDTO allHours = new DriverWorkHoursDTO();
-        List<WorkHours> workHours = workHoursRepository.getWorkHoursByDriverId(driverId);
+        List<WorkHours> workHours = workHoursRepository.findByDriver(driver);
         for (WorkHours w: workHours
              ) {
             WorkHoursDTO whd = new WorkHoursDTO();
-            whd.setEnd(w.getEnd());
-            whd.setStart(whd.getStart());
-            whd.setId(whd.getId());
+            whd.setEnd(w.getEndHours());
+            whd.setStart(w.getEndHours());
+            whd.setId(w.getId());
             allHours.getResults().add(whd);
 
         }
