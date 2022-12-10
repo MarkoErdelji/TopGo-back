@@ -1,22 +1,33 @@
 package com.example.topgoback.Users.Model;
 
+import com.example.topgoback.Messages.Model.Message;
+import com.example.topgoback.Users.DTO.CreateUserDTO;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import static jakarta.persistence.InheritanceType.TABLE_PER_CLASS;
 
 @Entity
+@Table(name="users")
 @Inheritance(strategy=TABLE_PER_CLASS)
 public class User {
+
     @Id
     @SequenceGenerator(name = "mySeqGenV1", sequenceName = "mySeqV1", initialValue = 1, allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenV1")
+    @Column(name="id")
     private Integer id;
     @Column(name = "firstName", nullable = false)
     private String firstName;
     @Column(name = "lastName", nullable = false)
     private String lastName;
+
+    @Column(name = "profilePicture", nullable = false)
+    private String profilePicture;
     @Column(name = "email", nullable = false)
     private String email;
     @Column(name = "password", nullable = false)
@@ -27,23 +38,40 @@ public class User {
     private String address;
     @Column(name = "isBlocked", nullable = false)
     private boolean isBlocked;
+    @Column(name = "isActive", nullable = false)
+    private boolean isActive;
+
 
     public User(){};
-    public User(String firstName, String lastName, String email, String password, String phoneNumber, String address) {
+
+    public User(CreateUserDTO userDTO){
+        this.firstName = userDTO.getName();
+        this.lastName = userDTO.getSurname();
+        this.email = userDTO.getEmail();
+        this.password = userDTO.getPassword();
+        this.profilePicture = userDTO.getProfilePicture();
+        this.phoneNumber = userDTO.getTelephoneNumber();
+        this.address = userDTO.getAddress();
+        this.isBlocked = false;
+        this.isActive = false;
+    }
+    public User(String firstName, String lastName, String profilePicture, String email, String password, String phoneNumber, String address) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.profilePicture = profilePicture;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.address = address;
         this.isBlocked = false;
+        this.isActive = false;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -61,6 +89,14 @@ public class User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 
     public String getEmail() {
@@ -87,8 +123,6 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-
-
     public String getAddress() {
         return address;
     }
@@ -104,4 +138,13 @@ public class User {
     public void setBlocked(boolean blocked) {
         isBlocked = blocked;
     }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
 }

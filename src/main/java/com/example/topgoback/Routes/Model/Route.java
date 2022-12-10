@@ -22,8 +22,6 @@ public class Route {
     @Column(name = "price")
     private float price;
 
-    public Route() {
-    }
 
     public Route(GeoLocation start, GeoLocation finish) {
         this.start = start;
@@ -31,6 +29,10 @@ public class Route {
         this.lenght = lenght;
         this.estimatedTime = estimatedTime;
         this.price = price;
+    }
+
+    public Route() {
+
     }
 
     public int getId() {

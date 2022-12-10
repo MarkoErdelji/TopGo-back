@@ -23,15 +23,6 @@ public class Driver extends User{
     public Driver() {
     }
 
-
-    public Vehicle getVehicle() {
-        return vehicle;
-    }
-
-    public void setVehicle(Vehicle vehicle) {
-        this.vehicle = vehicle;
-    }
-
     public List<Document> getDocuments() {
         return documents;
     }
@@ -40,10 +31,12 @@ public class Driver extends User{
         this.documents = documents;
     }
 
+    @Override
     public boolean isActive() {
         return isActive;
     }
 
+    @Override
     public void setActive(boolean active) {
         isActive = active;
     }
@@ -55,4 +48,13 @@ public class Driver extends User{
     public void setRides(List<Ride> rides) {
         this.rides = rides;
     }
+
+    public Vehicle getVehicle() {
+        return vehicle;
+    }
+
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
+    }
 }
+
