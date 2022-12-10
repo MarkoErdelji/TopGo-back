@@ -21,7 +21,7 @@ public class NoteService {
         NoteResponseDTO noteResponseDTO = new NoteResponseDTO();
         noteResponseDTO.setMessage(note.getMessage());
         noteResponseDTO.setId(10);
-        noteResponseDTO.setTimeOfPosting(LocalDateTime.now());
+        noteResponseDTO.setDate(LocalDateTime.now());
         return noteResponseDTO;
        // noteRepository.save(note);
     }
@@ -32,7 +32,7 @@ public class NoteService {
         NoteResponseDTO noteResponseDTO = new NoteResponseDTO();
         noteResponseDTO.setId(10);
         noteResponseDTO.setMessage("The passenger has requested and after that aborted the ride");
-        noteResponseDTO.setTimeOfPosting(LocalDateTime.now());
+        noteResponseDTO.setDate(LocalDateTime.now());
         List<NoteResponseDTO> noteResponseDTOList = new ArrayList<>();
         noteResponseDTOList.add(noteResponseDTO);
         userNoteListDTO.setResults(noteResponseDTOList);
