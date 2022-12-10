@@ -1,5 +1,7 @@
 package com.example.topgoback.GeoLocations.DTO;
 
+import com.example.topgoback.GeoLocations.Model.GeoLocation;
+
 public class GeoLocationDTO {
 
     private String address;
@@ -7,6 +9,15 @@ public class GeoLocationDTO {
     private float latitude;
 
     private float longitude;
+
+    public GeoLocationDTO(GeoLocation location) {
+        this.address = location.getAddress();
+        this.latitude = location.getLatitude();
+        this.longitude = location.getLongitude();
+    }
+
+    public GeoLocationDTO() {
+    }
 
     public String getAddress() {
         return address;

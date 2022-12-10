@@ -22,6 +22,7 @@ public class Route {
     @Column(name = "price")
     private float price;
 
+
     public Route(GeoLocation start, GeoLocation finish) {
         this.start = start;
         this.finish = finish;

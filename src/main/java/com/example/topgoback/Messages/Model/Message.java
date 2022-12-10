@@ -1,6 +1,7 @@
 package com.example.topgoback.Messages.Model;
 
 import com.example.topgoback.Enums.MessageType;
+import com.example.topgoback.Users.Model.Driver;
 import com.example.topgoback.Users.Model.User;
 import jakarta.persistence.*;
 
