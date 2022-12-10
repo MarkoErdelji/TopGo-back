@@ -22,7 +22,7 @@ public class ReviewController {
 
 
         CreateReviewResponseDTO createReviewResponseDTO = reviewService.addVehicleReview(rideId,id,createReviewDTO);
-        return new ResponseEntity<>(createReviewResponseDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(createReviewResponseDTO, HttpStatus.OK);
     }
 
     @GetMapping(value = "vehicle/{id}")
@@ -30,7 +30,7 @@ public class ReviewController {
 
 
         VehicleReviewListDTO vehicleReviewListDTO = reviewService.getVehicleReviews(id);
-        return new ResponseEntity<>(vehicleReviewListDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(vehicleReviewListDTO, HttpStatus.OK);
     }
 
     @PostMapping(consumes = "application/json",value = "{rideId}/driver/{id}")
@@ -40,7 +40,7 @@ public class ReviewController {
 
 
         CreateReviewResponseDTO createReviewResponseDTO = reviewService.addDriverReview(rideId,id,createReviewDTO);
-        return new ResponseEntity<>(createReviewResponseDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(createReviewResponseDTO, HttpStatus.OK);
     }
 
     @GetMapping(value = "driver/{id}")
@@ -48,14 +48,14 @@ public class ReviewController {
 
 
         DriverReviewListDTO driverReviewListDTO = reviewService.getDriverReviews(id);
-        return new ResponseEntity<>(driverReviewListDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(driverReviewListDTO, HttpStatus.OK);
     }
 
     @GetMapping(value = "{id}")
     public ResponseEntity<List<RideReviewsDTO>> getRideReviews(@PathVariable(name="id") Integer id) {
 
         List<RideReviewsDTO> rideReviews = reviewService.getRideReviews(id);
-        return new ResponseEntity<>(rideReviews, HttpStatus.CREATED);
+        return new ResponseEntity<>(rideReviews, HttpStatus.OK);
     }
 
 }

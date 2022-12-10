@@ -7,7 +7,7 @@ public class NoteResponseDTO {
 
     private String message;
 
-    private LocalDateTime timeOfPosting;
+    private LocalDateTime date;
 
     public Integer getId() {
         return id;
@@ -25,11 +25,11 @@ public class NoteResponseDTO {
         this.message = message;
     }
 
-    public LocalDateTime getTimeOfPosting() {
-        return timeOfPosting;
+    public LocalDateTime getDate() {
+        return date;
     }
 
-    public void setTimeOfPosting(LocalDateTime timeOfPosting) {
-        this.timeOfPosting = timeOfPosting;
+    public void setDate(LocalDateTime date) {
+        this.date = date;
     }
 }

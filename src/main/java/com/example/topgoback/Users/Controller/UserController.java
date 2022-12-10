@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "api/user/")
+@RequestMapping(value = "api/user")
 public class UserController {
     @Autowired
     private UserService userService;
@@ -31,7 +31,7 @@ public class UserController {
     @Autowired
     private NoteService noteService;
 
-    @GetMapping(value = "/{id}/ride")
+    @GetMapping(value = "{id}/ride")
     public ResponseEntity<?> getUserRides(@PathVariable Integer id,
                                                      @RequestParam(required = false) Integer page,
                                                      @RequestParam(required = false) Integer size,
@@ -123,26 +123,26 @@ public class UserController {
     @PutMapping(value = "{id}/block")
     public ResponseEntity<?> blockUser(@PathVariable Integer id)
     {
-        User user = userService.findOne(id);
-        if(user == null){
-            return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
-        }
-
-        userService.blockUser(user);
-        return new ResponseEntity<>("User is successfuly blocked",HttpStatus.OK);
+//        User user = userService.findOne(id);
+//        if(user == null){
+//            return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
+//        }
+//
+//        userService.blockUser(user);
+        return new ResponseEntity<>("User is successfuly blocked",HttpStatus.NO_CONTENT);
 
     }
 
     @PutMapping(value = "{id}/unblock")
     public ResponseEntity<?> unblockUser(@PathVariable Integer id)
     {
-        User user = userService.findOne(id);
-        if(user == null){
-            return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
-        }
-
-        userService.unblockUser(user);
-        return new ResponseEntity<>("User is successfuly unblocked",HttpStatus.OK);
+//        User user = userService.findOne(id);
+//        if(user == null){
+//            return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
+//        }
+//
+//        userService.unblockUser(user);
+        return new ResponseEntity<>("User is successfuly unblocked",HttpStatus.NO_CONTENT);
 
     }
 

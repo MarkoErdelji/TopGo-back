@@ -15,7 +15,7 @@ public class UnregisteredUserController {
         UnregisteredUserAssumptionDTO unregisteredUserAssumptionDTO = new UnregisteredUserAssumptionDTO();
         unregisteredUserAssumptionDTO.setEstimatedCost(450);
         unregisteredUserAssumptionDTO.setEstimatedTimeInMinutes(10);
-        return new ResponseEntity<>(unregisteredUserAssumptionDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(unregisteredUserAssumptionDTO, HttpStatus.OK);
     }
 
 }
