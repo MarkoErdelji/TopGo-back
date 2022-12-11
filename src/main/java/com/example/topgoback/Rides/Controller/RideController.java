@@ -1,10 +1,8 @@
 package com.example.topgoback.Rides.Controller;
 
-import com.example.topgoback.PanicReport.DTO.PanicReportDTO;
+import com.example.topgoback.Panic.DTO.PanicDTO;
 import com.example.topgoback.Rides.DTO.CreateRideDTO;
 import com.example.topgoback.Rides.DTO.RideDTO;
-import com.example.topgoback.Rides.DTO.UserRideDTO;
-import org.hibernate.mapping.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,8 +37,8 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/panic", consumes = "application/json")
-    public ResponseEntity<PanicReportDTO> panic(@PathVariable Integer id, @RequestBody String reason){
-        return new ResponseEntity<>(PanicReportDTO.getMokap(), HttpStatus.OK);
+    public ResponseEntity<PanicDTO> panic(@PathVariable Integer id, @RequestBody String reason){
+        return new ResponseEntity<>(PanicDTO.getMokap(), HttpStatus.OK);
     }
 
 
