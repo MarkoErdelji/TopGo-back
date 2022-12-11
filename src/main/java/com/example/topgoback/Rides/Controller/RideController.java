@@ -32,4 +32,9 @@ public class RideController {
         return new ResponseEntity<>(RideDTO.getMockupData(), HttpStatus.OK);
     }
 
+    @PutMapping(value = "/{id}/withdraw")
+    public ResponseEntity<RideDTO> cancelRoute(@PathVariable Integer id){
+        return new ResponseEntity<>(RideDTO.getMockupData(), HttpStatus.OK);
+    }
+
 }

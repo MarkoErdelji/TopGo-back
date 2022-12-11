@@ -67,6 +67,7 @@ public class RideDTO {
 
 
     }
+
     public Integer getId() {
         return id;
     }
