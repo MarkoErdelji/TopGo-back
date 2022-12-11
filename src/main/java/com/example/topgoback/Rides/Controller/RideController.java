@@ -17,8 +17,8 @@ public class RideController {
 
         return new ResponseEntity<>(RideDTO.getMockupData(), HttpStatus.OK);
     }
-/*    @GetMapping(value = "/driver/{driverId}/active")
+    @GetMapping(value = "/driver/{driverId}/active")
     public ResponseEntity<RideDTO> getActiveRideForDriver(@PathVariable Integer driverId){
         return new ResponseEntity<>(RideDTO.getMockupData(), HttpStatus.OK);
-    }*/
+    }
 }
