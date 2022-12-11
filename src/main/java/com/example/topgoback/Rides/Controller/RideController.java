@@ -1,5 +1,6 @@
 package com.example.topgoback.Rides.Controller;
 
+import com.example.topgoback.PanicReport.DTO.PanicReportDTO;
 import com.example.topgoback.Rides.DTO.CreateRideDTO;
 import com.example.topgoback.Rides.DTO.RideDTO;
 import com.example.topgoback.Rides.DTO.UserRideDTO;
@@ -33,9 +34,15 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/withdraw")
-    public ResponseEntity<RideDTO> cancelRoute(@PathVariable Integer id){
+    public ResponseEntity<RideDTO> withdrawRoute(@PathVariable Integer id){
         return new ResponseEntity<>(RideDTO.getMockupData(), HttpStatus.OK);
     }
+
+    @PutMapping(value = "/{id}/panic", consumes = "application/json")
+    public ResponseEntity<PanicReportDTO> panic(@PathVariable Integer id, @RequestBody String reason){
+        return new ResponseEntity<>(PanicReportDTO.getMokap(), HttpStatus.OK);
+    }
+
 
     @PutMapping(value = "/{id}/accept")
     public ResponseEntity<RideDTO> acceptRoute(@PathVariable Integer id){
@@ -48,7 +55,7 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/cancel", consumes = "application/json")
-    public ResponseEntity<RideDTO> cancelRide(@PathVariable Integer id, @RequestBody String reason){
+    public ResponseEntity<RideDTO> cancelRoute(@PathVariable Integer id, @RequestBody String reason){
         return new ResponseEntity<>(RideDTO.getCanceledMockupData(), HttpStatus.OK);
     }
 
