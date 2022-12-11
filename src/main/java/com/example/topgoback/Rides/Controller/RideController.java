@@ -37,4 +37,9 @@ public class RideController {
         return new ResponseEntity<>(RideDTO.getMockupData(), HttpStatus.OK);
     }
 
+    @PutMapping(value = "/{id}/accept")
+    public ResponseEntity<RideDTO> acceptRoute(@PathVariable Integer id){
+        return new ResponseEntity<>(RideDTO.getAcceptedMockupData(), HttpStatus.OK);
+    }
+
 }

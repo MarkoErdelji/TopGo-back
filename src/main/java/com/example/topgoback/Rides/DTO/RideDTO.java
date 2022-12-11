@@ -68,6 +68,35 @@ public class RideDTO {
 
     }
 
+    public static RideDTO getAcceptedMockupData(){
+        RideDTO rideDTO = new RideDTO();
+        rideDTO.setId(123);
+        String str = "2017-07-21T17:45:14Z";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX");
+        LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
+        rideDTO.setStartTime(dateTime);
+        rideDTO.setTotalCost(1235);
+        rideDTO.setDriver(UserRef.getMockupData());
+        List<UserRef> passengerList = new ArrayList<>();
+        passengerList.add(UserRef.getMockupData());
+        rideDTO.setPassengers((ArrayList<UserRef>) passengerList);
+        rideDTO.setEstimatedTimeInMinutes(5);
+        rideDTO.setRejection(UserRejectionLetterDTO.getMockupData());
+        List<DepartureDestinationDTO> locations = new ArrayList<>();
+        rideDTO.setBabyTransport(true);
+        rideDTO.setPetTransport(true);
+        rideDTO.setVehicleType("STANDARDNO");
+        locations.add(DepartureDestinationDTO.getMockedData());
+        rideDTO.setLocations((ArrayList<DepartureDestinationDTO>) locations);
+        rideDTO.setStatus("ACCEPTED");
+
+
+        return rideDTO;
+
+
+    }
+
+
     public Integer getId() {
         return id;
     }
