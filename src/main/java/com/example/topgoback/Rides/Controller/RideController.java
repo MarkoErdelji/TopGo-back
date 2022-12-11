@@ -26,4 +26,10 @@ public class RideController {
     public ResponseEntity<RideDTO> getActiveRideForPassenger(@PathVariable Integer passengerId){
         return new ResponseEntity<>(RideDTO.getMockupData(), HttpStatus.OK);
     }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<RideDTO> getRide(@PathVariable Integer id){
+        return new ResponseEntity<>(RideDTO.getMockupData(), HttpStatus.OK);
+    }
+
 }
