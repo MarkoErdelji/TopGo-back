@@ -3,7 +3,6 @@ package com.example.topgoback.Panic.Service;
 import com.example.topgoback.Panic.DTO.GetAllPanicDTO;
 import com.example.topgoback.Panic.DTO.PanicDTO;
 import com.example.topgoback.Rides.DTO.UserRideDTO;
-import com.example.topgoback.Users.DTO.UserListDTO;
 import com.example.topgoback.Users.DTO.UserListResponseDTO;
 import org.springframework.stereotype.Service;
 
