@@ -1,18 +1,24 @@
 package com.example.topgoback.Rides.Controller;
 
 import com.example.topgoback.Rides.DTO.CreateRideDTO;
-import com.example.topgoback.Rides.DTO.RideResponseDTO;
+import com.example.topgoback.Rides.DTO.RideDTO;
+import com.example.topgoback.Rides.DTO.UserRideDTO;
+import org.hibernate.mapping.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "api/rides")
+@RequestMapping(value = "api/ride")
 public class RideController {
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<RideResponseDTO> save(@RequestBody CreateRideDTO createRideDTO){
+    public ResponseEntity<RideDTO> save(@RequestBody CreateRideDTO createRideDTO){
 
-        return new ResponseEntity<>(new RideResponseDTO(createRideDTO), HttpStatus.OK);
+        return new ResponseEntity<>(RideDTO.getMockupData(), HttpStatus.OK);
     }
+/*    @GetMapping(value = "/driver/{driverId}/active")
+    public ResponseEntity<RideDTO> getActiveRideForDriver(@PathVariable Integer driverId){
+        return new ResponseEntity<>(RideDTO.getMockupData(), HttpStatus.OK);
+    }*/
 }
