@@ -47,4 +47,9 @@ public class RideController {
         return new ResponseEntity<>(RideDTO.getFinishMockupData(), HttpStatus.OK);
     }
 
+    @PutMapping(value = "/{id}/cancel", consumes = "application/json")
+    public ResponseEntity<RideDTO> cancelRide(@PathVariable Integer id, @RequestBody String reason){
+        return new ResponseEntity<>(RideDTO.getCanceledMockupData(), HttpStatus.OK);
+    }
+
 }
