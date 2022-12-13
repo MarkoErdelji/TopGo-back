@@ -1,20 +1,19 @@
 package com.example.topgoback.Users.Service;
 
-import com.example.topgoback.Messages.Model.Message;
 import com.example.topgoback.Users.DTO.CreateUserDTO;
 import com.example.topgoback.Users.DTO.UserListDTO;
 import com.example.topgoback.Users.DTO.UserListResponseDTO;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Supplier;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
@@ -56,4 +55,12 @@ public class UserService {
     }
 
 
+    @Override
+    public User loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        User userRes = userRepository.findByEmail(username);
+        if(userRes == null)
+            throw new UsernameNotFoundException("Could not findUser with email = " + username);
+        return userRes;
+    }
 }
