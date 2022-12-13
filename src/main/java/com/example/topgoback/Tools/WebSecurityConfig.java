@@ -9,7 +9,9 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -48,9 +50,8 @@ public class WebSecurityConfig {
 				.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 				.authenticationProvider(authenticationProvider())
-				.authorizeRequests().requestMatchers("/**").permitAll()
-				.requestMatchers("/api/test/**").hasRole("USER")
-				.anyRequest().authenticated();
+				.authorizeHttpRequests((authz) -> authz.requestMatchers("/api/user/**").hasRole("USER").anyRequest().authenticated())
+				;
 
 		// http....;
 
@@ -65,6 +66,11 @@ public class WebSecurityConfig {
 		authProvider.setPasswordEncoder(passwordEncoder());
 
 		return authProvider;
+	}
+
+	@Bean
+	public WebSecurityCustomizer webSecurityCustomizer() {
+		return (web) -> web.ignoring().requestMatchers("/api/user/login", "/api/user/login/");
 	}
 
 
