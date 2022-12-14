@@ -24,6 +24,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "api/driver")
+@CrossOrigin(origins = "http://localhost:4200")
 public class DriverController {
     @Autowired
     private DriverMokupService driverService;

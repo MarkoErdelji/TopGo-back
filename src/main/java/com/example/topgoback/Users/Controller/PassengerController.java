@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "api/passenger")
+@CrossOrigin(origins = "http://localhost:4200")
 public class PassengerController {
     @Autowired
     private PassengerService passengerService;
