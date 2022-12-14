@@ -51,7 +51,6 @@ public class JwtTokenUtil implements Serializable {
     //generate token for user
     public String generateToken(User userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("email",userDetails.getEmail());
         claims.put("role",userDetails.getUserType());
         return doGenerateToken(claims, userDetails.getUsername());
     }
@@ -63,7 +62,7 @@ public class JwtTokenUtil implements Serializable {
     //   compaction of the JWT to a URL-safe string
     private String doGenerateToken(Map<String, Object> claims, String subject) {
 
-        return Jwts.builder().setClaims(claims).setSubject("ASFASFASFASFASFASFASFASF").setIssuedAt(new Date(System.currentTimeMillis()))
+        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
                 .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
