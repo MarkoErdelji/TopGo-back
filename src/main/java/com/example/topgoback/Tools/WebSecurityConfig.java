@@ -35,6 +35,9 @@ public class WebSecurityConfig {
 	private UserService jwtUserDetailsService;
 
 	@Autowired
+	private JwtRequestFilter jwtRequestFilter;
+
+	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 		// configure AuthenticationManager so that it knows from where to load
 		// user for matching credentials
@@ -56,13 +59,12 @@ public class WebSecurityConfig {
 		corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PUT","OPTIONS","PATCH", "DELETE"));
 		corsConfiguration.setAllowCredentials(true);
 		corsConfiguration.setExposedHeaders(List.of("Authorization"));
+		http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 		http.cors().configurationSource(request -> corsConfiguration).and().csrf().disable()
 				.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 				.authenticationProvider(authenticationProvider())
-				.authorizeHttpRequests((authz) -> authz.requestMatchers("/api/user/**").hasRole("USER").anyRequest().authenticated())
 				;
-
 		// http....;
 
 		return http.build();

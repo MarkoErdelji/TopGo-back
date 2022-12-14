@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -110,6 +111,7 @@ public class UserController implements AuthenticationManager{
 
 
     @GetMapping(value = "{id}/message")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getUsersMessages(@PathVariable Integer id)
     {
 //        User user = userService.findOne(id);
