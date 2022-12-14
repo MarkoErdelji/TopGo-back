@@ -190,6 +190,7 @@ public class UserController implements AuthenticationManager{
 
 
     @GetMapping(value = "{id}/note")
+    @PreAuthorize(value = "hasRole('USER')")
     public ResponseEntity<?> getUserNotes(@PathVariable Integer id,
                                         @RequestParam(required = false) Integer page,
                                       @RequestParam(required = false) Integer size)
