@@ -1,5 +1,6 @@
 package com.example.topgoback.Users.Service;
 
+import com.example.topgoback.Enums.UserType;
 import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.Passenger;
 import com.example.topgoback.Users.Model.User;
@@ -19,8 +20,11 @@ public class PassengerService {
     @Autowired
     private UserRepository userRepository;
 
-    public Passenger addOne(CreatePassengerDTO passengerDTO)
-    {
+    public Passenger addOne(CreatePassengerDTO passengerDTO) throws Exception {
+        User user = userRepository.findByEmail(passengerDTO.getEmail());
+        if(user == null){
+            throw new Exception();
+        }
         Passenger passenger = new Passenger();
         passenger.setFirstName(passengerDTO.getName());
         passenger.setLastName(passengerDTO.getSurname());
@@ -29,10 +33,8 @@ public class PassengerService {
         passenger.setEmail(passengerDTO.getEmail());
         passenger.setAddress(passengerDTO.getAddress());
         passenger.setPassword(passengerDTO.getPassword());
-        passenger.setId(123);
-
-        //userRepository.save((User) passenger);
-        //passengerRepository.save(passenger);
+        passenger.setUserType(UserType.USER);
+        passengerRepository.save(passenger);
         return passenger;
     }
 
