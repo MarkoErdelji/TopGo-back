@@ -216,6 +216,7 @@ public class UserController implements AuthenticationManager{
         if (user == null) {
             throw new BadCredentialsException("1000");
         }
+        String userPass = user.getPassword();
         if (!password.matches(user.getPassword())) {
             throw new BadCredentialsException("1000");
         }

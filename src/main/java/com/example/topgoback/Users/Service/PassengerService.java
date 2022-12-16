@@ -22,7 +22,7 @@ public class PassengerService {
 
     public Passenger addOne(CreatePassengerDTO passengerDTO) throws Exception {
         User user = userRepository.findByEmail(passengerDTO.getEmail());
-        if(user == null){
+        if(user != null){
             throw new Exception();
         }
         Passenger passenger = new Passenger();
