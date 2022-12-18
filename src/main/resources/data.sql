@@ -1,7 +1,7 @@
-insert into users (id,address,email,first_name,last_name,password,phone_number,profile_picture,is_active,is_blocked,user_type) values  (1,'test','test1','test','test','test','test','test',FALSE,FALSE,0);
-insert into users (id,address,email,first_name,last_name,password,phone_number,profile_picture,is_active,is_blocked,user_type) values  (2,'test','test2','test','test','test','test','test',FALSE,FALSE,1);
-insert into users (id,address,email,first_name,last_name,password,phone_number,profile_picture,is_active,is_blocked,user_type) values  (3,'test','test3','test','test','test','test','test',FALSE,FALSE,2);
-insert into users (id,address,email,first_name,last_name,password,phone_number,profile_picture,is_active,is_blocked,user_type) values  (4,'test','test4','test','test','test','test','test',FALSE,FALSE,1);
+insert into users (id,address,email,first_name,last_name,password,phone_number,profile_picture,is_active,is_blocked,user_type) values  (1,'test','test1','test','test','098f6bcd4621d373cade4e832627b4f6','test','test',FALSE,FALSE,0);
+insert into users (id,address,email,first_name,last_name,password,phone_number,profile_picture,is_active,is_blocked,user_type) values  (2,'test','test2','test','test','098f6bcd4621d373cade4e832627b4f6','test','test',FALSE,FALSE,1);
+insert into users (id,address,email,first_name,last_name,password,phone_number,profile_picture,is_active,is_blocked,user_type) values  (3,'test','test3','test','test','098f6bcd4621d373cade4e832627b4f6','test','test',FALSE,FALSE,2);
+insert into users (id,address,email,first_name,last_name,password,phone_number,profile_picture,is_active,is_blocked,user_type) values  (4,'test','test4','test','test','098f6bcd4621d373cade4e832627b4f6','test','test',FALSE,FALSE,1);
 
 -- alter table if exists messages add constraint sender_id_fk foreign key (sender_id) references users;
 -- alter table if exists messages add constraint receiver_id_fk foreign key (receiver_id) references users;
