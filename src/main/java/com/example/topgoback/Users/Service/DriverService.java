@@ -200,6 +200,19 @@ public class DriverService {
 
 
     }
+    public AllDriversDTO getActiveDrivers (){
+        List<Driver> drivers = driverRepository.findByIsActiveTrue();
+        List<DriverInfoDTO> driversDTO = new ArrayList<>();
+        for (Driver d:drivers
+        ) {
+            driversDTO.add(new DriverInfoDTO(d));
+        }
+        AllDriversDTO allActiveDrivers = new AllDriversDTO();
+        allActiveDrivers.setTotalCount(drivers.size());
+        allActiveDrivers.setResults(driversDTO);
+
+        return allActiveDrivers;
+    }
 
     public WorkHoursDTO addDriverWorkingHour(Integer workingHourId, WorkHoursDTO newWorkHour) {
         return null;
