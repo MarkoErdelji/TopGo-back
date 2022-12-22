@@ -31,12 +31,11 @@ public class Driver extends User{
         this.documents = documents;
     }
 
-    @Override
     public boolean isActive() {
         return isActive;
     }
 
-    @Override
+
     public void setActive(boolean active) {
         isActive = active;
     }

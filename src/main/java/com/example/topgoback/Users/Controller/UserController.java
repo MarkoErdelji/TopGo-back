@@ -9,17 +9,32 @@ import com.example.topgoback.Notes.Model.Note;
 import com.example.topgoback.Notes.Service.NoteService;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
 import com.example.topgoback.Rides.Service.RideService;
+import com.example.topgoback.Tools.JwtTokenUtil;
 import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import javax.print.attribute.standard.Media;
 
 @RestController
 @RequestMapping(value = "api/user")
-public class UserController {
+@CrossOrigin(origins = "http://localhost:4200")
+public class UserController implements AuthenticationManager{
+
+
     @Autowired
     private UserService userService;
 
@@ -30,6 +45,9 @@ public class UserController {
 
     @Autowired
     private NoteService noteService;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @GetMapping(value = "{id}/ride")
     public ResponseEntity<?> getUserRides(@PathVariable Integer id,
@@ -71,19 +89,29 @@ public class UserController {
         }
     }
 
-    @PostMapping(value = "/login")
+    @PostMapping(value = "/login",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@RequestBody LoginCredentialDTO loginCredentialDTO)
     {
-        //Dodati logiku za kreiranje tokena za usera
+        authenticate(new UsernamePasswordAuthenticationToken(loginCredentialDTO.getEmail(),loginCredentialDTO.getPassword()));
+
+        final User userDetails = userService
+                .loadUserByUsername(loginCredentialDTO.getEmail());
+
+        final String token = jwtTokenUtil.generateToken(userDetails);
+
         JWTTokenDTO jwtTokenDTO = new JWTTokenDTO();
 
-        jwtTokenDTO.setAccessToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
-        jwtTokenDTO.setRefreshToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
+        jwtTokenDTO.setAccessToken(token);
+        jwtTokenDTO.setRefreshToken(token);
 
-        return new ResponseEntity<>(jwtTokenDTO, HttpStatus.OK);
+        return ResponseEntity.ok(jwtTokenDTO);
+
     }
 
+
+
     @GetMapping(value = "{id}/message")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<?> getUsersMessages(@PathVariable Integer id)
     {
 //        User user = userService.findOne(id);
@@ -162,6 +190,7 @@ public class UserController {
 
 
     @GetMapping(value = "{id}/note")
+    @PreAuthorize(value = "hasRole('USER')")
     public ResponseEntity<?> getUserNotes(@PathVariable Integer id,
                                         @RequestParam(required = false) Integer page,
                                       @RequestParam(required = false) Integer size)
@@ -178,7 +207,22 @@ public class UserController {
     }
 
 
+    @Override
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        String username = authentication.getPrincipal() + "";
+        String password = authentication.getCredentials() + "";
 
-
-
+        User user = userService.loadUserByUsername(username);
+        if (user == null) {
+            throw new BadCredentialsException("1000");
+        }
+        String userPass = user.getPassword();
+        if (!password.matches(user.getPassword())) {
+            throw new BadCredentialsException("1000");
+        }
+        if (user.isBlocked()) {
+            throw new DisabledException("1001");
+        }
+        return new UsernamePasswordAuthenticationToken(username, null);
+    }
 }

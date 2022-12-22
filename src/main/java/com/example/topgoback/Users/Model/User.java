@@ -1,12 +1,17 @@
 package com.example.topgoback.Users.Model;
 
+import com.example.topgoback.Enums.UserType;
 import com.example.topgoback.Messages.Model.Message;
 import com.example.topgoback.Users.DTO.CreateUserDTO;
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import static jakarta.persistence.InheritanceType.TABLE_PER_CLASS;
@@ -14,7 +19,7 @@ import static jakarta.persistence.InheritanceType.TABLE_PER_CLASS;
 @Entity
 @Table(name="users")
 @Inheritance(strategy=TABLE_PER_CLASS)
-public class User {
+public class User implements UserDetails {
 
     @Id
     @SequenceGenerator(name = "mySeqGenV1", sequenceName = "mySeqV1", initialValue = 1, allocationSize = 1)
@@ -37,10 +42,11 @@ public class User {
     @Column(name = "address", nullable = false)
     private String address;
 
-    @Column(name = "isActive", nullable = false)
-    private boolean isActive;
     @Column(name = "isBlocked", nullable = false)
     private boolean isBlocked;
+
+    @Column(name="userType",nullable = false)
+    private UserType userType;
 
 
     public User(){};
@@ -53,10 +59,9 @@ public class User {
         this.phoneNumber = userDTO.getTelephoneNumber();
         this.address = userDTO.getAddress();
         this.isBlocked = false;
-        this.isActive = false;
     }
 
-    public User(String firstName, String lastName, String profilePicture, String email, String password, String phoneNumber, String address) {
+    public User(String firstName, String lastName, String profilePicture, String email, String password, String phoneNumber, String address,UserType userType) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.profilePicture = profilePicture;
@@ -65,9 +70,8 @@ public class User {
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.address = address;
-        this.isActive = true;
+        this.userType = userType;
         this.isBlocked = false;
-        this.isActive = false;
     }
 
     public Integer getId() {
@@ -82,10 +86,14 @@ public class User {
         return firstName;
     }
 
-
-    public void setActive(boolean active) {
-        isActive = active;
+    public UserType getUserType() {
+        return userType;
     }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
+    }
+
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
@@ -115,8 +123,40 @@ public class User {
         this.email = email;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_"+this.getUserType().toString()));
+        return authorities;
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return null;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
     }
 
     public void setPassword(String password) {
@@ -148,9 +188,6 @@ public class User {
         isBlocked = blocked;
     }
 
-    public boolean isActive() {
-        return isActive;
-    }
 
 
 }

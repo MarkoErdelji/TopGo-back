@@ -24,9 +24,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "api/driver")
+@CrossOrigin(origins = "http://localhost:4200")
 public class DriverController {
     @Autowired
-    private DriverMokupService driverService;
+    private DriverService driverService;
 
     @Autowired
     WorkHoursService workHoursService;
@@ -44,8 +45,12 @@ public class DriverController {
     public ResponseEntity<AllDriversDTO> getAllDrivers()
     {
         AllDriversDTO response = driverService.findAll();
-
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @GetMapping(value = "/active")
+    public ResponseEntity<AllDriversDTO> getActiveDrivers(){
+        AllDriversDTO activeDrivers = driverService.getActiveDrivers();
+        return new ResponseEntity<>(activeDrivers, HttpStatus.OK);
     }
 
 
