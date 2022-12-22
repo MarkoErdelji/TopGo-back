@@ -42,8 +42,6 @@ public class User implements UserDetails {
     @Column(name = "address", nullable = false)
     private String address;
 
-    @Column(name = "isActive", nullable = false)
-    private boolean isActive;
     @Column(name = "isBlocked", nullable = false)
     private boolean isBlocked;
 
@@ -61,7 +59,6 @@ public class User implements UserDetails {
         this.phoneNumber = userDTO.getTelephoneNumber();
         this.address = userDTO.getAddress();
         this.isBlocked = false;
-        this.isActive = false;
     }
 
     public User(String firstName, String lastName, String profilePicture, String email, String password, String phoneNumber, String address,UserType userType) {
@@ -73,10 +70,8 @@ public class User implements UserDetails {
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.address = address;
-        this.isActive = true;
         this.userType = userType;
         this.isBlocked = false;
-        this.isActive = false;
     }
 
     public Integer getId() {
@@ -99,9 +94,6 @@ public class User implements UserDetails {
         this.userType = userType;
     }
 
-    public void setActive(boolean active) {
-        isActive = active;
-    }
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
@@ -196,9 +188,6 @@ public class User implements UserDetails {
         isBlocked = blocked;
     }
 
-    public boolean isActive() {
-        return isActive;
-    }
 
 
 }
