@@ -6,6 +6,7 @@ import com.example.topgoback.Documents.DocumentRepository;
 import com.example.topgoback.Documents.Model.Document;
 import com.example.topgoback.GeoLocations.Model.GeoLocation;
 import com.example.topgoback.GeoLocations.Repository.GeoLocationRepository;
+import com.example.topgoback.Rides.DTO.UserRidesListDTO;
 import com.example.topgoback.Users.DTO.AllDriversDTO;
 import com.example.topgoback.Users.DTO.CreateDriverDTO;
 import com.example.topgoback.Users.DTO.DriverInfoDTO;
@@ -17,6 +18,8 @@ import com.example.topgoback.Vehicles.Model.Vehicle;
 import com.example.topgoback.Vehicles.Model.VehicleType;
 import com.example.topgoback.Vehicles.Repository.VehicleRepository;
 import com.example.topgoback.Vehicles.Repository.VehicleTypeRepository;
+import com.example.topgoback.WorkHours.DTO.DriverWorkHoursDTO;
+import com.example.topgoback.WorkHours.DTO.WorkHoursDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -70,9 +73,18 @@ public class DriverService {
         return new DriverInfoDTO(driver);
 
     }
-    public Driver findById(Integer id)
+    public DriverInfoDTO findById(Integer id)
     {
-        return (driverRepository.findById(id).orElse(null));
+        DriverInfoDTO driverdto = new DriverInfoDTO();
+        Driver driver  = driverRepository.findById(id).orElse(null);
+        driverdto.setId(driver.getId());
+        driverdto.setAddress(driver.getAddress());
+        driverdto.setEmail(driver.getEmail());
+        driverdto.setName(driver.getFirstName());
+        driverdto.setProfilePicture(driver.getProfilePicture());
+        driverdto.setSurname(driver.getLastName());
+        driverdto.setTelephoneNumber(driver.getPhoneNumber());
+        return (driverdto);
     }
 
     public DriverInfoDTO updateOne(DriverInfoDTO newDriver, Integer driverId) {
@@ -187,5 +199,21 @@ public class DriverService {
         return new VehicleInfoDTO(driver.getVehicle());
 
 
+    }
+
+    public WorkHoursDTO addDriverWorkingHour(Integer workingHourId, WorkHoursDTO newWorkHour) {
+        return null;
+    }
+
+    public WorkHoursDTO getDriverWorkHour(Integer workingHourId) {
+        return null;
+    }
+
+    public UserRidesListDTO getDriverRides(Integer driverId) {
+        return null;
+    }
+
+    public DriverWorkHoursDTO getAllWorkHours(Integer driverId) {
+        return null;
     }
 }

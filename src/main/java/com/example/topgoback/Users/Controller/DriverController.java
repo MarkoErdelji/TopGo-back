@@ -27,7 +27,7 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:4200")
 public class DriverController {
     @Autowired
-    private DriverMokupService driverService;
+    private DriverService driverService;
 
     @Autowired
     WorkHoursService workHoursService;
