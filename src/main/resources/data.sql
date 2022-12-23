@@ -11,11 +11,19 @@ WHERE id = 4;
 
 insert into drivers (id,address,email,first_name,last_name,password,phone_number,profile_picture,is_blocked,user_type,is_active,vehicle_id) values (5,'Tunguzija','kris@buba.com','Kristijan','Bubasvaba','098f6bcd4621d373cade4e832627b4f6','test','test',FALSE,1,TRUE,null);
 insert into geo_location (id,address,latitude,longitude) values (2,'Dejana Matica 5',45.246893,19.840011);
-insert into vehicle_type(id,price_by_km,vehicle_name) values (2,200,0);
+insert into vehicle_type(id,price_by_km,vehicle_name) values (2,200,1);
 insert into vehicle (id,for_animals,for_babies,licence_plate,model,seat_number,location_id,driver_id,type_id) values  (2,TRUE,TRUE,'top-g','Lamburdzini',4,2,5,2);
 UPDATE drivers
 SET vehicle_id = 2
 WHERE id = 5;
+
+insert into drivers (id,address,email,first_name,last_name,password,phone_number,profile_picture,is_blocked,user_type,is_active,vehicle_id) values (6,'Donja Dobrinja','deki@gmail.com','Dejan','Kanta','098f6bcd4621d373cade4e832627b4f6','test','test',FALSE,1,TRUE,null);
+insert into geo_location (id,address,latitude,longitude) values (3,'Tita 5',45.248113,19.816799);
+insert into vehicle_type(id,price_by_km,vehicle_name) values (3,300,2);
+insert into vehicle (id,for_animals,for_babies,licence_plate,model,seat_number,location_id,driver_id,type_id) values  (3,FALSE,FALSE,'100%','Mecka',2,3,6,3);
+UPDATE drivers
+SET vehicle_id = 3
+WHERE id = 6;
 
 
 -- alter table if exists messages add constraint sender_id_fk foreign key (sender_id) references users;
