@@ -1,5 +1,6 @@
 package com.example.topgoback.Users.Controller;
 
+import com.example.topgoback.Enums.UserType;
 import com.example.topgoback.Messages.DTO.SendMessageDTO;
 import com.example.topgoback.Messages.DTO.UserMessagesDTO;
 import com.example.topgoback.Messages.Service.MessageService;
@@ -7,6 +8,8 @@ import com.example.topgoback.Notes.DTO.NoteResponseDTO;
 import com.example.topgoback.Notes.DTO.UserNoteListDTO;
 import com.example.topgoback.Notes.Model.Note;
 import com.example.topgoback.Notes.Service.NoteService;
+import com.example.topgoback.PasswordResetTokens.Model.PasswordResetToken;
+import com.example.topgoback.PasswordResetTokens.Service.PasswordResetTokenService;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
 import com.example.topgoback.Rides.Service.RideService;
 import com.example.topgoback.Tools.JwtTokenUtil;
@@ -25,9 +28,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.print.attribute.standard.Media;
+import javax.security.auth.login.CredentialExpiredException;
 
 @RestController
 @RequestMapping(value = "api/user")
@@ -48,6 +53,9 @@ public class UserController implements AuthenticationManager{
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private PasswordResetTokenService passwordResetTokenService;
 
     @GetMapping(value = "{id}/ride")
     public ResponseEntity<?> getUserRides(@PathVariable Integer id,
@@ -204,6 +212,32 @@ public class UserController implements AuthenticationManager{
         else {
             return new ResponseEntity<>(userNotes, HttpStatus.OK);
         }
+    }
+
+
+    @PutMapping(value = "reset/{token}/{email}/{newPassword}")
+    public ResponseEntity<?> updateUserPasswordWithToken(@PathVariable String token, @PathVariable String email,@PathVariable String newPassword)
+    {
+        try{
+        PasswordResetToken passwordResetToken = passwordResetTokenService.findOne(token);
+        User user = userService.loadUserByUsername(email);
+
+        user.setPassword(newPassword);
+        userService.updateOne(user);
+        } catch( CredentialExpiredException ce){
+            return new ResponseEntity<>("Token expired", HttpStatus.EXPECTATION_FAILED);
+        }
+        catch(UsernameNotFoundException unfe){
+            return new ResponseEntity<>("Email not found",HttpStatus.NOT_FOUND);
+
+        }
+        catch (Exception e){
+            return new ResponseEntity<>("Token not found", HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>("Password successfuly updated",HttpStatus.OK);
+
+
     }
 
 
