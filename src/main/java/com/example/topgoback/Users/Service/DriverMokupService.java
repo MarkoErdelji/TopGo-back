@@ -39,6 +39,8 @@ public class DriverMokupService {
         DriverInfoDTO response = getDriverInfoDTO();
         List<DriverInfoDTO> drivers = new ArrayList<>();
         drivers.add(response);
+        drivers.add(response);
+        drivers.add(response);
         response1.setResults(drivers);
 
         return  response1;
