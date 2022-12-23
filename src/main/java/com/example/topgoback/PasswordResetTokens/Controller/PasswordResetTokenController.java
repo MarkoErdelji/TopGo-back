@@ -28,12 +28,13 @@ public class PasswordResetTokenController {
     @Autowired
     private PasswordResetTokenService passwordResetTokenService;
 
-    @PostMapping(consumes = "application/json")
-    public ResponseEntity<?> saveToken(@RequestBody String token) {
+    @PostMapping(consumes = "application/json", produces = "text/plain")
+    public ResponseEntity<String> saveToken(@RequestBody String token) {
 
         passwordResetTokenService.addOne(token);
 
-        return new ResponseEntity<>("Token saved successfuly", HttpStatus.OK);
+        String success = "Token saved successfuly";
+        return ResponseEntity.ok(success);
     }
 
 
