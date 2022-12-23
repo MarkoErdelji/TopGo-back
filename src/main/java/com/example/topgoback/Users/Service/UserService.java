@@ -1,5 +1,6 @@
 package com.example.topgoback.Users.Service;
 
+import com.example.topgoback.PasswordResetTokens.Model.PasswordResetToken;
 import com.example.topgoback.Users.DTO.CreateUserDTO;
 import com.example.topgoback.Users.DTO.UserListDTO;
 import com.example.topgoback.Users.DTO.UserListResponseDTO;
@@ -10,7 +11,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.security.auth.login.CredentialExpiredException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -35,6 +39,7 @@ public class UserService implements UserDetailsService {
     public User findOne(int id){
         return userRepository.findById(id).orElse(null);
     }
+
 
     public User addOne(CreateUserDTO userDTO) {
         User u = new User(userDTO);
@@ -62,5 +67,9 @@ public class UserService implements UserDetailsService {
         if(userRes == null)
             throw new UsernameNotFoundException("Could not findUser with email = " + username);
         return userRes;
+    }
+
+    public void updateOne(User user) {
+        userRepository.save(user);
     }
 }
