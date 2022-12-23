@@ -1,21 +1,35 @@
 package com.example.topgoback.PasswordResetTokens.Model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 public class PasswordResetToken {
     @Id
+    @SequenceGenerator(name = "mySeqGenV1", sequenceName = "mySeqV1", initialValue = 1, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenV1")
+    @Column(name="id")
+    private Integer id;
+
+    @Column
     private String token;
 
     @Column
     private LocalDateTime expirationTime;
 
     public PasswordResetToken(){};
-    public PasswordResetToken(String token, LocalDateTime expirationTime) {
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public PasswordResetToken(Integer id, String token, LocalDateTime expirationTime) {
+        this.id = id;
         this.token = token;
         this.expirationTime = expirationTime;
     }

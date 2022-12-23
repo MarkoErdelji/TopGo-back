@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.security.auth.login.CredentialExpiredException;
 import java.util.List;
 
 @RestController
@@ -39,11 +40,18 @@ public class PasswordResetTokenController {
 
 
     @GetMapping(value = "/{token}")
-    public ResponseEntity<PasswordResetToken> findToken(@PathVariable String token) {
+    public ResponseEntity<?> findToken(@PathVariable String token) {
 
-        PasswordResetToken passwordResetToken = passwordResetTokenService.findOne(token);
-
-        return new ResponseEntity<>(passwordResetToken, HttpStatus.OK);
+        try {
+            PasswordResetToken passwordResetToken = passwordResetTokenService.findOne(token);
+            return new ResponseEntity<>(passwordResetToken, HttpStatus.OK);
+        }
+        catch( CredentialExpiredException ce){
+            return new ResponseEntity<>("Token expired", HttpStatus.EXPECTATION_FAILED);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>("Token not found", HttpStatus.NOT_FOUND);
+        }
     }
 
 
@@ -51,9 +59,14 @@ public class PasswordResetTokenController {
     @DeleteMapping(value = "/{token}")
     public ResponseEntity<?> deleteToken(@PathVariable String token) {
 
-        passwordResetTokenService.deleteOne(token);
+        try {
+            passwordResetTokenService.deleteOne(token);
+            return new ResponseEntity<>("Token deleted successfuly", HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>("Token not found", HttpStatus.NOT_FOUND);
+        }
 
-        return new ResponseEntity<>("Token deleted successfuly", HttpStatus.OK);
     }
 
 
