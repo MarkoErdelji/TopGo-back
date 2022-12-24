@@ -42,7 +42,9 @@ public class WebSecurityConfig {
 		// configure AuthenticationManager so that it knows from where to load
 		// user for matching credentials
 		// Use BCryptPasswordEncoder
-		auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());
+		auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder())
+				.and()
+				.authenticationProvider(authenticationProvider());
 	}
 
 	@Bean
@@ -61,9 +63,12 @@ public class WebSecurityConfig {
 		corsConfiguration.setExposedHeaders(List.of("Authorization"));
 		http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 		http.cors().configurationSource(request -> corsConfiguration).and().csrf().disable().headers().frameOptions().disable().and()
+				.authorizeHttpRequests((authorize) -> authorize
+						.requestMatchers("/api/user/**").permitAll()
+						.requestMatchers("/api/user/login").permitAll()
+						.requestMatchers("/api/driver/**").hasAuthority("ROLE_DRIVER"))
 				.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-				.authenticationProvider(authenticationProvider());
 				;
 		// http....;
 
@@ -82,7 +87,7 @@ public class WebSecurityConfig {
 
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
-		return (web) -> web.ignoring().requestMatchers("/api/user/login", "/api/user/login/","/h2/**","api/passenger/","/api/email/","api/passwordResetToken*");
+		return (web) -> web.ignoring().requestMatchers("/api/user/login","/h2/**","api/passenger/","/api/email/","api/passwordResetToken*");
 	}
 
 
