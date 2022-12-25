@@ -1,18 +1,16 @@
 package com.example.topgoback.Users.Model;
 
 import com.example.topgoback.Enums.UserType;
-import com.example.topgoback.Messages.Model.Message;
 import com.example.topgoback.Users.DTO.CreateUserDTO;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDate;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+
 
 import static jakarta.persistence.InheritanceType.TABLE_PER_CLASS;
 
@@ -22,8 +20,8 @@ import static jakarta.persistence.InheritanceType.TABLE_PER_CLASS;
 public class User implements UserDetails {
 
     @Id
-    @SequenceGenerator(name = "mySeqGenV1", sequenceName = "mySeqV1", initialValue = 1, allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenV1")
+    @SequenceGenerator(name = "mySeqGenUser", sequenceName = "mySeqGenUser", initialValue = 7, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenUser")
     @Column(name="id")
     private Integer id;
     @Column(name = "firstName", nullable = false)
@@ -31,7 +29,7 @@ public class User implements UserDetails {
     @Column(name = "lastName", nullable = false)
     private String lastName;
 
-    @Column(name = "profilePicture", nullable = true)
+    @Column(name = "profilePicture", nullable = false)
     private String profilePicture;
     @Column(name = "email", nullable = false)
     private String email;
@@ -42,10 +40,10 @@ public class User implements UserDetails {
     @Column(name = "address", nullable = false)
     private String address;
 
-    @Column(name = "isBlocked", nullable = false)
+    @Column(name = "isBlocked", nullable = true)
     private boolean isBlocked;
 
-    @Column(name="userType",nullable = false)
+    @Column(name="userType",nullable = true)
     private UserType userType;
 
 
