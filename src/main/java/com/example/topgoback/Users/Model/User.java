@@ -29,7 +29,8 @@ public class User implements UserDetails {
     @Column(name = "lastName", nullable = false)
     private String lastName;
 
-    @Column(name = "profilePicture", nullable = false)
+
+    @Column(name = "profilePicture", nullable = true, length = 500000)
     private String profilePicture;
     @Column(name = "email", nullable = false)
     private String email;
