@@ -4,6 +4,7 @@ import com.example.topgoback.Documents.DTO.CreateDocumentDTO;
 import com.example.topgoback.Documents.DTO.DocumentInfoDTO;
 import com.example.topgoback.Documents.DocumentRepository;
 import com.example.topgoback.Documents.Model.Document;
+import com.example.topgoback.Enums.UserType;
 import com.example.topgoback.GeoLocations.Model.GeoLocation;
 import com.example.topgoback.GeoLocations.Repository.GeoLocationRepository;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
@@ -18,6 +19,7 @@ import com.example.topgoback.Vehicles.Model.Vehicle;
 import com.example.topgoback.Vehicles.Model.VehicleType;
 import com.example.topgoback.Vehicles.Repository.VehicleRepository;
 import com.example.topgoback.Vehicles.Repository.VehicleTypeRepository;
+import com.example.topgoback.Vehicles.Service.VehicleTypeService;
 import com.example.topgoback.WorkHours.DTO.DriverWorkHoursDTO;
 import com.example.topgoback.WorkHours.DTO.WorkHoursDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,8 @@ public class DriverService {
     @Autowired
     private VehicleRepository vehicleRepository;
 
+    private VehicleTypeService vehicleTypeService;
+
 
     public AllDriversDTO findAll() {
 
@@ -63,12 +67,14 @@ public class DriverService {
 
 
         Driver driver= new Driver();
+        driver.setProfilePicture(ddriver.getProfilePicture());
         driver.setFirstName(ddriver.getName());
         driver.setLastName(ddriver.getSurname());
         driver.setAddress(ddriver.getAddress());
         driver.setPhoneNumber(ddriver.getTelephoneNumber());
         driver.setPassword(ddriver.getPassword());
         driver.setEmail(ddriver.getEmail());
+        driver.setUserType(UserType.DRIVER);
 
         driverRepository.save(driver);
 
@@ -160,9 +166,14 @@ public class DriverService {
         updateLocation(location,newVehicle);
         geoLocationRepository.save(location);
 
-        VehicleType vehicleType = new VehicleType();
-        vehicleType.setVehicleName(newVehicle.vehicleType);
-        vehicleTypeRepository.save(vehicleType);
+
+        String vehileTypeName = newVehicle.vehicleType;
+        VehicleType vehicleType = switch (vehileTypeName) {
+            case "STANDARD" -> this.vehicleTypeRepository.findById(1).orElseGet(null);
+            case "LUXURY" -> this.vehicleTypeRepository.findById(2).orElseGet(null);
+            case "VAN" -> this.vehicleTypeRepository.findById(3).orElseGet(null);
+            default -> new VehicleType();
+        };
 
         Vehicle vehicle = new Vehicle();
         vehicle = updateVehicle(location,driver,vehicleType,vehicle,newVehicle);
@@ -204,6 +215,23 @@ public class DriverService {
         return new VehicleInfoDTO(driver.getVehicle());
 
 
+    }
+    public AllDriversDTO getActiveDrivers (){
+        List<Driver> drivers = driverRepository.findByIsActiveTrue();
+        List<DriverInfoDTO> driversDTO = new ArrayList<>();
+        for (Driver d:drivers
+        ) {
+            driversDTO.add(new DriverInfoDTO(d));
+        }
+        AllDriversDTO allActiveDrivers = new AllDriversDTO();
+        allActiveDrivers.setTotalCount(drivers.size());
+        allActiveDrivers.setResults(driversDTO);
+
+        return allActiveDrivers;
+    }
+
+    public Driver getByEmail(String email){
+        return this.driverRepository.findByEmail(email);
     }
 
     public WorkHoursDTO addDriverWorkingHour(Integer workingHourId, WorkHoursDTO newWorkHour) {

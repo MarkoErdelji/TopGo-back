@@ -23,8 +23,8 @@ import static jakarta.persistence.InheritanceType.TABLE_PER_CLASS;
 public class User implements UserDetails {
 
     @Id
-    @SequenceGenerator(name = "mySeqGenV1", sequenceName = "mySeqV1", initialValue = 1, allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenV1")
+    @SequenceGenerator(name = "mySeqGenUser", sequenceName = "mySeqGenUser", initialValue = 7, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenUser")
     @Column(name="id")
     private Integer id;
     @Column(name = "firstName", nullable = false)
@@ -32,7 +32,9 @@ public class User implements UserDetails {
     @Column(name = "lastName", nullable = false)
     private String lastName;
 
+
     @Column(name = "profilePicture", nullable = true,length = 500000)
+
     private String profilePicture;
     @Column(name = "email", nullable = false)
     private String email;

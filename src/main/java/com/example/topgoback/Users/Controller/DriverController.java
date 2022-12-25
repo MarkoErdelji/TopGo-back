@@ -47,8 +47,12 @@ public class DriverController {
     public ResponseEntity<AllDriversDTO> getAllDrivers()
     {
         AllDriversDTO response = driverService.findAll();
-
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @GetMapping(value = "/active")
+    public ResponseEntity<AllDriversDTO> getActiveDrivers(){
+        AllDriversDTO activeDrivers = driverService.getActiveDrivers();
+        return new ResponseEntity<>(activeDrivers, HttpStatus.OK);
     }
 
 
@@ -58,6 +62,15 @@ public class DriverController {
 
         DriverInfoDTO response = driverService.findById(driverId);
         return new ResponseEntity<>(response, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/{email}/byEmail")
+    public ResponseEntity<DriverInfoDTO> getDriverByEmail(@PathVariable String email)
+    {
+
+        Driver driver = driverService.getByEmail(email);
+        return new ResponseEntity<>(new DriverInfoDTO(driver), HttpStatus.OK);
 
     }
 

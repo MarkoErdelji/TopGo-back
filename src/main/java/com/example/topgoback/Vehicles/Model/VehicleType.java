@@ -1,15 +1,13 @@
 package com.example.topgoback.Vehicles.Model;
 
 import com.example.topgoback.Enums.VehicleName;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class VehicleType {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "mySeqGenVehicleType", sequenceName = "mySeqGenVehicleType", initialValue = 4, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenVehicleType")
     private Integer id;
     private VehicleName vehicleName;
     private float priceByKm;
