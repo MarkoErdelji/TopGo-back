@@ -63,6 +63,15 @@ public class DriverController {
 
     }
 
+    @GetMapping(value = "/{email}/byEmail")
+    public ResponseEntity<DriverInfoDTO> getDriverByEmail(@PathVariable String email)
+    {
+
+        Driver driver = driverService.getByEmail(email);
+        return new ResponseEntity<>(new DriverInfoDTO(driver), HttpStatus.OK);
+
+    }
+
     @PutMapping(value = "/{driverId}",consumes = "application/json")
     public ResponseEntity<DriverInfoDTO> updateDriver(@RequestBody DriverInfoDTO newDriver,@PathVariable Integer driverId)
     {
