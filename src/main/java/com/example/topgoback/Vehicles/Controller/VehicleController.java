@@ -4,6 +4,7 @@ import com.example.topgoback.GeoLocations.DTO.GeoLocationDTO;
 import com.example.topgoback.GeoLocations.Model.GeoLocation;
 import com.example.topgoback.Users.DTO.CreateDriverDTO;
 import com.example.topgoback.Users.DTO.DriverInfoDTO;
+import com.example.topgoback.Vehicles.DTO.VehicleInfoDTO;
 import com.example.topgoback.Vehicles.Service.VehicleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,4 +22,13 @@ public class VehicleController {
         GeoLocationDTO response = vehicleService.changeCurrentLocation(id);
         return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping(value = "type/{id}")
+    public ResponseEntity<Float> getVehicleType(@PathVariable Integer id) {
+
+        float response = vehicleService.getTypePrice(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
 }

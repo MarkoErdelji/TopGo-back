@@ -47,6 +47,7 @@ public class DriverController {
         AllDriversDTO response = driverService.findAll();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     @GetMapping(value = "/active")
     public ResponseEntity<AllDriversDTO> getActiveDrivers(){
         AllDriversDTO activeDrivers = driverService.getActiveDrivers();

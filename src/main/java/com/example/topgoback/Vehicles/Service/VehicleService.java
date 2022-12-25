@@ -5,6 +5,7 @@ import com.example.topgoback.GeoLocations.Model.GeoLocation;
 import com.example.topgoback.GeoLocations.Service.GeoLocationService;
 import com.example.topgoback.Vehicles.DTO.VehicleDTO;
 import com.example.topgoback.Vehicles.Model.Vehicle;
+import com.example.topgoback.Vehicles.Model.VehicleType;
 import com.example.topgoback.Vehicles.Repository.VehicleRepository;
 import com.example.topgoback.Vehicles.Repository.VehicleTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +15,8 @@ import org.springframework.stereotype.Service;
 public class VehicleService {
     @Autowired
     private VehicleRepository vehicleRepository;
-
-    private VehicleTypeService vehicleTypeService;
-
-    private GeoLocationService geoLocationService;
-
+    @Autowired
+    private VehicleTypeRepository vehicleTypeRepository;
 
     public GeoLocationDTO changeCurrentLocation(Integer id) {
         GeoLocationDTO response = new GeoLocationDTO();
@@ -28,10 +26,9 @@ public class VehicleService {
         return response;
     }
 
-    public VehicleDTO addOne(VehicleDTO vehicleDTO){
-        Vehicle vehicle = new Vehicle();
-        vehicle.setVehicleType(vehicleTypeService.findById(vehicleDTO.getTypeId()));
 
-        return vehicleDTO;
+    public float getTypePrice(Integer id) {
+        VehicleType vt = vehicleTypeRepository.findById(id).orElse(null);
+        return vt.getPriceByKm();
     }
 }

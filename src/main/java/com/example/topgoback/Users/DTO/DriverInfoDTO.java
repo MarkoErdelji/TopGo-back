@@ -29,7 +29,7 @@ public class DriverInfoDTO {
         this.id = driver.getId();
         this.name = driver.getFirstName();
         this.surname = driver.getLastName();
-        this.profilePicture = "placeholder";
+        this.profilePicture = driver.getProfilePicture();
         this.telephoneNumber = driver.getPhoneNumber();
         this.email = driver.getEmail();
         this.address = driver.getAddress();
