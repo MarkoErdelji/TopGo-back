@@ -20,6 +20,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collections;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -34,7 +35,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
 
-		System.out.println(request.getHeaderNames());
+
+		System.out.println(request.getRequestURL());
 		final String requestTokenHeader = request.getHeader("Authorization");
 
 		String username = null;

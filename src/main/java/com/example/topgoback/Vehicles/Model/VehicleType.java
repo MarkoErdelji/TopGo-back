@@ -11,7 +11,7 @@ public class VehicleType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String vehicleName;
+    private VehicleName vehicleName;
     private float priceByKm;
 
     public VehicleType() {
@@ -26,11 +26,11 @@ public class VehicleType {
     }
 
     public String getVehicleName() {
-        return vehicleName;
+        return vehicleName.name();
     }
 
     public void setVehicleName(String vehicleName) {
-        this.vehicleName = vehicleName;
+        this.vehicleName= VehicleName.valueOf(vehicleName);
     }
 
     public float getPriceByKm() {

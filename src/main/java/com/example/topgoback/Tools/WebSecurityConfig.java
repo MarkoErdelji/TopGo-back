@@ -42,9 +42,7 @@ public class WebSecurityConfig {
 		// configure AuthenticationManager so that it knows from where to load
 		// user for matching credentials
 		// Use BCryptPasswordEncoder
-		auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder())
-				.and()
-				.authenticationProvider(authenticationProvider());
+		auth.userDetailsService(jwtUserDetailsService).passwordEncoder(passwordEncoder());
 	}
 
 	@Bean
@@ -57,18 +55,15 @@ public class WebSecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
 		corsConfiguration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
-		corsConfiguration.setAllowedOrigins(List.of("http://localhost:4200"));
+		corsConfiguration.setAllowedOrigins(List.of("http://localhost:4200","http://localhost:8000"));
 		corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PUT","OPTIONS","PATCH", "DELETE"));
 		corsConfiguration.setAllowCredentials(true);
 		corsConfiguration.setExposedHeaders(List.of("Authorization"));
-		http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 		http.cors().configurationSource(request -> corsConfiguration).and().csrf().disable().headers().frameOptions().disable().and()
-				.authorizeHttpRequests((authorize) -> authorize
-						.requestMatchers("/api/user/**").permitAll()
-						.requestMatchers("/api/user/login").permitAll()
-						.requestMatchers("/api/driver/**").hasAuthority("ROLE_DRIVER"))
 				.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+				.authenticationProvider(authenticationProvider());
+		http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 				;
 		// http....;
 
@@ -87,7 +82,7 @@ public class WebSecurityConfig {
 
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
-		return (web) -> web.ignoring().requestMatchers("/api/user/login","/h2/**","api/passenger/","/api/email/","api/passwordResetToken*");
+		return (web) -> web.ignoring().requestMatchers("/api/user/login", "/api/user/login/","api/passenger/","/api/email/","api/passwordResetToken*");
 	}
 
 
