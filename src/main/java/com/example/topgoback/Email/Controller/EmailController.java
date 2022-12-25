@@ -41,6 +41,6 @@ public class EmailController {
         helper.setSubject(email.getSubject());
         helper.setText(email.getMessage(),true);
         mailSender.send(message);
-        return new ResponseEntity<>("Email sent successfuly", HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 }

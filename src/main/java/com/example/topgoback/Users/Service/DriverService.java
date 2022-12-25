@@ -23,7 +23,9 @@ import com.example.topgoback.Vehicles.Service.VehicleTypeService;
 import com.example.topgoback.WorkHours.DTO.DriverWorkHoursDTO;
 import com.example.topgoback.WorkHours.DTO.WorkHoursDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -185,8 +187,11 @@ public class DriverService {
 
     }
 
-    public VehicleInfoDTO getDriverVehicle(Integer driverId) {
+    public VehicleInfoDTO getDriverVehicle(Integer driverId) throws Exception {
         Driver driver = driverRepository.findById(driverId).orElse(null);
+        if(driver == null){
+            throw new Exception("Error: No driver found!");
+        }
         return new VehicleInfoDTO(driver.getVehicle());
 
     }

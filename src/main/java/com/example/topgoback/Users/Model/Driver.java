@@ -3,6 +3,7 @@ package com.example.topgoback.Users.Model;
 import com.example.topgoback.Documents.Model.Document;
 import com.example.topgoback.Rides.Model.Ride;
 import com.example.topgoback.Vehicles.Model.Vehicle;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public class Driver extends User{
     @Column(name="isActive", unique=false, nullable=true)
     private boolean isActive;
     @OneToMany(mappedBy = "driver", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Ride> rides;
     @OneToOne
     @JoinColumn(name="vehicle_id", unique=false, nullable=true)

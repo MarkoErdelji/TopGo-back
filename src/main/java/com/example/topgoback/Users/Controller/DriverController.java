@@ -17,6 +17,8 @@ import com.example.topgoback.WorkHours.Service.WorkHoursService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -83,11 +85,15 @@ public class DriverController {
 
 
     @GetMapping(value = "/{driverId}/documents")
-    public ResponseEntity<List<DocumentInfoDTO>> getDriverDocuments(@PathVariable Integer driverId)
+    public ResponseEntity<?> getDriverDocuments(@PathVariable Integer driverId)
         {
             List<DocumentInfoDTO> response = driverService.getDriverDocuments(driverId);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-
+            if(response == null){
+                return new ResponseEntity<>("Driver doesn't exist",HttpStatus.BAD_REQUEST);
+            }
+            else {
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            }
         }
 
     @PostMapping(consumes = "application/json",value = "/{driverId}/documents")
@@ -98,7 +104,7 @@ public class DriverController {
 
     }
     @DeleteMapping(value = "/document/{documentId}")
-    public ResponseEntity<Void> addDriverDocument(@PathVariable Integer documentId)
+    public ResponseEntity<Void> deleteDriverDocument(@PathVariable Integer documentId)
     {
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -113,10 +119,15 @@ public class DriverController {
     }
 
     @GetMapping(value = "/{driverId}/vehicle")
-    public ResponseEntity<VehicleInfoDTO> getDriverVehicle(@PathVariable Integer driverId)
+    public ResponseEntity<?> getDriverVehicle(@PathVariable Integer driverId)
     {
-        VehicleInfoDTO response = driverService.getDriverVehicle(driverId);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        try {
+            VehicleInfoDTO response = driverService.getDriverVehicle(driverId);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
     }
 
 
