@@ -3,6 +3,7 @@ package com.example.topgoback.Users.Model;
 import com.example.topgoback.Enums.UserType;
 import com.example.topgoback.Messages.Model.Message;
 import com.example.topgoback.Users.DTO.CreateUserDTO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -31,7 +32,9 @@ public class User implements UserDetails {
     @Column(name = "lastName", nullable = false)
     private String lastName;
 
-    @Column(name = "profilePicture", nullable = true, length = 500000)
+
+    @Column(name = "profilePicture", nullable = true,length = 500000)
+
     private String profilePicture;
     @Column(name = "email", nullable = false)
     private String email;
@@ -124,6 +127,7 @@ public class User implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_"+this.getUserType().toString()));

@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -37,7 +38,7 @@ import javax.security.auth.login.CredentialExpiredException;
 @RestController
 @RequestMapping(value = "api/user")
 @CrossOrigin(origins = "http://localhost:4200")
-public class UserController implements AuthenticationManager{
+public class UserController {
 
 
     @Autowired
@@ -57,6 +58,7 @@ public class UserController implements AuthenticationManager{
     @Autowired
     private PasswordResetTokenService passwordResetTokenService;
 
+    @PreAuthorize(value="hasAuthority('ROLE_USER')")
     @GetMapping(value = "{id}/ride")
     public ResponseEntity<?> getUserRides(@PathVariable Integer id,
                                                      @RequestParam(required = false) Integer page,
@@ -100,8 +102,6 @@ public class UserController implements AuthenticationManager{
     @PostMapping(value = "/login",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@RequestBody LoginCredentialDTO loginCredentialDTO)
     {
-        authenticate(new UsernamePasswordAuthenticationToken(loginCredentialDTO.getEmail(),loginCredentialDTO.getPassword()));
-
         final User userDetails = userService
                 .loadUserByUsername(loginCredentialDTO.getEmail());
 
@@ -119,7 +119,7 @@ public class UserController implements AuthenticationManager{
 
 
     @GetMapping(value = "{id}/message")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAuthority('ROLE_DRIVER')")
     public ResponseEntity<?> getUsersMessages(@PathVariable Integer id)
     {
 //        User user = userService.findOne(id);
@@ -241,22 +241,21 @@ public class UserController implements AuthenticationManager{
     }
 
 
-    @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        String username = authentication.getPrincipal() + "";
-        String password = authentication.getCredentials() + "";
 
-        User user = userService.loadUserByUsername(username);
-        if (user == null) {
-            throw new BadCredentialsException("1000");
+    @PostAuthorize("hasAuthority('ROLE_DRIVER')")
+    @GetMapping(value = "/{email}")
+    public ResponseEntity<?> getUserRefByEmail(@PathVariable String email)
+    {
+        try{
+            UserRef user = userService.loadUserReferenceByUsername(email);
+
+            return ResponseEntity.ok(user);
+        } catch(UsernameNotFoundException unfe){
+            return new ResponseEntity<>("Email not found",HttpStatus.NOT_FOUND);
+
         }
-        String userPass = user.getPassword();
-        if (!password.matches(user.getPassword())) {
-            throw new BadCredentialsException("1000");
-        }
-        if (user.isBlocked()) {
-            throw new DisabledException("1001");
-        }
-        return new UsernamePasswordAuthenticationToken(username, null);
+
     }
+
+
 }

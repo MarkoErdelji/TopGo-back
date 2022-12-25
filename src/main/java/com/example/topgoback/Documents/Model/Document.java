@@ -9,6 +9,7 @@ public class Document {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
+    @Column(length = 500000)
     private String documentImage;
     @ManyToOne
     private Driver driver;

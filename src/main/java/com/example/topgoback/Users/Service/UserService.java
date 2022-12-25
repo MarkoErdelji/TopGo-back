@@ -4,6 +4,7 @@ import com.example.topgoback.PasswordResetTokens.Model.PasswordResetToken;
 import com.example.topgoback.Users.DTO.CreateUserDTO;
 import com.example.topgoback.Users.DTO.UserListDTO;
 import com.example.topgoback.Users.DTO.UserListResponseDTO;
+import com.example.topgoback.Users.DTO.UserRef;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,18 @@ public class UserService implements UserDetailsService {
             throw new UsernameNotFoundException("Could not findUser with email = " + username);
         return userRes;
     }
+
+    public UserRef loadUserReferenceByUsername(String username){
+        User userRes = userRepository.findByEmail(username);
+        if(userRes == null)
+            throw new UsernameNotFoundException("Could not findUser with email = " + username);
+        UserRef userRef = new UserRef();
+        userRef.setId(userRes.getId());
+        userRef.setEmail(userRes.getEmail());
+        return userRef;
+
+    }
+
 
     public void updateOne(User user) {
         userRepository.save(user);

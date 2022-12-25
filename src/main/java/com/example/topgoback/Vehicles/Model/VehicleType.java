@@ -28,7 +28,7 @@ public class VehicleType {
     }
 
     public void setVehicleName(String vehicleName) {
-        this.vehicleName = VehicleName.valueOf(vehicleName);
+        this.vehicleName= VehicleName.valueOf(vehicleName);
     }
 
     public float getPriceByKm() {
