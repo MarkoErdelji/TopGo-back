@@ -1,18 +1,17 @@
 package com.example.topgoback.Users.Service;
 
 import com.example.topgoback.PasswordResetTokens.Model.PasswordResetToken;
-import com.example.topgoback.Users.DTO.CreateUserDTO;
-import com.example.topgoback.Users.DTO.UserListDTO;
-import com.example.topgoback.Users.DTO.UserListResponseDTO;
-import com.example.topgoback.Users.DTO.UserRef;
+import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.CredentialExpiredException;
+import javax.security.auth.login.CredentialNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -22,6 +21,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public UserListDTO findAll() {
 
@@ -67,6 +69,17 @@ public class UserService implements UserDetailsService {
         User userRes = userRepository.findByEmail(username);
         if(userRes == null)
             throw new UsernameNotFoundException("Could not findUser with email = " + username);
+        return userRes;
+    }
+
+    public User login(LoginCredentialDTO loginCredentialDTO) throws CredentialNotFoundException,UsernameNotFoundException {
+        User userRes = userRepository.findByEmail(loginCredentialDTO.getEmail());
+        if(userRes == null)
+            throw new UsernameNotFoundException("Could not findUser with email = " + loginCredentialDTO.getEmail());
+        boolean isPasswordMatching = passwordEncoder.matches(loginCredentialDTO.getPassword(),userRes.getPassword());
+        if(!isPasswordMatching) {
+            throw new CredentialNotFoundException("Wrong password!");
+        }
         return userRes;
     }
 
