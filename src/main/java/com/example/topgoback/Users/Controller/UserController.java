@@ -129,22 +129,25 @@ public class UserController {
     }
 
 
-    @PostMapping(value = "{id}/resetPassword",consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> login(@PathVariable Integer id,@RequestBody LoginCredentialDTO loginCredentialDTO)
+    @PutMapping(value = "{id}/changePassword",consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> changeUserPassword(@PathVariable Integer id,@RequestBody ChangePasswordDTO changePasswordDTO)
     {
-        final User userDetails = userService
-                .loadUserByUsername(loginCredentialDTO.getEmail());
-
-        final String token = jwtTokenUtil.generateToken(userDetails);
-
-        JWTTokenDTO jwtTokenDTO = new JWTTokenDTO();
-
-        jwtTokenDTO.setAccessToken(token);
-        jwtTokenDTO.setRefreshToken(token);
-
-        return ResponseEntity.ok(jwtTokenDTO);
+        User user = userService.findOne(id);
+        if(user != null){
+            try {
+                userService.changeUserPassword(user, changePasswordDTO);
+                return new ResponseEntity<>("Password successfully changed!",HttpStatus.NO_CONTENT);
+            }
+            catch (CredentialNotFoundException credentialNotFoundException){
+                return new ResponseEntity<>("Current password is not matching!",HttpStatus.BAD_REQUEST);
+            }
+        }
+        else{
+            return new ResponseEntity<>("No such user with id:" + id,HttpStatus.NOT_FOUND);
+        }
 
     }
+
 
 
 //    @PostMapping(value = "/login",consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -287,11 +290,10 @@ public class UserController {
     public ResponseEntity<?> updateUserPasswordWithToken(@PathVariable String token, @PathVariable String email,@PathVariable String newPassword)
     {
         try{
-        PasswordResetToken passwordResetToken = passwordResetTokenService.findOne(token);
+        passwordResetTokenService.findOne(token);
         User user = userService.loadUserByUsername(email);
 
-        user.setPassword(newPassword);
-        userService.updateOne(user);
+        userService.updateUserPassword(user,newPassword);
         } catch( CredentialExpiredException ce){
             return new ResponseEntity<>("Token expired", HttpStatus.EXPECTATION_FAILED);
         }

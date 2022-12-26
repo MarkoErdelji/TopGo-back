@@ -1,6 +1,5 @@
 package com.example.topgoback.Users.Service;
 
-import com.example.topgoback.PasswordResetTokens.Model.PasswordResetToken;
 import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Repository.UserRepository;
@@ -10,11 +9,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.security.auth.login.CredentialExpiredException;
 import javax.security.auth.login.CredentialNotFoundException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -81,6 +77,19 @@ public class UserService implements UserDetailsService {
             throw new CredentialNotFoundException("Wrong password!");
         }
         return userRes;
+    }
+
+    public void changeUserPassword(User user,ChangePasswordDTO changePasswordDTO) throws CredentialNotFoundException {
+        if (!passwordEncoder.matches(changePasswordDTO.getOld_password(),user.getPassword())){
+            throw new CredentialNotFoundException("Old password does not match");
+        }
+        user.setPassword(passwordEncoder.encode(changePasswordDTO.getNew_password()));
+        userRepository.save(user);
+    }
+
+    public void updateUserPassword(User user,String NewPassword) throws CredentialNotFoundException {
+        user.setPassword(passwordEncoder.encode(NewPassword));
+        userRepository.save(user);
     }
 
     public UserRef loadUserReferenceByUsername(String username){
