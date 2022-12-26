@@ -1,5 +1,6 @@
 package com.example.topgoback.Users.Service;
 
+import ch.qos.logback.core.encoder.EchoEncoder;
 import com.example.topgoback.Documents.DTO.CreateDocumentDTO;
 import com.example.topgoback.Documents.DTO.DocumentInfoDTO;
 import com.example.topgoback.Documents.DocumentRepository;
@@ -24,6 +25,7 @@ import com.example.topgoback.WorkHours.DTO.DriverWorkHoursDTO;
 import com.example.topgoback.WorkHours.DTO.WorkHoursDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -43,6 +45,9 @@ public class DriverService {
     private VehicleTypeRepository vehicleTypeRepository;
     @Autowired
     private VehicleRepository vehicleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private VehicleTypeService vehicleTypeService;
 
@@ -72,7 +77,8 @@ public class DriverService {
         driver.setLastName(ddriver.getSurname());
         driver.setAddress(ddriver.getAddress());
         driver.setPhoneNumber(ddriver.getTelephoneNumber());
-        driver.setPassword(ddriver.getPassword());
+        String hashedPassword = passwordEncoder.encode(ddriver.getPassword());
+        driver.setPassword(hashedPassword);
         driver.setEmail(ddriver.getEmail());
         driver.setUserType(UserType.DRIVER);
 
