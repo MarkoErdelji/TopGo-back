@@ -107,6 +107,7 @@ public class DriverService {
         driver.setFirstName(newDriver.getName());
         driver.setLastName(newDriver.getSurname());
         driver.setPhoneNumber(newDriver.getTelephoneNumber());
+        driver.setProfilePicture(newDriver.getProfilePicture());
         driver.setAddress(newDriver.getAddress());
         driver.setEmail(newDriver.getEmail());
 

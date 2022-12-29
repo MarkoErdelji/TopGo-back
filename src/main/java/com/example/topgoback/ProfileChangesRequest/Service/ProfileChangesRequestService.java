@@ -1,5 +1,7 @@
 package com.example.topgoback.ProfileChangesRequest.Service;
 
+import com.example.topgoback.ProfileChangesRequest.DTO.AllProfileChangesRequestsDTO;
+import com.example.topgoback.ProfileChangesRequest.DTO.ProfileChangeRequestDTO;
 import com.example.topgoback.ProfileChangesRequest.Model.ProfileChangesRequest;
 import com.example.topgoback.ProfileChangesRequest.Repository.ProfileChangesRequestRepository;
 import com.example.topgoback.Users.DTO.DriverInfoDTO;
@@ -8,6 +10,8 @@ import com.example.topgoback.Users.Repository.DriverRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,5 +39,26 @@ public class ProfileChangesRequestService {
             throw new Exception("Driver is not present");
         }
         profileChangesRequestRepository.save(profileChangesRequest);
+    }
+    public AllProfileChangesRequestsDTO getAll(){
+        AllProfileChangesRequestsDTO allProfileChangesRequestsDTO = new AllProfileChangesRequestsDTO();
+
+
+        List<ProfileChangeRequestDTO> pcrDTOS = new ArrayList<ProfileChangeRequestDTO>();
+        for(ProfileChangesRequest prc: this.profileChangesRequestRepository.findAll()){
+            ProfileChangeRequestDTO pcrDTO = new ProfileChangeRequestDTO();
+            pcrDTO.setId(prc.getId());
+            pcrDTO.setAddress(prc.getAddress());
+            pcrDTO.setDriverId(prc.getDriver().getId());
+            pcrDTO.setEmail(prc.getEmail());
+            pcrDTO.setFirstName(prc.getFirstName());
+            pcrDTO.setLastName(prc.getLastName());
+            pcrDTO.setPhoneNumber(prc.getPhoneNumber());
+            pcrDTO.setProfilePicture(prc.getProfilePicture());
+            pcrDTOS.add(pcrDTO);
+        }
+        allProfileChangesRequestsDTO.setProfileChangeRequestDTOS(pcrDTOS);
+        allProfileChangesRequestsDTO.setCount(pcrDTOS.size());
+        return allProfileChangesRequestsDTO;
     }
 }

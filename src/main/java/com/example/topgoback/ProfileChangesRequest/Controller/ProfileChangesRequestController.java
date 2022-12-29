@@ -1,15 +1,13 @@
 package com.example.topgoback.ProfileChangesRequest.Controller;
 
+import com.example.topgoback.ProfileChangesRequest.DTO.AllProfileChangesRequestsDTO;
 import com.example.topgoback.ProfileChangesRequest.Service.ProfileChangesRequestService;
 import com.example.topgoback.Users.DTO.DriverInfoDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping(value = "api/profileChangesRequest")
@@ -30,4 +28,9 @@ public class ProfileChangesRequestController {
             return new ResponseEntity<>("Error: Request could not be created",HttpStatus.BAD_REQUEST);
         }
     }
+    @GetMapping
+    public ResponseEntity<AllProfileChangesRequestsDTO> getAll(){
+        return new ResponseEntity<>(profileChangesRequestService.getAll(), HttpStatus.OK);
+    }
+
 }

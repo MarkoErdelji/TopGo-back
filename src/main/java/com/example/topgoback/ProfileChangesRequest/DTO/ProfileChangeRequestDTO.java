@@ -1,32 +1,25 @@
-package com.example.topgoback.ProfileChangesRequest.Model;
+package com.example.topgoback.ProfileChangesRequest.DTO;
 
 import com.example.topgoback.Users.Model.Driver;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
 
-@Entity
-public class ProfileChangesRequest {
-    @Id
-    @SequenceGenerator(name = "mySeqGenV1Req", sequenceName = "mySeqV1Req", initialValue = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenV1Req")
-    @Column(name="id")
-    private Long id;
-    
-    @ManyToOne
-    private Driver driver;
+public class ProfileChangeRequestDTO {
+
+    private long id;
+    private long driverId;
     private String firstName;
     private String lastName;
     private String email;
     private String phoneNumber;
     private String address;
-    @Column(length = 500000)
     private String profilePicture;
 
-    public ProfileChangesRequest() {
+    public ProfileChangeRequestDTO() {
     }
 
-    public ProfileChangesRequest(Long id, Driver driver, String firstName, String lastName, String email, String phoneNumber, String address, String profilePicture) {
+    public ProfileChangeRequestDTO(int id, int driverId, String firstName, String lastName, String email, String phoneNumber, String address, String profilePicture) {
         this.id = id;
-        this.driver = driver;
+        this.driverId = driverId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -35,12 +28,20 @@ public class ProfileChangesRequest {
         this.profilePicture = profilePicture;
     }
 
-    public Driver getDriver() {
-        return driver;
+    public long getId() {
+        return id;
     }
 
-    public void setDriver(Driver driver) {
-        this.driver = driver;
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getDriverId() {
+        return driverId;
+    }
+
+    public void setDriverId(long driverId) {
+        this.driverId = driverId;
     }
 
     public String getFirstName() {
@@ -89,13 +90,5 @@ public class ProfileChangesRequest {
 
     public void setProfilePicture(String profilePicture) {
         this.profilePicture = profilePicture;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
     }
 }
