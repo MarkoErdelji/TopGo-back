@@ -1,23 +1,38 @@
 package com.example.topgoback.Users.Model;
 
+import com.example.topgoback.Enums.UserType;
+import com.example.topgoback.Users.DTO.CreateUserDTO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDate;
+
+import java.util.ArrayList;
+import java.util.Collection;
+
 
 import static jakarta.persistence.InheritanceType.TABLE_PER_CLASS;
 
 @Entity
+@Table(name="users")
 @Inheritance(strategy=TABLE_PER_CLASS)
-public class User {
+public class User implements UserDetails {
+
     @Id
-    @SequenceGenerator(name = "mySeqGenV1", sequenceName = "mySeqV1", initialValue = 1, allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenV1")
+    @SequenceGenerator(name = "mySeqGenUser", sequenceName = "mySeqGenUser", initialValue = 7, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenUser")
+    @Column(name="id")
     private Integer id;
     @Column(name = "firstName", nullable = false)
     private String firstName;
     @Column(name = "lastName", nullable = false)
     private String lastName;
-    @Column(name = "profilePicture", nullable = true)
+
+
+    @Column(name = "profilePicture", nullable = true, length = 500000)
+
     private String profilePicture;
     @Column(name = "email", nullable = false)
     private String email;
@@ -28,29 +43,43 @@ public class User {
     @Column(name = "address", nullable = false)
     private String address;
 
-    @Column(name = "isActive", nullable = false)
-    private boolean isActive;
-    @Column(name = "isBlocked", nullable = false)
+    @Column(name = "isBlocked", nullable = true)
     private boolean isBlocked;
 
+    @Column(name="userType",nullable = true)
+    private UserType userType;
+
+
     public User(){};
-    public User(String firstName, String lastName, String profilePicture, String email, String password, String phoneNumber, String address) {
+    public User(CreateUserDTO userDTO){
+        this.firstName = userDTO.getName();
+        this.lastName = userDTO.getSurname();
+        this.email = userDTO.getEmail();
+        this.password = userDTO.getPassword();
+        this.profilePicture = userDTO.getProfilePicture();
+        this.phoneNumber = userDTO.getTelephoneNumber();
+        this.address = userDTO.getAddress();
+        this.isBlocked = false;
+    }
+
+    public User(String firstName, String lastName, String profilePicture, String email, String password, String phoneNumber, String address,UserType userType) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.profilePicture = profilePicture;
         this.email = email;
+        this.profilePicture = profilePicture;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.address = address;
-        this.isActive = true;
+        this.userType = userType;
         this.isBlocked = false;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -58,10 +87,14 @@ public class User {
         return firstName;
     }
 
-
-    public void setActive(boolean active) {
-        isActive = active;
+    public UserType getUserType() {
+        return userType;
     }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
+    }
+
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
@@ -91,8 +124,41 @@ public class User {
         this.email = email;
     }
 
+    @Override
+    @JsonIgnore
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_"+this.getUserType().toString()));
+        return authorities;
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return null;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
     }
 
     public void setPassword(String password) {
@@ -107,21 +173,12 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
-
-
     public String getAddress() {
         return address;
     }
 
     public void setAddress(String address) {
         this.address = address;
-    }
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public boolean isActive() {
-        return isActive;
     }
 
 
@@ -132,4 +189,7 @@ public class User {
     public void setBlocked(boolean blocked) {
         isBlocked = blocked;
     }
+
+
+
 }

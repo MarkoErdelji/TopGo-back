@@ -2,7 +2,7 @@ package com.example.topgoback.Users.DTO;
 
 import com.example.topgoback.Users.Model.Driver;
 
-public class CreateDriverResponseDTO {
+public class DriverInfoDTO {
     /*{
   "id": 123,
   "name": "Pera",
@@ -22,11 +22,14 @@ public class CreateDriverResponseDTO {
     private String address;
 
 
-    public CreateDriverResponseDTO(Driver driver) {
+    public DriverInfoDTO() {
+    }
+
+    public DriverInfoDTO(Driver driver) {
         this.id = driver.getId();
         this.name = driver.getFirstName();
         this.surname = driver.getLastName();
-        this.profilePicture = "placeholder";
+        this.profilePicture = driver.getProfilePicture();
         this.telephoneNumber = driver.getPhoneNumber();
         this.email = driver.getEmail();
         this.address = driver.getAddress();

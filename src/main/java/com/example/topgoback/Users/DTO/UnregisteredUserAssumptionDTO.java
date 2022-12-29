@@ -2,22 +2,22 @@ package com.example.topgoback.Users.DTO;
 
 public class UnregisteredUserAssumptionDTO {
 
-    private float assumedPrice;
-    private float assumedTimeInMinutes;
+    private float estimatedCost;
+    private float estimatedTimeInMinutes;
 
-    public float getAssumedPrice() {
-        return assumedPrice;
+    public float getEstimatedCost() {
+        return estimatedCost;
     }
 
-    public void setAssumedPrice(float assumedPrice) {
-        this.assumedPrice = assumedPrice;
+    public void setEstimatedCost(float assumedPrice) {
+        this.estimatedCost = assumedPrice;
     }
 
-    public float getAssumedTimeInMinutes() {
-        return assumedTimeInMinutes;
+    public float getEstimatedTimeInMinutes() {
+        return estimatedTimeInMinutes;
     }
 
-    public void setAssumedTimeInMinutes(float assumedTimeInMinutes) {
-        this.assumedTimeInMinutes = assumedTimeInMinutes;
+    public void setEstimatedTimeInMinutes(float estimatedTimeInMinutes) {
+        this.estimatedTimeInMinutes = estimatedTimeInMinutes;
     }
 }

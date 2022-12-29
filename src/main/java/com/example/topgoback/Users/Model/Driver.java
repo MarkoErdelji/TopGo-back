@@ -1,6 +1,9 @@
 package com.example.topgoback.Users.Model;
 
+import com.example.topgoback.Documents.Model.Document;
 import com.example.topgoback.Rides.Model.Ride;
+import com.example.topgoback.Vehicles.Model.Vehicle;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -8,34 +11,32 @@ import java.util.List;
 @Table(name="Drivers")
 public class Driver extends User{
 
-    @Column(name="driversLicense", unique=false, nullable=true)
-    private String driversLicense;
+    @OneToMany(mappedBy = "driver", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<Document> documents;
     @Column(name="isActive", unique=false, nullable=true)
     private boolean isActive;
     @OneToMany(mappedBy = "driver", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Ride> rides;
+    @OneToOne
+    @JoinColumn(name="vehicle_id", unique=false, nullable=true)
+    private Vehicle vehicle;
 
     public Driver() {
     }
 
-    public Driver(String firstName, String lastName, String profilePicture, String email, String password, String phoneNumber, String address, String driversLicense, boolean isActive, List<Ride> rides) {
-        super(firstName, lastName, profilePicture,email, password, phoneNumber, address);
-        this.driversLicense = driversLicense;
-        this.isActive = isActive;
-        this.rides = rides;
+    public List<Document> getDocuments() {
+        return documents;
     }
 
-    public String getDriversLicense() {
-        return driversLicense;
-    }
-
-    public void setDriversLicense(String driversLicense) {
-        this.driversLicense = driversLicense;
+    public void setDocuments(List<Document> documents) {
+        this.documents = documents;
     }
 
     public boolean isActive() {
         return isActive;
     }
+
 
     public void setActive(boolean active) {
         isActive = active;
@@ -48,4 +49,13 @@ public class Driver extends User{
     public void setRides(List<Ride> rides) {
         this.rides = rides;
     }
+
+    public Vehicle getVehicle() {
+        return vehicle;
+    }
+
+    public void setVehicle(Vehicle vehicle) {
+        this.vehicle = vehicle;
+    }
 }
+

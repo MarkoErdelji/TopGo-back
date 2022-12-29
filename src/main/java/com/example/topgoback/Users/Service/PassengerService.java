@@ -1,8 +1,11 @@
 package com.example.topgoback.Users.Service;
 
-import com.example.topgoback.Users.DTO.CreatePassengerDTO;
+import com.example.topgoback.Enums.UserType;
+import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.Passenger;
+import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Repository.PassengerRepository;
+import com.example.topgoback.Users.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +17,14 @@ public class PassengerService {
     @Autowired
     private PassengerRepository passengerRepository;
 
-    public Passenger addOne(CreatePassengerDTO passengerDTO)
-    {
+    @Autowired
+    private UserRepository userRepository;
+
+    public Passenger addOne(CreatePassengerDTO passengerDTO) throws Exception {
+        User user = userRepository.findByEmail(passengerDTO.getEmail());
+        if(user != null){
+            throw new Exception();
+        }
         Passenger passenger = new Passenger();
         passenger.setFirstName(passengerDTO.getName());
         passenger.setLastName(passengerDTO.getSurname());
@@ -24,15 +33,23 @@ public class PassengerService {
         passenger.setEmail(passengerDTO.getEmail());
         passenger.setAddress(passengerDTO.getAddress());
         passenger.setPassword(passengerDTO.getPassword());
-
+        passenger.setUserType(UserType.USER);
         passengerRepository.save(passenger);
         return passenger;
     }
 
     public Passenger findById(Integer id)
     {
-
-        return (passengerRepository.findById(id).orElseGet(null));
+        Passenger passenger = new Passenger();
+        passenger.setFirstName("Pera");
+        passenger.setLastName("Peric");
+        passenger.setProfilePicture("U3dhZ2dlciByb2Nrcw==");
+        passenger.setPhoneNumber("+381123123");
+        passenger.setEmail("pera.peric@email.com");
+        passenger.setAddress("Bulevar Oslobodjenja 74");
+        passenger.setId(123);
+        //return (passengerRepository.findById(id).orElseGet(null));
+        return passenger;
     }
 
     public Passenger update(CreatePassengerDTO createPassengerDTO, Passenger passenger){
@@ -43,21 +60,22 @@ public class PassengerService {
         passenger.setEmail(createPassengerDTO.getEmail());
         passenger.setAddress(createPassengerDTO.getAddress());
         passenger.setPassword(createPassengerDTO.getPassword());
-
-        passengerRepository.save(passenger);
+        passenger.setId(123);
+        // passengerRepository.save(passenger);
         return passenger;
     }
 
-    public List<Passenger> findAll(){
-        return passengerRepository.findAll();
+    public PassengerListDTO findAll(){
+        PassengerListDTO passengerListDTo = new PassengerListDTO();
+        passengerListDTo.setTotalCount(243);
+        ArrayList<PassengerListResponseDTO> passengerListResponseDTOS = new ArrayList<>();
+        passengerListResponseDTOS.add(PassengerListResponseDTO.getMockupData());
+        passengerListDTo.setResults(passengerListResponseDTOS);
+        if(passengerListDTo.getResults().isEmpty()){
+            return null;}
+        else{
+            return passengerListDTo;
+        }
     }
 
-    public List<Passenger> getPaginated(Integer page, Integer size){
-        List<Passenger> allPassengers = findAll();
-        List<Passenger> filteredPassengers = new ArrayList<Passenger>();
-        for(Integer i = page; i <=size; i ++){
-            filteredPassengers.add(allPassengers.get(i));
-        }
-        return filteredPassengers;
-    }
 }

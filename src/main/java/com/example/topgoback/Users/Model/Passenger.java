@@ -1,5 +1,6 @@
 package com.example.topgoback.Users.Model;
 
+import com.example.topgoback.Enums.UserType;
 import com.example.topgoback.Payments.Model.Payment;
 import com.example.topgoback.Rides.Model.Ride;
 import com.example.topgoback.Routes.Model.Route;
@@ -21,8 +22,9 @@ public class Passenger extends  User{
 
     }
 
-    public Passenger(String firstName, String lastName, String profilePicture, String email, String password, String phoneNumber, String address, List<Payment> payments, List<Ride> rides, List<Route> favouriteRoutes) {
-        super(firstName, lastName, profilePicture,email, password, phoneNumber, address);
+    public Passenger(String firstName, String lastName, String profilePicture,String email, String password, String phoneNumber, String address, List<Payment> payments, List<Ride> rides, List<Route> favouriteRoutes) {
+        super(firstName, lastName, email,profilePicture, password, phoneNumber, address, UserType.USER);
+
         this.payments = payments;
         this.rides = rides;
         this.favouriteRoutes = favouriteRoutes;
