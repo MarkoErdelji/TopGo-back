@@ -1,4 +1,4 @@
-insert into users (id,address,email,first_name,last_name,password,phone_number,profile_picture,is_blocked,user_type) values  (1,'test','test1','test','test','$2a$10$Wn4A5JzgizcMBttHv/MA7Omunwewqv5h6Wn1dbLmR9lp40bmxY0y6','test','test',FALSE,0);
+insert into users (id,address,email,first_name,last_name,password,phone_number,profile_picture,is_blocked,user_type) values  (1,'test','test1','test','test','$2a$10$Wn4A5JzgizcMBttHv/MA7Omunwewqv5h6Wn1dbLmR9lp40bmxY0y6','test','test',TRUE,0);
 insert into users (id,address,email,first_name,last_name,password,phone_number,profile_picture,is_blocked,user_type) values  (2,'test','test2','test','test','$2a$10$Wn4A5JzgizcMBttHv/MA7Omunwewqv5h6Wn1dbLmR9lp40bmxY0y6','test','test',FALSE,1);
 insert into users (id,address,email,first_name,last_name,password,phone_number,profile_picture,is_blocked,user_type) values  (3,'test','test3','test','test','$2a$10$Wn4A5JzgizcMBttHv/MA7Omunwewqv5h6Wn1dbLmR9lp40bmxY0y6','test','test',FALSE,2);
 

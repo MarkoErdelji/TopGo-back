@@ -68,13 +68,16 @@ public class UserService implements UserDetailsService {
         return userRes;
     }
 
-    public User login(LoginCredentialDTO loginCredentialDTO) throws CredentialNotFoundException,UsernameNotFoundException {
+    public User login(LoginCredentialDTO loginCredentialDTO) throws CredentialNotFoundException,UsernameNotFoundException,SecurityException {
         User userRes = userRepository.findByEmail(loginCredentialDTO.getEmail());
         if(userRes == null)
             throw new UsernameNotFoundException("Could not findUser with email = " + loginCredentialDTO.getEmail());
         boolean isPasswordMatching = passwordEncoder.matches(loginCredentialDTO.getPassword(),userRes.getPassword());
         if(!isPasswordMatching) {
-            throw new CredentialNotFoundException("Wrong password!");
+            throw new CredentialNotFoundException("Wrong password");
+        }
+        if(userRes.isBlocked()){
+            throw new SecurityException("User is blocked!");
         }
         return userRes;
     }
