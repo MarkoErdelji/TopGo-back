@@ -122,6 +122,9 @@ public class UserController {
 
             return ResponseEntity.ok(jwtTokenDTO);
         }
+        catch (SecurityException se){
+            return new ResponseEntity<>("User is blocked!",HttpStatus.BAD_REQUEST);
+        }
         catch (Exception e){
             return new ResponseEntity<>("Wrong username or password!",HttpStatus.BAD_REQUEST);
         }
