@@ -1,7 +1,5 @@
 package com.example.topgoback.Users.Controller;
 
-import com.example.topgoback.Email.Model.Email;
-import com.example.topgoback.Enums.UserType;
 import com.example.topgoback.Messages.DTO.SendMessageDTO;
 import com.example.topgoback.Messages.DTO.UserMessagesDTO;
 import com.example.topgoback.Messages.Service.MessageService;
@@ -9,36 +7,26 @@ import com.example.topgoback.Notes.DTO.NoteResponseDTO;
 import com.example.topgoback.Notes.DTO.UserNoteListDTO;
 import com.example.topgoback.Notes.Model.Note;
 import com.example.topgoback.Notes.Service.NoteService;
-import com.example.topgoback.PasswordResetTokens.Model.PasswordResetToken;
 import com.example.topgoback.PasswordResetTokens.Service.PasswordResetTokenService;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
 import com.example.topgoback.Rides.Service.RideService;
-import com.example.topgoback.Tools.JwtTokenUtil;
 import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Service.UserService;
-import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.print.attribute.standard.Media;
 import javax.security.auth.login.CredentialExpiredException;
-import javax.security.auth.login.CredentialNotFoundException;
 
 @RestController
 @RequestMapping(value = "api/user")
@@ -91,11 +79,17 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<?> getUsers(@RequestParam(required = false) Integer page,
-                                      @RequestParam(required = false) Integer size)
+                                      @RequestParam(required = false) Integer size,
+                                      Pageable pageable)
     {
-
-        UserListDTO users = userService.findAll();
-
+        if (page == null) {
+            page = 0;
+        }
+        if (size == null) {
+            size = 3;
+        }
+        pageable = (Pageable) PageRequest.of(page, size);
+        UserListDTO users = userService.findAll(pageable);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 

@@ -5,6 +5,8 @@ import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,7 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.security.auth.login.CredentialNotFoundException;
+import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,17 +33,20 @@ public class UserService implements UserDetailsService {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
-    public UserListDTO findAll() {
+    public UserListDTO findAll(Pageable pageable) {
+        System.out.println("Page number: " + pageable.getPageNumber());
+        System.out.println("Page size: " + pageable.getPageSize());
 
-        UserListDTO userListDTo = new UserListDTO();
-        userListDTo.setTotalCount(243);
-        ArrayList<UserListResponseDTO> userListResponseDTOS = new ArrayList<>();
-        userListResponseDTOS.add(UserListResponseDTO.getMockupData());
-        userListDTo.setResults(userListResponseDTOS);
-        if(userListDTo.getResults().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No users in database");
-        }
-        return userListDTo;
+        Page<User> page = userRepository.findAll(pageable);
+        List<UserListResponseDTO> userListResponseDTOS = UserListResponseDTO.convertToUserListResponseDTO(page.getContent());
+
+        // Print the total number of users in the repository
+        System.out.println("Total users: " + page.getTotalElements());
+        // Print the list of users that are being returned
+        System.out.println("Users: " + userListResponseDTOS);
+
+        UserListDTO users = new UserListDTO(new PageImpl<>(userListResponseDTOS, pageable, page.getTotalElements()));
+        return users;
     }
 
     public User findOne(int id){
