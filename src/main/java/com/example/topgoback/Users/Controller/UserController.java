@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +51,7 @@ public class UserController {
     private PasswordResetTokenService passwordResetTokenService;
 
     UserController(JavaMailSender mailSender){this.mailSender = mailSender;}
-    
+
     @GetMapping(value = "{id}/ride")
     public ResponseEntity<?> getUserRides(@PathVariable Integer id,
                                                      @RequestParam(required = false) Integer page,
@@ -87,7 +88,7 @@ public class UserController {
         if (size == null) {
             size = 3;
         }
-        pageable = (Pageable) PageRequest.of(page, size);
+        pageable = (Pageable) PageRequest.of(page, size, Sort.by("id").ascending());
         UserListDTO users = userService.findAll(pageable);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
@@ -148,12 +149,7 @@ public class UserController {
     @PutMapping(value = "{id}/block")
     public ResponseEntity<?> blockUser(@PathVariable Integer id)
     {
-//        User user = userService.findOne(id);
-//        if(user == null){
-//            return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
-//        }
-//
-//        userService.blockUser(user);
+        userService.blockUser(id);
         return new ResponseEntity<>("User is successfuly blocked",HttpStatus.NO_CONTENT);
 
     }
@@ -161,12 +157,7 @@ public class UserController {
     @PutMapping(value = "{id}/unblock")
     public ResponseEntity<?> unblockUser(@PathVariable Integer id)
     {
-//        User user = userService.findOne(id);
-//        if(user == null){
-//            return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
-//        }
-//
-//        userService.unblockUser(user);
+        userService.unblockUser(id);
         return new ResponseEntity<>("User is successfuly unblocked",HttpStatus.NO_CONTENT);
 
     }

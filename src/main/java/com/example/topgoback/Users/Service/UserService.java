@@ -66,15 +66,21 @@ public class UserService implements UserDetailsService {
         return u;}
 
 
-    public void blockUser(User user) {
+    public void blockUser(int userId) {
+        User user = findOne(userId);
+        if(user.isBlocked()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already blocked!");
+        }
         user.setBlocked(true);
-
         userRepository.save(user);
     }
 
-    public void unblockUser(User user) {
+    public void unblockUser(int userId) {
+        User user = findOne(userId);
+        if(!user.isBlocked()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User is not blocked!");
+        }
         user.setBlocked(false);
-
         userRepository.save(user);
     }
 
@@ -91,13 +97,13 @@ public class UserService implements UserDetailsService {
     public JWTTokenDTO login(LoginCredentialDTO loginCredentialDTO) throws ResponseStatusException {
         User userRes = userRepository.findByEmail(loginCredentialDTO.getEmail());
         if(userRes == null)
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Could not findUser with email = " + loginCredentialDTO.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Could not findUser with email = " + loginCredentialDTO.getEmail());
         boolean isPasswordMatching = passwordEncoder.matches(loginCredentialDTO.getPassword(),userRes.getPassword());
         if(!isPasswordMatching) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Wrong password");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Wrong password");
         }
         if(userRes.isBlocked()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User is blocked!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User is blocked!");
         }
         final String token = jwtTokenUtil.generateToken(userRes);
 
