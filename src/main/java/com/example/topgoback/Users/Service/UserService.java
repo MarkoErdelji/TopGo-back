@@ -1,16 +1,21 @@
 package com.example.topgoback.Users.Service;
 
+import com.example.topgoback.Tools.JwtTokenUtil;
 import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.security.auth.login.CredentialNotFoundException;
 import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -21,6 +26,9 @@ public class UserService implements UserDetailsService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
     public UserListDTO findAll() {
 
         UserListDTO userListDTo = new UserListDTO();
@@ -28,15 +36,20 @@ public class UserService implements UserDetailsService {
         ArrayList<UserListResponseDTO> userListResponseDTOS = new ArrayList<>();
         userListResponseDTOS.add(UserListResponseDTO.getMockupData());
         userListDTo.setResults(userListResponseDTOS);
-        if(userListDTo.getResults().isEmpty()){
-        return null;}
-        else{
-            return userListDTo;
+        if(userListDTo.getResults().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No users in database");
         }
+        return userListDTo;
     }
 
     public User findOne(int id){
-        return userRepository.findById(id).orElse(null);
+        Optional<User> user = userRepository.findById(id);
+        if(user.isPresent()){
+            return user.get();
+        }
+        else{
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User does not exist!");
+        }
     }
 
 
@@ -68,23 +81,31 @@ public class UserService implements UserDetailsService {
         return userRes;
     }
 
-    public User login(LoginCredentialDTO loginCredentialDTO) throws CredentialNotFoundException,UsernameNotFoundException,SecurityException {
+    public JWTTokenDTO login(LoginCredentialDTO loginCredentialDTO) throws ResponseStatusException {
         User userRes = userRepository.findByEmail(loginCredentialDTO.getEmail());
         if(userRes == null)
-            throw new UsernameNotFoundException("Could not findUser with email = " + loginCredentialDTO.getEmail());
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Could not findUser with email = " + loginCredentialDTO.getEmail());
         boolean isPasswordMatching = passwordEncoder.matches(loginCredentialDTO.getPassword(),userRes.getPassword());
         if(!isPasswordMatching) {
-            throw new CredentialNotFoundException("Wrong password");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Wrong password");
         }
         if(userRes.isBlocked()){
-            throw new SecurityException("User is blocked!");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User is blocked!");
         }
-        return userRes;
+        final String token = jwtTokenUtil.generateToken(userRes);
+
+        JWTTokenDTO jwtTokenDTO = new JWTTokenDTO();
+
+        jwtTokenDTO.setAccessToken(token);
+        jwtTokenDTO.setRefreshToken(token);
+
+        return jwtTokenDTO;
     }
 
-    public void changeUserPassword(User user,ChangePasswordDTO changePasswordDTO) throws CredentialNotFoundException {
+    public void changeUserPassword(int userId,ChangePasswordDTO changePasswordDTO) {
+        User user = findOne(userId);
         if (!passwordEncoder.matches(changePasswordDTO.getOld_password(),user.getPassword())){
-            throw new CredentialNotFoundException("Old password does not match");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Current password is not matching!");
         }
         user.setPassword(passwordEncoder.encode(changePasswordDTO.getNew_password()));
         userRepository.save(user);
