@@ -6,6 +6,10 @@ import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.Passenger;
 import com.example.topgoback.Users.Service.PassengerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -47,11 +51,17 @@ public class PassengerController {
         return new ResponseEntity<>(new CreatePassengerResponseDTO(passenger), HttpStatus.OK);
     }
     @GetMapping
-    public  ResponseEntity<?> getPaginated(@RequestParam Integer page,
-                                                                  @RequestParam Integer size){
-        PassengerListDTO passengers = passengerService.findAll();
-
-
+    public  ResponseEntity<?> getPaginated(@RequestParam(required = false) Integer page,
+                                           @RequestParam(required = false) Integer size,
+                                           Pageable pageable){
+        if(page == null){
+            page = 0;
+        }
+        if(size == null){
+            size = 10;
+        }
+        pageable = (Pageable) PageRequest.of(page, size, Sort.by("id").ascending());
+        PassengerListDTO passengers = passengerService.findAll(pageable);
         return new ResponseEntity<>(passengers, HttpStatus.OK);
 
     }

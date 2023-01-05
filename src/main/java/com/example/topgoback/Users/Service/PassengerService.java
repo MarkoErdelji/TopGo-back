@@ -7,6 +7,9 @@ import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Repository.PassengerRepository;
 import com.example.topgoback.Users.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -65,17 +68,12 @@ public class PassengerService {
         return passenger;
     }
 
-    public PassengerListDTO findAll(){
-        PassengerListDTO passengerListDTo = new PassengerListDTO();
-        passengerListDTo.setTotalCount(243);
-        ArrayList<PassengerListResponseDTO> passengerListResponseDTOS = new ArrayList<>();
-        passengerListResponseDTOS.add(PassengerListResponseDTO.getMockupData());
-        passengerListDTo.setResults(passengerListResponseDTOS);
-        if(passengerListDTo.getResults().isEmpty()){
-            return null;}
-        else{
-            return passengerListDTo;
-        }
+    public PassengerListDTO findAll(Pageable pageable){
+        Page<Passenger> page = passengerRepository.findAll( pageable);
+        List<PassengerListResponseDTO> passengerListResponseDTOS = PassengerListResponseDTO.convertToUserListResponseDTO(page.getContent());
+
+        PassengerListDTO passengers = new PassengerListDTO(new PageImpl<>(passengerListResponseDTOS,pageable, page.getTotalElements()));
+        return passengers;
     }
 
 }
