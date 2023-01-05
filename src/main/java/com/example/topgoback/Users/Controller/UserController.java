@@ -1,5 +1,6 @@
 package com.example.topgoback.Users.Controller;
 
+import com.example.topgoback.Enums.AllowedSortFields;
 import com.example.topgoback.Messages.DTO.SendMessageDTO;
 import com.example.topgoback.Messages.DTO.UserMessagesDTO;
 import com.example.topgoback.Messages.Service.MessageService;
@@ -14,10 +15,12 @@ import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +29,11 @@ import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.security.auth.login.CredentialExpiredException;
+import java.time.LocalDateTime;
+import java.util.Arrays;
 
 @RestController
 @RequestMapping(value = "api/user")
@@ -54,18 +60,43 @@ public class UserController {
 
     @GetMapping(value = "{id}/ride")
     public ResponseEntity<?> getUserRides(@PathVariable Integer id,
-                                                     @RequestParam(required = false) Integer page,
-                                                     @RequestParam(required = false) Integer size,
-                                                     @RequestParam(required = false) String sort,
-                                                     @RequestParam(required = false) String beginDateInterval,
-                                                     @RequestParam(required = false) String endDateInterval)
+                                         @RequestParam(required = false) Integer page,
+                                         @RequestParam(required = false) Integer size,
+                                         @RequestParam(required = false) String sort,
+                                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beginDateInterval,
+                                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateInterval,
+                                         Pageable pageable)
     {
-//        User user = userService.findOne(id);
-//        if(user == null){
-//            return new ResponseEntity<>("User does not exist!",HttpStatus.BAD_REQUEST);
-//        }
+        if (page == null) {
+            page = 0;
+        }
+        if (size == null) {
+            size = 10;
+        }
+        if(sort == null){
+            sort = "id";
+        }
+        else{
+            boolean isValidSortField = false;
+            for (AllowedSortFields allowedField : AllowedSortFields.values()) {
+                if (sort.equals(allowedField.getField())) {
+                    isValidSortField = true;
+                    break;
+                }
+            }
+            if (!isValidSortField) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid sort field. Allowed fields: " + Arrays.toString(AllowedSortFields.values()));
+            }
+        }
+        if(beginDateInterval == null){
+            beginDateInterval = LocalDateTime.of(0001, 01, 01, 00, 00, 00, 00);;
+        }
+        if(endDateInterval == null){
+            endDateInterval = LocalDateTime.of(9999, 12, 31, 23, 59, 59, 999999);
+        }
+        pageable = (Pageable) PageRequest.of(page, size, Sort.by(sort).ascending());
 
-        UserRidesListDTO rides = rideService.findRidesByUserId(id);
+        UserRidesListDTO rides = rideService.findRidesByUserId(id,pageable,beginDateInterval,endDateInterval);
 
 
         if(rides == null){

@@ -1,5 +1,6 @@
 package com.example.topgoback.RejectionLetters.Model;
 
+import com.example.topgoback.RejectionLetters.DTO.RejectionLetterDTO;
 import com.example.topgoback.Rides.Model.Ride;
 import jakarta.persistence.*;
 
@@ -17,6 +18,8 @@ public class RejectionLetter {
 
     public RejectionLetter() {
     }
+
+
 
     public RejectionLetter(int id, String reason, LocalDateTime timeOfRejection, Ride ride) {
         this.id = id;
