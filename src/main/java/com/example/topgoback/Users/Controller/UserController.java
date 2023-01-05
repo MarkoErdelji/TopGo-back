@@ -78,6 +78,7 @@ public class UserController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<?> getUsers(@RequestParam(required = false) Integer page,
                                       @RequestParam(required = false) Integer size,
                                       Pageable pageable)
@@ -86,7 +87,7 @@ public class UserController {
             page = 0;
         }
         if (size == null) {
-            size = 3;
+            size = 10;
         }
         pageable = (Pageable) PageRequest.of(page, size, Sort.by("id").ascending());
         UserListDTO users = userService.findAll(pageable);

@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,16 +35,9 @@ public class UserService implements UserDetailsService {
     private JwtTokenUtil jwtTokenUtil;
 
     public UserListDTO findAll(Pageable pageable) {
-        System.out.println("Page number: " + pageable.getPageNumber());
-        System.out.println("Page size: " + pageable.getPageSize());
 
         Page<User> page = userRepository.findAll(pageable);
         List<UserListResponseDTO> userListResponseDTOS = UserListResponseDTO.convertToUserListResponseDTO(page.getContent());
-
-        // Print the total number of users in the repository
-        System.out.println("Total users: " + page.getTotalElements());
-        // Print the list of users that are being returned
-        System.out.println("Users: " + userListResponseDTOS);
 
         UserListDTO users = new UserListDTO(new PageImpl<>(userListResponseDTOS, pageable, page.getTotalElements()));
         return users;
