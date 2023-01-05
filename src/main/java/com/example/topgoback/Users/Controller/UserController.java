@@ -1,7 +1,5 @@
 package com.example.topgoback.Users.Controller;
 
-import com.example.topgoback.Email.Model.Email;
-import com.example.topgoback.Enums.UserType;
 import com.example.topgoback.Messages.DTO.SendMessageDTO;
 import com.example.topgoback.Messages.DTO.UserMessagesDTO;
 import com.example.topgoback.Messages.Service.MessageService;
@@ -9,36 +7,27 @@ import com.example.topgoback.Notes.DTO.NoteResponseDTO;
 import com.example.topgoback.Notes.DTO.UserNoteListDTO;
 import com.example.topgoback.Notes.Model.Note;
 import com.example.topgoback.Notes.Service.NoteService;
-import com.example.topgoback.PasswordResetTokens.Model.PasswordResetToken;
 import com.example.topgoback.PasswordResetTokens.Service.PasswordResetTokenService;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
 import com.example.topgoback.Rides.Service.RideService;
-import com.example.topgoback.Tools.JwtTokenUtil;
 import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Service.UserService;
-import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.print.attribute.standard.Media;
 import javax.security.auth.login.CredentialExpiredException;
-import javax.security.auth.login.CredentialNotFoundException;
 
 @RestController
 @RequestMapping(value = "api/user")
@@ -59,14 +48,10 @@ public class UserController {
     private NoteService noteService;
 
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
-
-    @Autowired
     private PasswordResetTokenService passwordResetTokenService;
 
     UserController(JavaMailSender mailSender){this.mailSender = mailSender;}
 
-    @PreAuthorize(value="hasAuthority('ROLE_USER')")
     @GetMapping(value = "{id}/ride")
     public ResponseEntity<?> getUserRides(@PathVariable Integer id,
                                                      @RequestParam(required = false) Integer page,
@@ -93,38 +78,28 @@ public class UserController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<?> getUsers(@RequestParam(required = false) Integer page,
-                                      @RequestParam(required = false) Integer size)
+                                      @RequestParam(required = false) Integer size,
+                                      Pageable pageable)
     {
-
-        UserListDTO users = userService.findAll();
-
-        if(users == null){
-            return new ResponseEntity<>("No users in database",HttpStatus.NOT_FOUND);
+        if (page == null) {
+            page = 0;
         }
-        else {
-            return new ResponseEntity<>(users, HttpStatus.OK);
+        if (size == null) {
+            size = 10;
         }
+        pageable = (Pageable) PageRequest.of(page, size, Sort.by("id").ascending());
+        UserListDTO users = userService.findAll(pageable);
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @PostMapping(value = "/login",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@RequestBody LoginCredentialDTO loginCredentialDTO)
     {
-        try {
-            final User userDetails = userService
-                    .login(loginCredentialDTO);
-            final String token = jwtTokenUtil.generateToken(userDetails);
+        JWTTokenDTO jwtTokenDTO = userService.login(loginCredentialDTO);
 
-            JWTTokenDTO jwtTokenDTO = new JWTTokenDTO();
-
-            jwtTokenDTO.setAccessToken(token);
-            jwtTokenDTO.setRefreshToken(token);
-
-            return ResponseEntity.ok(jwtTokenDTO);
-        }
-        catch (Exception e){
-            return new ResponseEntity<>("Wrong username or password!",HttpStatus.BAD_REQUEST);
-        }
+        return new ResponseEntity<>(jwtTokenDTO,HttpStatus.OK);
 
     }
 
@@ -132,72 +107,17 @@ public class UserController {
     @PutMapping(value = "{id}/changePassword",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> changeUserPassword(@PathVariable Integer id,@RequestBody ChangePasswordDTO changePasswordDTO)
     {
-        User user = userService.findOne(id);
-        if(user != null){
-            try {
-                userService.changeUserPassword(user, changePasswordDTO);
-                return new ResponseEntity<>("Password successfully changed!",HttpStatus.NO_CONTENT);
-            }
-            catch (CredentialNotFoundException credentialNotFoundException){
-                return new ResponseEntity<>("Current password is not matching!",HttpStatus.BAD_REQUEST);
-            }
-        }
-        else{
-            return new ResponseEntity<>("No such user with id:" + id,HttpStatus.NOT_FOUND);
-        }
+        userService.changeUserPassword(id, changePasswordDTO);
 
+        return new ResponseEntity<>("Password successfully changed!",HttpStatus.NO_CONTENT);
     }
 
 
 
-//    @PostMapping(value = "/login",consumes = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<?> emailUserPasswordReset(@RequestBody Email email)
-//    {
-//        MimeMessage message = mailSender.createMimeMessage();
-//        try{
-//            userService.loadUserByUsername(email.getTo());
-//        }
-//        catch (UsernameNotFoundException e){
-//            return new ResponseEntity<>("No such user",HttpStatus.NOT_FOUND);
-//        }
-//        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-//        helper.setTo(email.getTo());
-//        helper.setSubject(email.getSubject());
-//        helper.setText(email.getMessage(),true);
-//        mailSender.send(message);
-//        return ResponseEntity.status(HttpStatus.OK).body(null);
-//
-//    }
-
-
-//    @PostMapping(value = "/login",consumes = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<?> resetUserPassword(@RequestBody LoginCredentialDTO loginCredentialDTO)
-//    {
-//        final User userDetails = userService
-//                .loadUserByUsername(loginCredentialDTO.getEmail());
-//
-//        final String token = jwtTokenUtil.generateToken(userDetails);
-//
-//        JWTTokenDTO jwtTokenDTO = new JWTTokenDTO();
-//
-//        jwtTokenDTO.setAccessToken(token);
-//        jwtTokenDTO.setRefreshToken(token);
-//
-//        return ResponseEntity.ok(jwtTokenDTO);
-//
-//    }
-
-
-
     @GetMapping(value = "{id}/message")
-    @PreAuthorize("hasAuthority('ROLE_DRIVER')")
     public ResponseEntity<?> getUsersMessages(@PathVariable Integer id)
     {
-//        User user = userService.findOne(id);
-//
-//        if(user == null){
-//            return new ResponseEntity<>("No users in database",HttpStatus.NOT_FOUND);
-//        }
+
         UserMessagesListDTO userMessages = messageService.findBySenderOrReceiver(id);
 
         if(userMessages == null){
@@ -230,12 +150,7 @@ public class UserController {
     @PutMapping(value = "{id}/block")
     public ResponseEntity<?> blockUser(@PathVariable Integer id)
     {
-//        User user = userService.findOne(id);
-//        if(user == null){
-//            return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
-//        }
-//
-//        userService.blockUser(user);
+        userService.blockUser(id);
         return new ResponseEntity<>("User is successfuly blocked",HttpStatus.NO_CONTENT);
 
     }
@@ -243,12 +158,7 @@ public class UserController {
     @PutMapping(value = "{id}/unblock")
     public ResponseEntity<?> unblockUser(@PathVariable Integer id)
     {
-//        User user = userService.findOne(id);
-//        if(user == null){
-//            return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
-//        }
-//
-//        userService.unblockUser(user);
+        userService.unblockUser(id);
         return new ResponseEntity<>("User is successfuly unblocked",HttpStatus.NO_CONTENT);
 
     }
@@ -269,7 +179,6 @@ public class UserController {
 
 
     @GetMapping(value = "{id}/note")
-    @PreAuthorize(value = "hasRole('USER')")
     public ResponseEntity<?> getUserNotes(@PathVariable Integer id,
                                         @RequestParam(required = false) Integer page,
                                       @RequestParam(required = false) Integer size)
@@ -312,7 +221,6 @@ public class UserController {
 
 
 
-    @PostAuthorize("hasAuthority('ROLE_DRIVER')")
     @GetMapping(value = "/{email}")
     public ResponseEntity<?> getUserRefByEmail(@PathVariable String email)
     {

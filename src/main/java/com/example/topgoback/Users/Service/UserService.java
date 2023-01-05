@@ -1,16 +1,26 @@
 package com.example.topgoback.Users.Service;
 
+import com.example.topgoback.Tools.JwtTokenUtil;
 import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.security.auth.login.CredentialNotFoundException;
+import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -21,22 +31,26 @@ public class UserService implements UserDetailsService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public UserListDTO findAll() {
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
-        UserListDTO userListDTo = new UserListDTO();
-        userListDTo.setTotalCount(243);
-        ArrayList<UserListResponseDTO> userListResponseDTOS = new ArrayList<>();
-        userListResponseDTOS.add(UserListResponseDTO.getMockupData());
-        userListDTo.setResults(userListResponseDTOS);
-        if(userListDTo.getResults().isEmpty()){
-        return null;}
-        else{
-            return userListDTo;
-        }
+    public UserListDTO findAll(Pageable pageable) {
+
+        Page<User> page = userRepository.findAll(pageable);
+        List<UserListResponseDTO> userListResponseDTOS = UserListResponseDTO.convertToUserListResponseDTO(page.getContent());
+
+        UserListDTO users = new UserListDTO(new PageImpl<>(userListResponseDTOS, pageable, page.getTotalElements()));
+        return users;
     }
 
     public User findOne(int id){
-        return userRepository.findById(id).orElse(null);
+        Optional<User> user = userRepository.findById(id);
+        if(user.isPresent()){
+            return user.get();
+        }
+        else{
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User does not exist!");
+        }
     }
 
 
@@ -46,15 +60,21 @@ public class UserService implements UserDetailsService {
         return u;}
 
 
-    public void blockUser(User user) {
+    public void blockUser(int userId) {
+        User user = findOne(userId);
+        if(user.isBlocked()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already blocked!");
+        }
         user.setBlocked(true);
-
         userRepository.save(user);
     }
 
-    public void unblockUser(User user) {
+    public void unblockUser(int userId) {
+        User user = findOne(userId);
+        if(!user.isBlocked()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User is not blocked!");
+        }
         user.setBlocked(false);
-
         userRepository.save(user);
     }
 
@@ -68,20 +88,31 @@ public class UserService implements UserDetailsService {
         return userRes;
     }
 
-    public User login(LoginCredentialDTO loginCredentialDTO) throws CredentialNotFoundException,UsernameNotFoundException {
+    public JWTTokenDTO login(LoginCredentialDTO loginCredentialDTO) throws ResponseStatusException {
         User userRes = userRepository.findByEmail(loginCredentialDTO.getEmail());
         if(userRes == null)
-            throw new UsernameNotFoundException("Could not findUser with email = " + loginCredentialDTO.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Could not findUser with email = " + loginCredentialDTO.getEmail());
         boolean isPasswordMatching = passwordEncoder.matches(loginCredentialDTO.getPassword(),userRes.getPassword());
         if(!isPasswordMatching) {
-            throw new CredentialNotFoundException("Wrong password!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Wrong password");
         }
-        return userRes;
+        if(userRes.isBlocked()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User is blocked!");
+        }
+        final String token = jwtTokenUtil.generateToken(userRes);
+
+        JWTTokenDTO jwtTokenDTO = new JWTTokenDTO();
+
+        jwtTokenDTO.setAccessToken(token);
+        jwtTokenDTO.setRefreshToken(token);
+
+        return jwtTokenDTO;
     }
 
-    public void changeUserPassword(User user,ChangePasswordDTO changePasswordDTO) throws CredentialNotFoundException {
+    public void changeUserPassword(int userId,ChangePasswordDTO changePasswordDTO) {
+        User user = findOne(userId);
         if (!passwordEncoder.matches(changePasswordDTO.getOld_password(),user.getPassword())){
-            throw new CredentialNotFoundException("Old password does not match");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Current password is not matching!");
         }
         user.setPassword(passwordEncoder.encode(changePasswordDTO.getNew_password()));
         userRepository.save(user);
