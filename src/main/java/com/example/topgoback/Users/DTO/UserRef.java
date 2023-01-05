@@ -1,11 +1,18 @@
 package com.example.topgoback.Users.DTO;
 
+import com.example.topgoback.Users.Model.User;
+
 public class UserRef {
     Integer id;
 
     String email;
 
     public UserRef() {
+    }
+
+    public UserRef(User user) {
+      this.id = user.getId();
+      this.email = user.getEmail();
     }
 
     public static UserRef getMockupData(){

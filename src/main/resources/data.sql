@@ -51,7 +51,42 @@ UPDATE drivers
 SET vehicle_id = 3
 WHERE id = 6;
 
+INSERT INTO passenger (ID, ADDRESS, EMAIL, FIRST_NAME, IS_BLOCKED, LAST_NAME, PASSWORD, PHONE_NUMBER, PROFILE_PICTURE, USER_TYPE)
+VALUES (21, '123 Main Street', 'passenger@example.com', 'John', false, 'Doe', 'password', '123-456-7890', NULL, 0);
 
+INSERT INTO passenger (ID, ADDRESS, EMAIL, FIRST_NAME, IS_BLOCKED, LAST_NAME, PASSWORD, PHONE_NUMBER, PROFILE_PICTURE, USER_TYPE)
+VALUES (22, '123 Main Street', 'passenger3@example.com', 'John', false, 'Doe', 'password', '123-456-7890', NULL, 0);
+
+INSERT INTO passenger (ID, ADDRESS, EMAIL, FIRST_NAME, IS_BLOCKED, LAST_NAME, PASSWORD, PHONE_NUMBER, PROFILE_PICTURE, USER_TYPE)
+VALUES (23, '123 Main Street', 'passenger2@example.com', 'John', false, 'Doe', 'password', '123-456-7890', NULL, 0);
+
+INSERT INTO passenger (ID, ADDRESS, EMAIL, FIRST_NAME, IS_BLOCKED, LAST_NAME, PASSWORD, PHONE_NUMBER, PROFILE_PICTURE, USER_TYPE)
+VALUES (24, '123 Main Street', 'passenger4@example.com', 'John', false, 'Doe', 'password', '123-456-7890', NULL, 0);
+
+INSERT INTO GEO_LOCATION (ID, ADDRESS, LATITUDE, LONGITUDE)
+VALUES (4, '123 Main Street', 45.248113,19.816799),
+       (5, '456 Market Street', 45.24221,19.414311),
+       (6, '789 Elm Street', 45.215699, 19.722299),
+       (7, '321 Maple Avenue', 45.298712, 19.842143),
+       (8, '159 Pine Street', 45.243567, 19.598345),
+       (9, '753 Oak Boulevard', 45.276456, 19.957342);
+
+INSERT INTO ROUTE (ID,LENGHT, FINISH_ID, START_ID)
+VALUES (1, 15, 4,5),
+        (2, 15, 6,7),
+        (3, 15, 8,9);
+
+INSERT INTO RIDE (ID, END_TIME, FOR_ANIMALS, FOR_BABIES, PANIC, PRICE, START_TIME, STATUS, VEHICLE_NAME, REJECTION_ID, DRIVER_ID, PAYMENT_ID, ROUTE_ID)
+VALUES (1, '2023-01-01T12:00:00', true, true, false, 1230.00, '2023-01-01T09:00:00', 4, 2, NULL, 5, NULL, 1);
+
+INSERT INTO RIDE (ID, END_TIME, FOR_ANIMALS, FOR_BABIES, PANIC, PRICE, START_TIME, STATUS, VEHICLE_NAME, REJECTION_ID, DRIVER_ID, PAYMENT_ID, ROUTE_ID)
+VALUES (2, '2023-01-01T15:00:00', true, true, false, 1433.00, '2023-01-01T14:00:00', 4, 2, NULL, 5, NULL, 2);
+
+INSERT INTO RIDE (ID, END_TIME, FOR_ANIMALS, FOR_BABIES, PANIC, PRICE, START_TIME, STATUS, VEHICLE_NAME, REJECTION_ID, DRIVER_ID, PAYMENT_ID, ROUTE_ID)
+VALUES (3, '2023-01-02T12:00:00', true, true, false, 1570.00, '2023-01-02T09:00:00', 4, 2, NULL, 5, NULL, 3);
+
+INSERT INTO PASSENGER_RIDES (PASSENGER_ID, RIDE_ID)
+VALUES (21, 1),(22, 2),(23, 3),(21,3);
 -- alter table if exists messages add constraint sender_id_fk foreign key (sender_id) references users;
 -- alter table if exists messages add constraint receiver_id_fk foreign key (receiver_id) references users;
 --
