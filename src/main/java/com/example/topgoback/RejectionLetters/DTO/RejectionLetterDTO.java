@@ -1,5 +1,7 @@
 package com.example.topgoback.RejectionLetters.DTO;
 
+import com.example.topgoback.RejectionLetters.Model.RejectionLetter;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -8,6 +10,8 @@ public class RejectionLetterDTO {
     private LocalDateTime timeOfRejection;
 
     public RejectionLetterDTO() {}
+
+
 
     public static RejectionLetterDTO getMockupData(){
         RejectionLetterDTO rejectionLetterDTO = new RejectionLetterDTO();

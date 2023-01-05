@@ -17,18 +17,12 @@ public class Route {
     private GeoLocation finish;
     @Column(name = "lenght")
     private float lenght;
-    @Column(name = "estunatedTime")
-    private float estimatedTime;
-    @Column(name = "price")
-    private float price;
 
 
     public Route(GeoLocation start, GeoLocation finish) {
         this.start = start;
         this.finish = finish;
         this.lenght = lenght;
-        this.estimatedTime = estimatedTime;
-        this.price = price;
     }
 
     public Route() {
@@ -67,19 +61,5 @@ public class Route {
         this.lenght = lenght;
     }
 
-    public float getEstimatedTime() {
-        return estimatedTime;
-    }
 
-    public void setEstimatedTime(float estimatedTime) {
-        this.estimatedTime = estimatedTime;
-    }
-
-    public float getPrice() {
-        return price;
-    }
-
-    public void setPrice(float price) {
-        this.price = price;
-    }
 }

@@ -1,6 +1,7 @@
 package com.example.topgoback.Users.DTO;
 
 import com.example.topgoback.Enums.VehicleName;
+import com.example.topgoback.GeoLocations.DTO.DepartureDestinationDTO;
 import com.example.topgoback.GeoLocations.DTO.GeoLocationDTO;
 import com.example.topgoback.GeoLocations.Model.GeoLocation;
 import com.example.topgoback.Routes.DTO.RouteForCreateRideDTO;
@@ -10,16 +11,16 @@ import java.util.List;
 
 public class UnregisteredUserDTO {
 
-    private List<RouteForCreateRideDTO> locations ;
+    private List<DepartureDestinationDTO> locations ;
     private String vehicleType;
     private boolean babyTransport;
     private boolean petTransport;
 
-    public List<RouteForCreateRideDTO> getLocations() {
+    public List<DepartureDestinationDTO> getLocations() {
         return locations;
     }
 
-    public void setLocations(List<RouteForCreateRideDTO> locations) {
+    public void setLocations(List<DepartureDestinationDTO> locations) {
         this.locations = locations;
     }
 

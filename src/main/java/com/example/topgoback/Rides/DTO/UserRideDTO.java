@@ -1,8 +1,15 @@
 package com.example.topgoback.Rides.DTO;
 
 import com.example.topgoback.GeoLocations.DTO.DepartureDestinationDTO;
+import com.example.topgoback.GeoLocations.DTO.GeoLocationDTO;
+import com.example.topgoback.RejectionLetters.DTO.RejectionLetterDTO;
 import com.example.topgoback.RejectionLetters.DTO.UserRejectionLetterDTO;
+import com.example.topgoback.Rides.Model.Ride;
+import com.example.topgoback.Tools.DistanceCalculator;
+import com.example.topgoback.Users.DTO.UserListResponseDTO;
 import com.example.topgoback.Users.DTO.UserRef;
+import com.example.topgoback.Users.Model.Passenger;
+import com.example.topgoback.Users.Model.User;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,13 +23,13 @@ public class UserRideDTO {
 
     public LocalDateTime endTime;
 
-    public Integer totalCost;
+    public float totalCost;
 
     public UserRef driver;
 
     public ArrayList<UserRef> passengers;
 
-    public Integer estimatedTimeInMinutes;
+    public int estimatedTimeInMinutes;
 
     public String vehicleType;
 
@@ -35,6 +42,41 @@ public class UserRideDTO {
     ArrayList<DepartureDestinationDTO> locations;
 
     public UserRideDTO() {
+    }
+
+    public UserRideDTO(Ride ride){
+        this.setId(ride.getId());
+        this.setStartTime(ride.getStart());
+        this.setEndTime(ride.getEnd());
+        this.setDriver(new UserRef(ride.getDriver()));
+        ArrayList<UserRef> passengers = new ArrayList<UserRef>();
+        for(Passenger p:ride.getPassenger()){
+            passengers.add(new UserRef(p));
+        }
+        this.setPassengers(passengers);
+        GeoLocationDTO start = new GeoLocationDTO(ride.getRoute().getStart());
+        GeoLocationDTO end = new GeoLocationDTO(ride.getRoute().getFinish());
+        DepartureDestinationDTO departureDestinationDTO = new DepartureDestinationDTO();
+        departureDestinationDTO.setDeparture(start);
+        departureDestinationDTO.setDestination(end);
+        ArrayList<DepartureDestinationDTO> locations = new ArrayList<DepartureDestinationDTO>();
+        locations.add(departureDestinationDTO);
+        this.setEstimatedTimeInMinutes((int) DistanceCalculator.getEstimatedTimeInMinutes(45,ride.getRoute().getLenght()));
+        this.setLocations(locations);
+        this.setTotalCost(ride.getPrice());
+        if(ride.getRejectionLetter() != null){
+            this.setRejection(new UserRejectionLetterDTO(ride.getRejectionLetter()));
+        }
+        this.setPetTransport(ride.isForAnimals());
+        this.setBabyTransport(ride.isForBabies());
+        this.setVehicleType(ride.getVehicleName().toString());
+    }
+    public static List<UserRideDTO> convertToUserRideDTO(List<Ride> rides){
+        List<UserRideDTO> userRideDTOList = new ArrayList<UserRideDTO>();
+        for(Ride r:rides){
+            userRideDTOList.add(new UserRideDTO(r));
+        }
+        return userRideDTOList;
     }
 
     public static UserRideDTO getMockupData(){
@@ -87,21 +129,20 @@ public class UserRideDTO {
         this.endTime = endTime;
     }
 
-    public Integer getTotalCost() {
+
+    public float getTotalCost() {
         return totalCost;
     }
 
-    public void setTotalCost(Integer totalCost) {
+    public void setTotalCost(float totalCost) {
         this.totalCost = totalCost;
     }
 
-
-
-    public Integer getEstimatedTimeInMinutes() {
+    public int getEstimatedTimeInMinutes() {
         return estimatedTimeInMinutes;
     }
 
-    public void setEstimatedTimeInMinutes(Integer estimatedTimeInMinutes) {
+    public void setEstimatedTimeInMinutes(int estimatedTimeInMinutes) {
         this.estimatedTimeInMinutes = estimatedTimeInMinutes;
     }
 
