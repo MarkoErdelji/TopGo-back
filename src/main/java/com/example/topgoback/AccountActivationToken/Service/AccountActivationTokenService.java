@@ -25,7 +25,7 @@ public class AccountActivationTokenService {
     public void addOne(int id){
         AccountActivationToken accountActivationToken = new AccountActivationToken();
         accountActivationToken.setPassenger(passengerService.findById(id));
-        accountActivationToken.setExpirationTime(LocalDateTime.now().minusHours(1));
+        accountActivationToken.setExpirationTime(LocalDateTime.now().plusHours(1));
         accountActivationTokenRepository.save(accountActivationToken);
     }
 
