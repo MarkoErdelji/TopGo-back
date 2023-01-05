@@ -24,15 +24,11 @@ public class PassengerController {
     private RideService rideService;
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<?> create(@RequestBody CreatePassengerDTO createPassengerDTO){
+    public ResponseEntity<?> create(@RequestBody CreatePassengerDTO createPassengerDTO) {
 
-        try {
-            Passenger passenger = passengerService.addOne(createPassengerDTO);
-            return new ResponseEntity<>(new CreatePassengerResponseDTO(passenger), HttpStatus.OK);
-        }
-        catch(Exception e){
-            return new ResponseEntity<>("Email already exists!", HttpStatus.CONFLICT);
-        }
+    Passenger passenger = passengerService.addOne(createPassengerDTO);
+    return new ResponseEntity<>(new CreatePassengerResponseDTO(passenger), HttpStatus.OK);
+
 
     }
 

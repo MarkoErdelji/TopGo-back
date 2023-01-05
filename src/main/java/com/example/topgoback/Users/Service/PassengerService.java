@@ -7,10 +7,13 @@ import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Repository.PassengerRepository;
 import com.example.topgoback.Users.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PassengerService {
@@ -20,39 +23,36 @@ public class PassengerService {
     @Autowired
     private UserRepository userRepository;
 
-    public Passenger addOne(CreatePassengerDTO passengerDTO) throws Exception {
-        User user = userRepository.findByEmail(passengerDTO.getEmail());
-        if(user != null){
-            throw new Exception();
+    public Passenger addOne(CreatePassengerDTO passengerDTO) {
+        Optional<Passenger> user = Optional.ofNullable(passengerRepository.findByEmail(passengerDTO.getEmail()));
+        if(user.isEmpty()){
+            Passenger passenger = new Passenger();
+            passenger.setFirstName(passengerDTO.getName());
+            passenger.setLastName(passengerDTO.getSurname());
+            passenger.setProfilePicture(passengerDTO.getProfilePicture());
+            passenger.setPhoneNumber(passengerDTO.getTelephoneNumber());
+            passenger.setEmail(passengerDTO.getEmail());
+            passenger.setAddress(passengerDTO.getAddress());
+            passenger.setPassword(passengerDTO.getPassword());
+            passenger.setUserType(UserType.USER);
+            passengerRepository.save(passenger);
+            return passenger;
         }
-        Passenger passenger = new Passenger();
-        passenger.setFirstName(passengerDTO.getName());
-        passenger.setLastName(passengerDTO.getSurname());
-        passenger.setProfilePicture(passengerDTO.getProfilePicture());
-        passenger.setPhoneNumber(passengerDTO.getTelephoneNumber());
-        passenger.setEmail(passengerDTO.getEmail());
-        passenger.setAddress(passengerDTO.getAddress());
-        passenger.setPassword(passengerDTO.getPassword());
-        passenger.setUserType(UserType.USER);
-        passengerRepository.save(passenger);
-        return passenger;
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passenger with that email already exists");
+
     }
 
     public Passenger findById(Integer id)
     {
-        Passenger passenger = new Passenger();
-        passenger.setFirstName("Pera");
-        passenger.setLastName("Peric");
-        passenger.setProfilePicture("U3dhZ2dlciByb2Nrcw==");
-        passenger.setPhoneNumber("+381123123");
-        passenger.setEmail("pera.peric@email.com");
-        passenger.setAddress("Bulevar Oslobodjenja 74");
-        passenger.setId(123);
-        //return (passengerRepository.findById(id).orElseGet(null));
-        return passenger;
+        Optional<Passenger> passenger = passengerRepository.findById(id);
+        if(passenger.isPresent()){
+            return passenger.get();
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Passenger does not exist!");
     }
 
     public Passenger update(CreatePassengerDTO createPassengerDTO, Passenger passenger){
+
         passenger.setFirstName(createPassengerDTO.getName());
         passenger.setLastName(createPassengerDTO.getSurname());
         passenger.setProfilePicture(createPassengerDTO.getProfilePicture());
