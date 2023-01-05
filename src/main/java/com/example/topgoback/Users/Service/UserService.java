@@ -5,8 +5,11 @@ import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.security.auth.login.CredentialNotFoundException;
+import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,17 +34,13 @@ public class UserService implements UserDetailsService {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
-    public UserListDTO findAll() {
+    public UserListDTO findAll(Pageable pageable) {
 
-        UserListDTO userListDTo = new UserListDTO();
-        userListDTo.setTotalCount(243);
-        ArrayList<UserListResponseDTO> userListResponseDTOS = new ArrayList<>();
-        userListResponseDTOS.add(UserListResponseDTO.getMockupData());
-        userListDTo.setResults(userListResponseDTOS);
-        if(userListDTo.getResults().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No users in database");
-        }
-        return userListDTo;
+        Page<User> page = userRepository.findAll(pageable);
+        List<UserListResponseDTO> userListResponseDTOS = UserListResponseDTO.convertToUserListResponseDTO(page.getContent());
+
+        UserListDTO users = new UserListDTO(new PageImpl<>(userListResponseDTOS, pageable, page.getTotalElements()));
+        return users;
     }
 
     public User findOne(int id){
@@ -59,15 +60,21 @@ public class UserService implements UserDetailsService {
         return u;}
 
 
-    public void blockUser(User user) {
+    public void blockUser(int userId) {
+        User user = findOne(userId);
+        if(user.isBlocked()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already blocked!");
+        }
         user.setBlocked(true);
-
         userRepository.save(user);
     }
 
-    public void unblockUser(User user) {
+    public void unblockUser(int userId) {
+        User user = findOne(userId);
+        if(!user.isBlocked()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User is not blocked!");
+        }
         user.setBlocked(false);
-
         userRepository.save(user);
     }
 
@@ -84,13 +91,13 @@ public class UserService implements UserDetailsService {
     public JWTTokenDTO login(LoginCredentialDTO loginCredentialDTO) throws ResponseStatusException {
         User userRes = userRepository.findByEmail(loginCredentialDTO.getEmail());
         if(userRes == null)
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Could not findUser with email = " + loginCredentialDTO.getEmail());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Could not findUser with email = " + loginCredentialDTO.getEmail());
         boolean isPasswordMatching = passwordEncoder.matches(loginCredentialDTO.getPassword(),userRes.getPassword());
         if(!isPasswordMatching) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Wrong password");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Wrong password");
         }
         if(userRes.isBlocked()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User is blocked!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"User is blocked!");
         }
         final String token = jwtTokenUtil.generateToken(userRes);
 
