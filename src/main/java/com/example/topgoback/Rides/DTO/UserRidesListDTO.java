@@ -37,4 +37,5 @@ public class UserRidesListDTO {
     public void setResults(ArrayList<UserRideDTO> results) {
         this.results = results;
     }
+
 }
