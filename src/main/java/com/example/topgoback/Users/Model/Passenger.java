@@ -18,6 +18,9 @@ public class Passenger extends  User{
     @JoinTable(name = "favourite_routes", joinColumns = @JoinColumn(name = "route_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "passanger_id", referencedColumnName = "id"))
     private List<Route> favouriteRoutes;
 
+    @Column(name = "is_active")
+    private boolean isActive;
+
     public Passenger() {
 
     }
@@ -25,6 +28,7 @@ public class Passenger extends  User{
     public Passenger(String firstName, String lastName, String profilePicture,String email, String password, String phoneNumber, String address, List<Payment> payments, List<Ride> rides, List<Route> favouriteRoutes) {
         super(firstName, lastName, email,profilePicture, password, phoneNumber, address, UserType.USER);
 
+        this.isActive = false;
         this.payments = payments;
         this.rides = rides;
         this.favouriteRoutes = favouriteRoutes;
@@ -52,5 +56,13 @@ public class Passenger extends  User{
 
     public void setFavouriteRoutes(List<Route> favouriteRoutes) {
         this.favouriteRoutes = favouriteRoutes;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }

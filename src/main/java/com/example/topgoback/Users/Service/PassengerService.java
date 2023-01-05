@@ -1,5 +1,6 @@
 package com.example.topgoback.Users.Service;
 
+import com.example.topgoback.AccountActivationToken.Service.AccountActivationTokenService;
 import com.example.topgoback.Enums.UserType;
 import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.Passenger;
@@ -24,6 +25,9 @@ public class PassengerService {
     private PassengerRepository passengerRepository;
 
     @Autowired
+    private AccountActivationTokenService activationTokenService;
+
+    @Autowired
     private UserRepository userRepository;
 
     public Passenger addOne(CreatePassengerDTO passengerDTO) {
@@ -39,9 +43,10 @@ public class PassengerService {
             passenger.setPassword(passengerDTO.getPassword());
             passenger.setUserType(UserType.USER);
             passengerRepository.save(passenger);
+            activationTokenService.addOne(passenger.getId());
             return passenger;
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passenger with that email already exists");
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User with that email already exists!");
 
     }
 
@@ -56,16 +61,18 @@ public class PassengerService {
 
     public Passenger update(CreatePassengerDTO createPassengerDTO, Integer id){
         Passenger passenger = findById(id);
-        passenger.setFirstName(createPassengerDTO.getName());
-        passenger.setLastName(createPassengerDTO.getSurname());
-        passenger.setProfilePicture(createPassengerDTO.getProfilePicture());
-        passenger.setPhoneNumber(createPassengerDTO.getTelephoneNumber());
-        passenger.setEmail(createPassengerDTO.getEmail());
-        passenger.setAddress(createPassengerDTO.getAddress());
-        passenger.setPassword(createPassengerDTO.getPassword());
-        passenger.setId(123);
-        // passengerRepository.save(passenger);
+        passengerRepository.save(passenger);
         return passenger;
+    }
+
+    public void delete(int id){
+        passengerRepository.deleteById(id);
+    }
+
+    public void activate(int id){
+        Passenger passenger = findById(id);
+        passenger.setActive(true);
+        passengerRepository.save(passenger);
     }
 
     public PassengerListDTO findAll(Pageable pageable){

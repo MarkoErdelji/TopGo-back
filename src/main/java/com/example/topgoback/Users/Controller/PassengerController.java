@@ -1,21 +1,18 @@
 package com.example.topgoback.Users.Controller;
 
+import com.example.topgoback.AccountActivationToken.Service.AccountActivationTokenService;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
 import com.example.topgoback.Rides.Service.RideService;
 import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.Passenger;
 import com.example.topgoback.Users.Service.PassengerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(value = "api/passenger")
@@ -23,6 +20,9 @@ import java.util.List;
 public class PassengerController {
     @Autowired
     private PassengerService passengerService;
+
+    @Autowired
+    private AccountActivationTokenService activationTokenService;
 
     @Autowired
     private RideService rideService;
@@ -67,7 +67,8 @@ public class PassengerController {
     }
 
     @GetMapping(value = "/activate/{activationId}")
-    public ResponseEntity<?> getActivation(){
+    public ResponseEntity<?> getActivation(@PathVariable int activationId){
+        activationTokenService.findAndActivate(activationId);
         return new ResponseEntity<>("Succesfull account activation", HttpStatus.OK);
     }
 
