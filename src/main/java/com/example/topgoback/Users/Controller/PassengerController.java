@@ -41,8 +41,8 @@ public class PassengerController {
     }
     @PutMapping(value = "/{id}", consumes = "application/json")
     public ResponseEntity<CreatePassengerResponseDTO> updateOne(@PathVariable Integer id, @RequestBody CreatePassengerDTO createPassengerDTO){
-        Passenger passenger = passengerService.findById(id);
-        passenger = passengerService.update(createPassengerDTO, passenger);
+        Passenger passenger = new Passenger();
+        passenger = passengerService.update(createPassengerDTO, id);
 
         return new ResponseEntity<>(new CreatePassengerResponseDTO(passenger), HttpStatus.OK);
     }

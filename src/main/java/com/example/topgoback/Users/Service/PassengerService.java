@@ -51,8 +51,8 @@ public class PassengerService {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Passenger does not exist!");
     }
 
-    public Passenger update(CreatePassengerDTO createPassengerDTO, Passenger passenger){
-
+    public Passenger update(CreatePassengerDTO createPassengerDTO, Integer id){
+        Passenger passenger = findById(id);
         passenger.setFirstName(createPassengerDTO.getName());
         passenger.setLastName(createPassengerDTO.getSurname());
         passenger.setProfilePicture(createPassengerDTO.getProfilePicture());
