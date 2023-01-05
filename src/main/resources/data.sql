@@ -51,17 +51,17 @@ UPDATE drivers
 SET vehicle_id = 3
 WHERE id = 6;
 
-INSERT INTO passenger (ID, ADDRESS, EMAIL, FIRST_NAME, IS_BLOCKED, LAST_NAME, PASSWORD, PHONE_NUMBER, PROFILE_PICTURE, USER_TYPE)
-VALUES (21, '123 Main Street', 'passenger@example.com', 'John', false, 'Doe', 'password', '123-456-7890', NULL, 0);
+INSERT INTO passenger (ID, ADDRESS, EMAIL, FIRST_NAME, IS_BLOCKED, LAST_NAME, PASSWORD, PHONE_NUMBER, PROFILE_PICTURE, USER_TYPE, IS_ACTIVE)
+VALUES (21, '123 Main Street', 'passenger@example.com', 'John', false, 'Doe', 'password', '123-456-7890', NULL, 0, TRUE);
 
-INSERT INTO passenger (ID, ADDRESS, EMAIL, FIRST_NAME, IS_BLOCKED, LAST_NAME, PASSWORD, PHONE_NUMBER, PROFILE_PICTURE, USER_TYPE)
-VALUES (22, '123 Main Street', 'passenger3@example.com', 'John', false, 'Doe', 'password', '123-456-7890', NULL, 0);
+INSERT INTO passenger (ID, ADDRESS, EMAIL, FIRST_NAME, IS_BLOCKED, LAST_NAME, PASSWORD, PHONE_NUMBER, PROFILE_PICTURE, USER_TYPE, IS_ACTIVE)
+VALUES (22, '123 Main Street', 'passenger3@example.com', 'John', false, 'Doe', 'password', '123-456-7890', NULL, 0, TRUE);
 
-INSERT INTO passenger (ID, ADDRESS, EMAIL, FIRST_NAME, IS_BLOCKED, LAST_NAME, PASSWORD, PHONE_NUMBER, PROFILE_PICTURE, USER_TYPE)
-VALUES (23, '123 Main Street', 'passenger2@example.com', 'John', false, 'Doe', 'password', '123-456-7890', NULL, 0);
+INSERT INTO passenger (ID, ADDRESS, EMAIL, FIRST_NAME, IS_BLOCKED, LAST_NAME, PASSWORD, PHONE_NUMBER, PROFILE_PICTURE, USER_TYPE, IS_ACTIVE)
+VALUES (23, '123 Main Street', 'passenger2@example.com', 'John', false, 'Doe', 'password', '123-456-7890', NULL, 0, TRUE);
 
-INSERT INTO passenger (ID, ADDRESS, EMAIL, FIRST_NAME, IS_BLOCKED, LAST_NAME, PASSWORD, PHONE_NUMBER, PROFILE_PICTURE, USER_TYPE)
-VALUES (24, '123 Main Street', 'passenger4@example.com', 'John', false, 'Doe', 'password', '123-456-7890', NULL, 0);
+INSERT INTO passenger (ID, ADDRESS, EMAIL, FIRST_NAME, IS_BLOCKED, LAST_NAME, PASSWORD, PHONE_NUMBER, PROFILE_PICTURE, USER_TYPE, IS_ACTIVE)
+VALUES (24, '123 Main Street', 'passenger4@example.com', 'John', false, 'Doe', 'password', '123-456-7890', NULL, 0, TRUE);
 
 INSERT INTO GEO_LOCATION (ID, ADDRESS, LATITUDE, LONGITUDE)
 VALUES (4, '123 Main Street', 45.248113,19.816799),
