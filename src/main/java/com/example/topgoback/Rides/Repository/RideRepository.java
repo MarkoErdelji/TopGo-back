@@ -25,4 +25,12 @@ public interface RideRepository extends JpaRepository<Ride,Integer> {
     @Query("SELECT DISTINCT r FROM Ride r INNER JOIN r.passenger p WHERE  p.id = :userId AND (r.start BETWEEN :startDate AND :endDate)")
     Page<Ride> findByPassengerAndBeginBetween(@Param("userId") int userId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
 
+    @Query("SELECT DISTINCT r FROM Ride r  WHERE (r.driver.id = :driverId) AND (r.status = 3)")
+    List<Ride> findRidesByDriveridAndIsActive(@Param("driverId") int driverId);
+
+    @Query("SELECT DISTINCT r FROM Ride r  WHERE (r.driver.id = :driverId) AND (r.status = 1)")
+    List<Ride> findRidesByDriveridAndIsAccepted(@Param("driverId") int driverId);
+
+
+
 }

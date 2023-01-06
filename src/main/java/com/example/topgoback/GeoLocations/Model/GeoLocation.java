@@ -7,8 +7,8 @@ import jakarta.persistence.*;
 @Entity
 public class GeoLocation {
     @Id
-    @SequenceGenerator(name = "mySeqGenV2", sequenceName = "mySeqV2", initialValue = 4)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenV2")
+    @SequenceGenerator(name = "mySeqGenLocation", sequenceName = "mySeqGenLocation", initialValue = 590)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenLocation")
     private Integer id;
     @Column(name = "address", unique = false, nullable = true)
     private String address;

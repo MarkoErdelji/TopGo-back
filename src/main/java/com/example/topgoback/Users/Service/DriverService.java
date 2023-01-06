@@ -49,7 +49,6 @@ public class DriverService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private VehicleTypeService vehicleTypeService;
 
 
     public AllDriversDTO findAll() {

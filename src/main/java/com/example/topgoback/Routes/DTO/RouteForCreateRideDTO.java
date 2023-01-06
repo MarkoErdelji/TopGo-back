@@ -4,7 +4,7 @@ import com.example.topgoback.GeoLocations.DTO.GeoLocationDTO;
 
 public class RouteForCreateRideDTO {
     private GeoLocationDTO departure;
-    private GeoLocationDTO destinations;
+    private GeoLocationDTO destination;
 
     public GeoLocationDTO getDeparture() {
         return departure;
@@ -14,11 +14,13 @@ public class RouteForCreateRideDTO {
         this.departure = departure;
     }
 
-    public GeoLocationDTO getDestinations() {
-        return destinations;
+    public GeoLocationDTO getDestination() {
+        return destination;
     }
 
-    public void setDestinations(GeoLocationDTO destinations) {
-        this.destinations = destinations;
+    public void setDestination(GeoLocationDTO destination) {
+        this.destination = destination;
     }
+
+
 }

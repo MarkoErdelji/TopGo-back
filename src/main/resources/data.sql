@@ -36,7 +36,7 @@ insert into document(id,name,document_image,driver_id) values(3,'Test-if-overflo
 
 insert into geo_location (id,address,latitude,longitude) values (2,'Dejana Matica 5',45.246893,19.840011);
 insert into vehicle_type(id,price_by_km,vehicle_name) values (2,200,1);
-insert into vehicle (id,for_animals,for_babies,licence_plate,model,seat_number,location_id,driver_id,type_id) values  (2,TRUE,TRUE,'top-g','Lamburdzini',4,2,5,2);
+insert into vehicle (id,for_animals,for_babies,licence_plate,model,seat_number,location_id,driver_id,type_id) values  (2,TRUE,TRUE,'top-g','Lamburdzini',4,2,5,1);
 UPDATE drivers
 SET vehicle_id = 2
 WHERE id = 5;

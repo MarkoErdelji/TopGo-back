@@ -1,6 +1,7 @@
 package com.example.topgoback.Tools;
 
 import com.example.topgoback.GeoLocations.DTO.GeoLocationDTO;
+import com.example.topgoback.Vehicles.Model.VehicleType;
 
 public class DistanceCalculator {
 
@@ -22,5 +23,11 @@ public class DistanceCalculator {
 
     public static double getEstimatedTimeInMinutes(double speedInKmH,double distanceInKm){
         return (double) (distanceInKm/speedInKmH * 60);
+    }
+    public static float getEstimatedTimeInMinutes(float speedInKmH,float distanceInKm){
+        return  (distanceInKm/speedInKmH * 60);
+    }
+    public static float getPrice(float distanceInKm, VehicleType vehicleType){
+        return vehicleType.getPriceByKm() * distanceInKm;
     }
 }

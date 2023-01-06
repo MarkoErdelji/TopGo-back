@@ -15,7 +15,8 @@ import java.util.List;
 @Entity
 public class Ride {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "mySeqGenRide", sequenceName = "mySeqGenRide", initialValue = 7, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenRide")
     private int id;
 
     @ManyToOne(fetch = FetchType.EAGER)

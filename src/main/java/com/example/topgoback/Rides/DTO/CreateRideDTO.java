@@ -13,7 +13,7 @@ public class CreateRideDTO {
 
     private List<RouteForCreateRideDTO> locations ;
     private List<RidePassengerDTO> passengers;
-    private String vehicleType;
+    private VehicleName vehicleType;
     private boolean babyTransport;
     private boolean petTransport;
 
@@ -33,11 +33,11 @@ public class CreateRideDTO {
         this.passengers = passengers;
     }
 
-    public String getVehicleType() {
+    public VehicleName getVehicleType() {
         return vehicleType;
     }
 
-    public void setVehicleType(String vehicleType) {
+    public void setVehicleType(VehicleName vehicleType) {
         this.vehicleType = vehicleType;
     }
 
