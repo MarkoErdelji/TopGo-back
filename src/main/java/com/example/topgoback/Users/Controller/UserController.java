@@ -60,23 +60,14 @@ public class UserController {
 
     @GetMapping(value = "{id}/ride")
     public ResponseEntity<?> getUserRides(@PathVariable Integer id,
-                                         @RequestParam(required = false) Integer page,
-                                         @RequestParam(required = false) Integer size,
-                                         @RequestParam(required = false) String sort,
-                                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beginDateInterval,
-                                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateInterval,
+                                         @RequestParam(required = false,defaultValue = "0") Integer page,
+                                         @RequestParam(required = false,defaultValue = "10") Integer size,
+                                         @RequestParam(required = false,defaultValue = "id") String sort,
+                                         @RequestParam(required = false,defaultValue = "0001-01-01T00:00:00") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beginDateInterval,
+                                         @RequestParam(required = false,defaultValue = "9999-12-31T23:59:59.999999") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateInterval,
                                          Pageable pageable)
     {
-        if (page == null) {
-            page = 0;
-        }
-        if (size == null) {
-            size = 10;
-        }
-        if(sort == null){
-            sort = "id";
-        }
-        else{
+        if(sort!=null){
             boolean isValidSortField = false;
             for (AllowedSortFields allowedField : AllowedSortFields.values()) {
                 if (sort.equals(allowedField.getField())) {
@@ -88,38 +79,21 @@ public class UserController {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid sort field. Allowed fields: " + Arrays.toString(AllowedSortFields.values()));
             }
         }
-        if(beginDateInterval == null){
-            beginDateInterval = LocalDateTime.of(0001, 01, 01, 00, 00, 00, 00);;
-        }
-        if(endDateInterval == null){
-            endDateInterval = LocalDateTime.of(9999, 12, 31, 23, 59, 59, 999999);
-        }
         pageable = (Pageable) PageRequest.of(page, size, Sort.by(sort).ascending());
 
         UserRidesListDTO rides = rideService.findRidesByUserId(id,pageable,beginDateInterval,endDateInterval);
 
 
-        if(rides == null){
-            return new ResponseEntity<>("User has no rides!",HttpStatus.NOT_FOUND);
-        }
-        else {
-            return new ResponseEntity<>(rides, HttpStatus.OK);
-        }
+       return new ResponseEntity<>(rides,HttpStatus.OK);
 
     }
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<?> getUsers(@RequestParam(required = false) Integer page,
-                                      @RequestParam(required = false) Integer size,
+    public ResponseEntity<?> getUsers(@RequestParam(required = false,defaultValue = "0") Integer page,
+                                      @RequestParam(required = false,defaultValue = "10") Integer size,
                                       Pageable pageable)
     {
-        if (page == null) {
-            page = 0;
-        }
-        if (size == null) {
-            size = 10;
-        }
         pageable = (Pageable) PageRequest.of(page, size, Sort.by("id").ascending());
         UserListDTO users = userService.findAll(pageable);
         return new ResponseEntity<>(users, HttpStatus.OK);

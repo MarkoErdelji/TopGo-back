@@ -2,6 +2,7 @@ package com.example.topgoback.Rides.Service;
 
 import com.example.topgoback.Enums.Status;
 import com.example.topgoback.Enums.VehicleName;
+import com.example.topgoback.GeoLocations.DTO.GeoLocationDTO;
 import com.example.topgoback.GeoLocations.Model.GeoLocation;
 import com.example.topgoback.GeoLocations.Repository.GeoLocationRepository;
 import com.example.topgoback.Rides.DTO.CreateRideDTO;
@@ -12,7 +13,6 @@ import com.example.topgoback.Rides.Repository.RideRepository;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
 import com.example.topgoback.Routes.Model.Route;
 import com.example.topgoback.Routes.Repository.RouteRepository;
-import com.example.topgoback.Routes.Service.RouteService;
 import com.example.topgoback.Tools.DistanceCalculator;
 import com.example.topgoback.Users.DTO.RidePassengerDTO;
 import com.example.topgoback.Users.DTO.UserRef;
@@ -21,7 +21,7 @@ import com.example.topgoback.Users.Model.Passenger;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Repository.DriverRepository;
 import com.example.topgoback.Users.Repository.PassengerRepository;
-import com.example.topgoback.Users.Service.UnregisteredUserService;
+import com.example.topgoback.Users.Service.PassengerService;
 import com.example.topgoback.Users.Service.UserService;
 import com.example.topgoback.Vehicles.Model.Vehicle;
 import com.example.topgoback.Vehicles.Repository.VehicleTypeRepository;
@@ -56,6 +56,9 @@ public class RideService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private PassengerService passengerService;
+
     public void addOne(Ride ride) { rideRepository.save(ride);}
 
 
@@ -64,7 +67,6 @@ public class RideService {
     public UserRidesListDTO findRidesByUserId(int userId, Pageable pageable, LocalDateTime beginDateTimeInterval, LocalDateTime endDateTimeInterval) {
 
         User user = userService.findOne(userId);
-        System.out.println("SELECT r FROM Ride r JOIN r.passenger p JOIN r.driver d WHERE p.id = " + userId + " OR d.id = " + userId + " AND r.start BETWEEN " + beginDateTimeInterval + " AND " + endDateTimeInterval);
         Page<Ride> rides = rideRepository.findByDriverOrPassengerAndBeginBetween(user.getId(),beginDateTimeInterval,endDateTimeInterval,pageable);
         List<UserRideDTO> userRideDTOList = UserRideDTO.convertToUserRideDTO(rides.getContent());
         UserRidesListDTO userRidesListDTO = new UserRidesListDTO(new PageImpl<>(userRideDTOList, pageable, rides.getTotalElements()));
@@ -73,13 +75,14 @@ public class RideService {
         return userRidesListDTO;
 
         }
-    public UserRidesListDTO findRidesByPassengerId(int passengerId) {
 
-        UserRidesListDTO userRidesListDTO = new UserRidesListDTO();
-        userRidesListDTO.setTotalCount(243);
-        ArrayList<UserRideDTO> userRides = new ArrayList<>();
-        userRides.add(UserRideDTO.getMockupData());
-        userRidesListDTO.setResults(userRides);
+    public UserRidesListDTO findRidesByPassengerId(int passengerId, Pageable pageable, LocalDateTime beginDateTimeInterval, LocalDateTime endDateTimeInterval) {
+
+        Passenger passenger = passengerService.findById(passengerId);
+        Page<Ride> rides = rideRepository.findByPassengerAndBeginBetween(passenger.getId(),beginDateTimeInterval,endDateTimeInterval,pageable);
+        List<UserRideDTO> userRideDTOList = UserRideDTO.convertToUserRideDTO(rides.getContent());
+        UserRidesListDTO userRidesListDTO = new UserRidesListDTO(new PageImpl<>(userRideDTOList, pageable, rides.getTotalElements()));
+        userRidesListDTO.setTotalCount((int) rides.getTotalElements());
 
         return userRidesListDTO;
     }
@@ -114,8 +117,8 @@ public class RideService {
         ride.setStart(LocalDateTime.now());
         response.setStartTime(LocalDateTime.now());
 
-        ride.setStatus(Status.PENDING);
-        response.setStatus(Status.PENDING);
+        ride.setStatus(Status.ACTIVE);
+        response.setStatus(Status.ACTIVE);
 
         ride.setVehicleName(createRideDTO.getVehicleType());
         response.setVehicleType(createRideDTO.getVehicleType());
@@ -141,21 +144,28 @@ public class RideService {
             response.getPassengers().add(userRef);
 
         }
+        Driver driver = this.DriverSelection(ride,response.estimatedTimeInMinutes);
+        ride.setDriver(driver);
+        UserRef driverRef = new UserRef();
+        driverRef.setId(driver.getId());
+        driverRef.setEmail(driver.getEmail());
+        response.setDriver(driverRef);
+
 
         rideRepository.save(ride);
         response.setId(ride.getId());
-        Driver driver = this.DriverSelection(ride);
         return response;
 
 
     }
 
-    private Driver DriverSelection(Ride ride) {
+    private Driver DriverSelection(Ride ride,float estimatedTime) {
         List<Driver> drivers = driverRepository.findAll();
         List<Driver> viableDrivers = new ArrayList<Driver>();
         for (Driver driver:drivers
              ) {
             Vehicle vehicle = driver.getVehicle();
+            if (!driver.isActive())continue;
             if (!vehicle.getVehicleType().getVehicleName().equals(ride.getVehicleName().toString()))
                 continue;
             if(!vehicle.isForBabies())
@@ -167,21 +177,44 @@ public class RideService {
                 if (ride.isForAnimals()) continue;
             }
             if(this.checkForActiveRide(driver))continue;
+            if(this.checkForAcceptedRide(driver,estimatedTime))continue;
+            viableDrivers.add(driver);
 
-
-
-
-
+        }
+        double minimumDistance = Double.MAX_VALUE;
+        Driver bestDriver = null;
+        for (Driver driver:viableDrivers)
+        {
+            Vehicle vehicle = driver.getVehicle();
+            double distance = DistanceCalculator.getDistanceFromLocations(new GeoLocationDTO(vehicle.getCurrentLocation()),new GeoLocationDTO(ride.getRoute().getStart()));
+            if (distance< minimumDistance)
+            {
+                distance = minimumDistance;
+                bestDriver = driver;
+            }
 
 
         }
 
+    return bestDriver;
+    }
 
+    private boolean checkForAcceptedRide(Driver driver,float estimatedTime) {
+        List<Ride> rides = rideRepository.findRidesByDriveridAndIsAccepted(driver.getId());
+
+        if (rides.isEmpty())return false;
+        LocalDateTime currentTime = LocalDateTime.now();
+        for (Ride ride:rides)
+        {
+            if (currentTime.plusMinutes((long) estimatedTime).isAfter(ride.getStart()))return true;
+        }
+        return false;
     }
 
     private boolean checkForActiveRide(Driver driver) {
-
-        return false;
+        List<Ride> ride = rideRepository.findRidesByDriveridAndIsActive(driver.getId());
+        if (ride.isEmpty())return false;
+        return true;
 
     }
 }
