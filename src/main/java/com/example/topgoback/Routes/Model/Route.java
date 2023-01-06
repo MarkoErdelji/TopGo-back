@@ -1,12 +1,17 @@
 package com.example.topgoback.Routes.Model;
 
 import com.example.topgoback.GeoLocations.Model.GeoLocation;
+import com.example.topgoback.Routes.DTO.RouteForCreateRideDTO;
+import com.example.topgoback.Tools.DistanceCalculator;
 import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 public class Route {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @SequenceGenerator(name = "mySeqGenRoute", sequenceName = "mySeqGenRoute", initialValue = 7, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenRoute")
     private int id;
 
     @ManyToOne(optional=false)
@@ -28,6 +33,9 @@ public class Route {
     public Route() {
 
     }
+
+
+
 
     public int getId() {
         return id;

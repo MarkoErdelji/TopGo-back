@@ -1,8 +1,10 @@
 package com.example.topgoback.Rides.DTO;
 
 import com.example.topgoback.Enums.Status;
+import com.example.topgoback.Enums.VehicleName;
 import com.example.topgoback.GeoLocations.DTO.DepartureDestinationDTO;
 import com.example.topgoback.RejectionLetters.DTO.UserRejectionLetterDTO;
+import com.example.topgoback.Routes.DTO.RouteForCreateRideDTO;
 import com.example.topgoback.Users.DTO.UserRef;
 
 import java.time.LocalDateTime;
@@ -17,15 +19,15 @@ public class RideDTO {
 
     public LocalDateTime endTime;
 
-    public Integer totalCost;
+    public float totalCost;
 
     public UserRef driver;
 
     public ArrayList<UserRef> passengers;
 
-    public Integer estimatedTimeInMinutes;
+    public float estimatedTimeInMinutes;
 
-    public String vehicleType;
+    public VehicleName vehicleType;
 
     public boolean babyTransport;
 
@@ -33,124 +35,13 @@ public class RideDTO {
 
     public UserRejectionLetterDTO rejection;
 
-    ArrayList<DepartureDestinationDTO> locations;
+    public List<RouteForCreateRideDTO> locations;
 
-    public String status;
+    public Status status;
 
     public RideDTO() {
     }
 
-    public static RideDTO getMockupData(){
-        RideDTO rideDTO = new RideDTO();
-        rideDTO.setId(123);
-        String str = "2017-07-21T17:45:14Z";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX");
-        LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
-        rideDTO.setStartTime(dateTime);
-        rideDTO.setTotalCost(1235);
-        rideDTO.setDriver(UserRef.getMockupData());
-        List<UserRef> passengerList = new ArrayList<>();
-        passengerList.add(UserRef.getMockupData());
-        rideDTO.setPassengers((ArrayList<UserRef>) passengerList);
-        rideDTO.setEstimatedTimeInMinutes(5);
-        rideDTO.setRejection(UserRejectionLetterDTO.getMockupData());
-        List<DepartureDestinationDTO> locations = new ArrayList<>();
-        rideDTO.setBabyTransport(true);
-        rideDTO.setPetTransport(true);
-        rideDTO.setVehicleType("STANDARDNO");
-        locations.add(DepartureDestinationDTO.getMockedData());
-        rideDTO.setLocations((ArrayList<DepartureDestinationDTO>) locations);
-        rideDTO.setStatus("PENDING");
-
-
-        return rideDTO;
-
-
-    }
-
-    public static RideDTO getAcceptedMockupData(){
-        RideDTO rideDTO = new RideDTO();
-        rideDTO.setId(123);
-        String str = "2017-07-21T17:45:14Z";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX");
-        LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
-        rideDTO.setStartTime(dateTime);
-        rideDTO.setTotalCost(1235);
-        rideDTO.setDriver(UserRef.getMockupData());
-        List<UserRef> passengerList = new ArrayList<>();
-        passengerList.add(UserRef.getMockupData());
-        rideDTO.setPassengers((ArrayList<UserRef>) passengerList);
-        rideDTO.setEstimatedTimeInMinutes(5);
-        rideDTO.setRejection(UserRejectionLetterDTO.getMockupData());
-        List<DepartureDestinationDTO> locations = new ArrayList<>();
-        rideDTO.setBabyTransport(true);
-        rideDTO.setPetTransport(true);
-        rideDTO.setVehicleType("STANDARDNO");
-        locations.add(DepartureDestinationDTO.getMockedData());
-        rideDTO.setLocations((ArrayList<DepartureDestinationDTO>) locations);
-        rideDTO.setStatus("ACCEPTED");
-
-
-        return rideDTO;
-
-
-    }
-
-    public static RideDTO getFinishMockupData(){
-        RideDTO rideDTO = new RideDTO();
-        rideDTO.setId(123);
-        String str = "2017-07-21T17:45:14Z";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX");
-        LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
-        rideDTO.setStartTime(dateTime);
-        rideDTO.setTotalCost(1235);
-        rideDTO.setDriver(UserRef.getMockupData());
-        List<UserRef> passengerList = new ArrayList<>();
-        passengerList.add(UserRef.getMockupData());
-        rideDTO.setPassengers((ArrayList<UserRef>) passengerList);
-        rideDTO.setEstimatedTimeInMinutes(5);
-        rideDTO.setRejection(UserRejectionLetterDTO.getMockupData());
-        List<DepartureDestinationDTO> locations = new ArrayList<>();
-        rideDTO.setBabyTransport(true);
-        rideDTO.setPetTransport(true);
-        rideDTO.setVehicleType("STANDARDNO");
-        locations.add(DepartureDestinationDTO.getMockedData());
-        rideDTO.setLocations((ArrayList<DepartureDestinationDTO>) locations);
-        rideDTO.setStatus("FINISHED");
-
-
-        return rideDTO;
-
-
-    }
-
-    public static RideDTO getCanceledMockupData(){
-        RideDTO rideDTO = new RideDTO();
-        rideDTO.setId(123);
-        String str = "2017-07-21T17:45:14Z";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX");
-        LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
-        rideDTO.setStartTime(dateTime);
-        rideDTO.setTotalCost(1235);
-        rideDTO.setDriver(UserRef.getMockupData());
-        List<UserRef> passengerList = new ArrayList<>();
-        passengerList.add(UserRef.getMockupData());
-        rideDTO.setPassengers((ArrayList<UserRef>) passengerList);
-        rideDTO.setEstimatedTimeInMinutes(5);
-        rideDTO.setRejection(UserRejectionLetterDTO.getMockupData());
-        List<DepartureDestinationDTO> locations = new ArrayList<>();
-        rideDTO.setBabyTransport(true);
-        rideDTO.setPetTransport(true);
-        rideDTO.setVehicleType("STANDARDNO");
-        locations.add(DepartureDestinationDTO.getMockedData());
-        rideDTO.setLocations((ArrayList<DepartureDestinationDTO>) locations);
-        rideDTO.setStatus("REJECTED");
-
-
-        return rideDTO;
-
-
-    }
 
     public Integer getId() {
         return id;
@@ -176,21 +67,21 @@ public class RideDTO {
         this.endTime = endTime;
     }
 
-    public Integer getTotalCost() {
+    public float getTotalCost() {
         return totalCost;
     }
 
-    public void setTotalCost(Integer totalCost) {
+    public void setTotalCost(float totalCost) {
         this.totalCost = totalCost;
     }
 
 
 
-    public Integer getEstimatedTimeInMinutes() {
+    public float getEstimatedTimeInMinutes() {
         return estimatedTimeInMinutes;
     }
 
-    public void setEstimatedTimeInMinutes(Integer estimatedTimeInMinutes) {
+    public void setEstimatedTimeInMinutes(float estimatedTimeInMinutes) {
         this.estimatedTimeInMinutes = estimatedTimeInMinutes;
     }
 
@@ -210,11 +101,11 @@ public class RideDTO {
         this.passengers = passengers;
     }
 
-    public String getVehicleType() {
+    public VehicleName getVehicleType() {
         return vehicleType;
     }
 
-    public void setVehicleType(String vehicleType) {
+    public void setVehicleType(VehicleName vehicleType) {
         this.vehicleType = vehicleType;
     }
 
@@ -242,19 +133,19 @@ public class RideDTO {
         this.rejection = rejection;
     }
 
-    public ArrayList<DepartureDestinationDTO> getLocations() {
+    public List<RouteForCreateRideDTO> getLocations() {
         return locations;
     }
 
-    public void setLocations(ArrayList<DepartureDestinationDTO> locations) {
+    public void setLocations(List<RouteForCreateRideDTO> locations) {
         this.locations = locations;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 }
