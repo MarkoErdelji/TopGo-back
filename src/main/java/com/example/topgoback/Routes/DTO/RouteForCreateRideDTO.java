@@ -1,10 +1,21 @@
 package com.example.topgoback.Routes.DTO;
 
 import com.example.topgoback.GeoLocations.DTO.GeoLocationDTO;
+import com.example.topgoback.Routes.Model.Route;
 
 public class RouteForCreateRideDTO {
     private GeoLocationDTO departure;
     private GeoLocationDTO destination;
+
+
+    public RouteForCreateRideDTO(){
+
+    }
+    public RouteForCreateRideDTO(Route route) {
+        this.departure = new GeoLocationDTO(route.getStart());
+        this.destination = new GeoLocationDTO(route.getFinish());
+
+    }
 
     public GeoLocationDTO getDeparture() {
         return departure;

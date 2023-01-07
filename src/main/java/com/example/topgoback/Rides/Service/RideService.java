@@ -11,6 +11,7 @@ import com.example.topgoback.Rides.DTO.UserRideDTO;
 import com.example.topgoback.Rides.Model.Ride;
 import com.example.topgoback.Rides.Repository.RideRepository;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
+import com.example.topgoback.Routes.DTO.RouteForCreateRideDTO;
 import com.example.topgoback.Routes.Model.Route;
 import com.example.topgoback.Routes.Repository.RouteRepository;
 import com.example.topgoback.Tools.DistanceCalculator;
@@ -35,6 +36,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -87,15 +89,13 @@ public class RideService {
         return userRidesListDTO;
     }
 
+
     public RideDTO createRide(CreateRideDTO createRideDTO) {
         Ride ride = new Ride();
-        RideDTO response = new RideDTO();
 
 
         ride.setForBabies(createRideDTO.getBabyTransport());
-        response.setBabyTransport(createRideDTO.getBabyTransport());
         ride.setForAnimals(createRideDTO.getPetTransport());
-        response.setPetTransport(createRideDTO.getPetTransport());
 
         Route route = new Route();
 
@@ -108,31 +108,23 @@ public class RideService {
         geoLocationRepository.save(destination);
 
 
-        response.setLocations(createRideDTO.getLocations());
         route.setLenght((float)DistanceCalculator.getDistanceFromLocations(createRideDTO.getLocations().get(0).getDeparture(),
                 createRideDTO.getLocations().get(0).getDestination()));
         routeRepository.save(route);
 
         ride.setRoute(route);
         ride.setStart(LocalDateTime.now());
-        response.setStartTime(LocalDateTime.now());
 
         ride.setStatus(Status.PENDING);
-        response.setStatus(Status.PENDING);
 
         ride.setVehicleName(createRideDTO.getVehicleType());
-        response.setVehicleType(createRideDTO.getVehicleType());
         float totalCost = DistanceCalculator.getPrice(route.getLenght(),
                 vehicleTypeRepository.findByVehicleName(createRideDTO.getVehicleType()));
 
         ride.setPrice(totalCost);
-        response.setTotalCost(totalCost);
-
-        response.setEstimatedTimeInMinutes(DistanceCalculator.getEstimatedTimeInMinutes(60,route.getLenght()));
 
 
         ride.setPassenger(new ArrayList<Passenger>());
-        response.setPassengers(new ArrayList<UserRef>());
         for (RidePassengerDTO passengerDTO: createRideDTO.getPassengers()
              ) {
             Optional<Passenger> passenger = passengerRepository.findById(passengerDTO.getId());
@@ -141,20 +133,21 @@ public class RideService {
             UserRef userRef = new UserRef();
             userRef.setId(passenger.get().getId());
             userRef.setEmail(passenger.get().getEmail());
-            response.getPassengers().add(userRef);
 
         }
-        Driver driver = this.DriverSelection(ride,response.estimatedTimeInMinutes);
+
+
+        Driver driver = this.DriverSelection(ride,DistanceCalculator.getEstimatedTimeInMinutes(60,ride.getRoute().getLenght()));
         if (driver == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"No avaliable drivers at this moment");
+
         ride.setDriver(driver);
         UserRef driverRef = new UserRef();
         driverRef.setId(driver.getId());
         driverRef.setEmail(driver.getEmail());
-        response.setDriver(driverRef);
 
 
         rideRepository.save(ride);
-        response.setId(ride.getId());
+        RideDTO response = new RideDTO(ride);
         return response;
 
 
@@ -217,5 +210,21 @@ public class RideService {
         if (ride.isEmpty())return false;
         return true;
 
+    }
+
+
+    public RideDTO acceptRide(int id) {
+        Optional<Ride> optionalRide = rideRepository.findById(id);
+        if(optionalRide.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Ride does not exist!");
+        }
+
+        Ride ride = optionalRide.get();
+        if(ride.getStatus() != Status.PENDING){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Cannot accept a ride that is not in status PENDING!");
+        }
+        ride.setStatus(Status.ACCEPTED);
+        rideRepository.save(ride);
+        return new RideDTO(ride);
     }
 }
