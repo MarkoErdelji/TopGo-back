@@ -135,7 +135,11 @@ public class RideService {
             userRef.setEmail(passenger.get().getEmail());
 
         }
+
+
         Driver driver = this.DriverSelection(ride,DistanceCalculator.getEstimatedTimeInMinutes(60,ride.getRoute().getLenght()));
+        if (driver == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"No avaliable drivers at this moment");
+
         ride.setDriver(driver);
         UserRef driverRef = new UserRef();
         driverRef.setId(driver.getId());

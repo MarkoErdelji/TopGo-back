@@ -63,6 +63,7 @@ public class RideController {
     @PutMapping(value = "/{id}/accept")
     public ResponseEntity<RideDTO> acceptRide(@PathVariable Integer id){
         RideDTO ride = rideService.acceptRide(id);
+        sendPassengerRideUpdate(ride);
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
 
