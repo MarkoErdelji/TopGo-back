@@ -31,7 +31,7 @@ public class RideController {
     @PostMapping(consumes = "application/json")
     public ResponseEntity<RideDTO> createRide(@RequestBody CreateRideDTO createRideDTO){
         RideDTO response = rideService.createRide(createRideDTO);
-        sendRideUpdate(response);
+        sendDriverRideUpdate(response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     /*@GetMapping(value = "/driver/{driverId}/active")
