@@ -9,6 +9,9 @@ import com.example.topgoback.Vehicles.Service.VehicleTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,9 +22,14 @@ public class RideController {
     private RideService rideService;
 
 
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+
     @PostMapping(consumes = "application/json")
     public ResponseEntity<RideDTO> createRide(@RequestBody CreateRideDTO createRideDTO){
         RideDTO response = rideService.createRide(createRideDTO);
+        sendRideUpdate(response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     /*@GetMapping(value = "/driver/{driverId}/active")
@@ -65,4 +73,10 @@ public class RideController {
         return new ResponseEntity<>(RideDTO.getCanceledMockupData(), HttpStatus.OK);
     }*/
 
+
+    @CrossOrigin(origins = "http://localhost:4200")
+
+    public void sendRideUpdate(RideDTO update) {
+        messagingTemplate.convertAndSend("/topic/driver/ride/"+update.driver.getId(), update);
+    }
 }

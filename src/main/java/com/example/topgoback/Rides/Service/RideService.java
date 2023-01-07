@@ -117,8 +117,8 @@ public class RideService {
         ride.setStart(LocalDateTime.now());
         response.setStartTime(LocalDateTime.now());
 
-        ride.setStatus(Status.ACTIVE);
-        response.setStatus(Status.ACTIVE);
+        ride.setStatus(Status.PENDING);
+        response.setStatus(Status.PENDING);
 
         ride.setVehicleName(createRideDTO.getVehicleType());
         response.setVehicleType(createRideDTO.getVehicleType());
@@ -189,7 +189,7 @@ public class RideService {
             double distance = DistanceCalculator.getDistanceFromLocations(new GeoLocationDTO(vehicle.getCurrentLocation()),new GeoLocationDTO(ride.getRoute().getStart()));
             if (distance< minimumDistance)
             {
-                distance = minimumDistance;
+                minimumDistance = distance;
                 bestDriver = driver;
             }
 
