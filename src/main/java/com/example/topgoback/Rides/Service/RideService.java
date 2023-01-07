@@ -145,6 +145,7 @@ public class RideService {
 
         }
         Driver driver = this.DriverSelection(ride,response.estimatedTimeInMinutes);
+        if (driver == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"No avaliable drivers at this moment");
         ride.setDriver(driver);
         UserRef driverRef = new UserRef();
         driverRef.setId(driver.getId());
