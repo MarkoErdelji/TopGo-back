@@ -104,10 +104,10 @@ public class DriverController {
 
     }
     @DeleteMapping(value = "/document/{documentId}")
-    public ResponseEntity<Void> deleteDriverDocument(@PathVariable Integer documentId)
+    public ResponseEntity<?> deleteDriverDocument(@PathVariable Integer documentId)
     {
-
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        driverService.deleteDriverDocument(documentId);
+        return new ResponseEntity<>("Driver document deleted successfully", HttpStatus.NO_CONTENT);
 
     }
 
