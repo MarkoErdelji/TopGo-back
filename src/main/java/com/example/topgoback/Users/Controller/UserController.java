@@ -169,14 +169,9 @@ public class UserController {
     }
 
     @PostMapping(value = "{id}/note")
-    public ResponseEntity<?> addNote(@PathVariable Integer id,@RequestBody Note note)
+    public ResponseEntity<?> addNote(@PathVariable Integer id,@RequestBody CreateNoteDTO note)
     {
-//        User user = userService.findOne(id);
-//        if(user == null){
-//            return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
-//        }
-
-        NoteResponseDTO noteResponseDTO = noteService.addOne(note);
+        NoteResponseDTO noteResponseDTO = noteService.addOne(id,note);
 
         return new ResponseEntity<>(noteResponseDTO,HttpStatus.OK);
 
