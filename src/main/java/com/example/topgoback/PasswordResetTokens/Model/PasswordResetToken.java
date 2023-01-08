@@ -1,5 +1,6 @@
 package com.example.topgoback.PasswordResetTokens.Model;
 
+import com.example.topgoback.Users.Model.User;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -18,7 +19,9 @@ public class PasswordResetToken {
     @Column
     private LocalDateTime expirationTime;
 
+
     public PasswordResetToken(){};
+
 
     public Integer getId() {
         return id;
