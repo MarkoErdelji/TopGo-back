@@ -1,6 +1,7 @@
 package com.example.topgoback.Notes.Model;
 
 import com.example.topgoback.Enums.MessageType;
+import com.example.topgoback.Users.Model.User;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -13,10 +14,23 @@ public class Note {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @ManyToOne(optional = true)
+    private User user;
+
+
+    private LocalDateTime timeOfWriting;
     private String message;
 
 
     public Note(){}
+
+    public LocalDateTime getTimeOfWriting() {
+        return timeOfWriting;
+    }
+
+    public void setTimeOfWriting(LocalDateTime timeOfWriting) {
+        this.timeOfWriting = timeOfWriting;
+    }
 
     public Integer getId() {
         return id;
@@ -28,6 +42,14 @@ public class Note {
 
     public String getMessage() {
         return message;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public void setMessage(String message) {

@@ -1,6 +1,7 @@
 package com.example.topgoback.Users.Model;
 
 import com.example.topgoback.Enums.UserType;
+import com.example.topgoback.Notes.Model.Note;
 import com.example.topgoback.Users.DTO.CreateUserDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 
 import static jakarta.persistence.InheritanceType.TABLE_PER_CLASS;
@@ -49,6 +51,16 @@ public class User implements UserDetails {
     @Column(name="userType",nullable = true)
     private UserType userType;
 
+    @OneToMany()
+    private List<Note> userNotes;
+
+    public List<Note> getUserNotes() {
+        return userNotes;
+    }
+
+    public void setUserNotes(List<Note> userNotes) {
+        this.userNotes = userNotes;
+    }
 
     public User(){};
     public User(CreateUserDTO userDTO){

@@ -169,14 +169,9 @@ public class UserController {
     }
 
     @PostMapping(value = "{id}/note")
-    public ResponseEntity<?> addNote(@PathVariable Integer id,@RequestBody Note note)
+    public ResponseEntity<?> addNote(@PathVariable Integer id,@RequestBody CreateNoteDTO note)
     {
-//        User user = userService.findOne(id);
-//        if(user == null){
-//            return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
-//        }
-
-        NoteResponseDTO noteResponseDTO = noteService.addOne(note);
+        NoteResponseDTO noteResponseDTO = noteService.addOne(id,note);
 
         return new ResponseEntity<>(noteResponseDTO,HttpStatus.OK);
 
@@ -185,18 +180,14 @@ public class UserController {
 
     @GetMapping(value = "{id}/note")
     public ResponseEntity<?> getUserNotes(@PathVariable Integer id,
-                                        @RequestParam(required = false) Integer page,
-                                      @RequestParam(required = false) Integer size)
+                                          @RequestParam(required = false,defaultValue = "0") Integer page,
+                                          @RequestParam(required = false,defaultValue = "10") Integer size,
+                                          Pageable pageable)
     {
 
-        UserNoteListDTO userNotes = noteService.findUsersNotes(id);
-
-        if(userNotes == null){
-            return new ResponseEntity<>("No notes in database",HttpStatus.NOT_FOUND);
-        }
-        else {
-            return new ResponseEntity<>(userNotes, HttpStatus.OK);
-        }
+        pageable = (Pageable) PageRequest.of(page, size, Sort.by("id").ascending());
+        UserNoteListDTO userNotes = noteService.findUsersNotes(id,pageable);
+        return new ResponseEntity<>(userNotes, HttpStatus.OK);
     }
 
 
