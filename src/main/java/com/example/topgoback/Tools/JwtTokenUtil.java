@@ -34,10 +34,10 @@ public class JwtTokenUtil implements Serializable {
         return (String) claims.get("role");
     }
 
-    public String getUserIdFromToken(String token) {
+    public int getUserIdFromToken(String token) {
         Map<String, Object> claims;
         claims = getAllClaimsFromToken(token);
-        return (String) claims.get("id");
+        return (int) claims.get("id");
     }
 
     //retrieve expiration date from jwt token

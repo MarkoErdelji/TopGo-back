@@ -62,7 +62,12 @@ public class RideDTO {
 
         this.setEndTime(r.getEnd());
         this.setDriver(new UserRef(r.getDriver()));
-
+        if(r.getRejectionLetter()!= null) {
+            UserRejectionLetterDTO u = new UserRejectionLetterDTO();
+            u.setReason(r.getRejectionLetter().getReason());
+            u.setTimeOfRejection(r.getRejectionLetter().getTimeOfRejection());
+            this.setRejection(u);
+        }
         ArrayList<UserRef> userRefList = new ArrayList<>();
         for(Passenger p:r.getPassenger()){
             userRefList.add(new UserRef(p));

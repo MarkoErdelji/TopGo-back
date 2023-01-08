@@ -87,7 +87,7 @@ INSERT INTO RIDE (ID, END_TIME, FOR_ANIMALS, FOR_BABIES, PANIC, PRICE, START_TIM
 VALUES (3, '2023-01-02T12:00:00', true, true, false, 1570.00, '2023-01-02T09:00:00', 4, 2, NULL, 5, NULL, 3);
 
 INSERT INTO PASSENGER_RIDES (PASSENGER_ID, RIDE_ID)
-VALUES (21, 1),(22, 2),(23, 3),(21,3);
+VALUES (21, 1),(22, 2),(23, 3),(21,3),(21,2);
 
 -- alter table if exists messages add constraint sender_id_fk foreign key (sender_id) references users;
 -- alter table if exists messages add constraint receiver_id_fk foreign key (receiver_id) references users;

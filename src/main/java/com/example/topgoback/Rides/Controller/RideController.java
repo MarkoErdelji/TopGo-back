@@ -1,20 +1,20 @@
 package com.example.topgoback.Rides.Controller;
 
+import com.example.topgoback.FavouriteRides.DTO.FavouriteRideDTO;
+import com.example.topgoback.FavouriteRides.DTO.FavouriteRideInfoDTO;
 import com.example.topgoback.Panic.DTO.PanicDTO;
+import com.example.topgoback.RejectionLetters.DTO.RejectionTextDTO;
 import com.example.topgoback.Rides.DTO.CreateRideDTO;
 import com.example.topgoback.Rides.DTO.RideDTO;
 import com.example.topgoback.Rides.Service.RideService;
 import com.example.topgoback.Users.DTO.UserRef;
-import com.example.topgoback.Users.Model.Passenger;
-import com.example.topgoback.Vehicles.Model.VehicleType;
-import com.example.topgoback.Vehicles.Service.VehicleTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "api/ride")
@@ -34,29 +34,34 @@ public class RideController {
         sendDriverRideUpdate(response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-    /*@GetMapping(value = "/driver/{driverId}/active")
+    @GetMapping(value = "/driver/{driverId}/active")
     public ResponseEntity<RideDTO> getActiveRideForDriver(@PathVariable Integer driverId){
-        return new ResponseEntity<>(RideDTO.getMockupData(), HttpStatus.OK);
-    }*/
+        RideDTO response = rideService.getDriverActiveRide(driverId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
-   /* @GetMapping(value = "/passenger/{passengerId}/active")
+    @GetMapping(value = "/passenger/{passengerId}/active")
     public ResponseEntity<RideDTO> getActiveRideForPassenger(@PathVariable Integer passengerId){
-        return new ResponseEntity<>(RideDTO.getMockupData(), HttpStatus.OK);
-    }*/
+        RideDTO response = rideService.getPassengerActiveRide(passengerId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
-   /* @GetMapping(value = "/{id}")
+    @GetMapping(value = "/{id}")
     public ResponseEntity<RideDTO> getRide(@PathVariable Integer id){
-        return new ResponseEntity<>(RideDTO.getMockupData(), HttpStatus.OK);
-    }*/
+        RideDTO response = rideService.getRideById(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
-   /* @PutMapping(value = "/{id}/withdraw")
+    @PutMapping(value = "/{id}/withdraw")
     public ResponseEntity<RideDTO> withdrawRoute(@PathVariable Integer id){
-        return new ResponseEntity<>(RideDTO.getMockupData(), HttpStatus.OK);
-    }*/
+        RideDTO response = rideService.withdrawRide(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     @PutMapping(value = "/{id}/panic", consumes = "application/json")
-    public ResponseEntity<PanicDTO> panic(@PathVariable Integer id, @RequestBody String reason){
-        return new ResponseEntity<>(PanicDTO.getMokap(), HttpStatus.OK);
+    public ResponseEntity<PanicDTO> panic(@PathVariable Integer id, @RequestBody RejectionTextDTO reason){
+        PanicDTO response = rideService.panic(id,reason);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
@@ -67,15 +72,48 @@ public class RideController {
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
 
-   /* @PutMapping(value = "/{id}/end")
-    public ResponseEntity<RideDTO> finishRoute(@PathVariable Integer id){
-        return new ResponseEntity<>(RideDTO.getFinishMockupData(), HttpStatus.OK);
-    }*/
+    @PutMapping(value = "/{id}/cancel")
+    public ResponseEntity<RideDTO> cancelRide(@PathVariable Integer id, @RequestBody RejectionTextDTO reason){
+        RideDTO ride = rideService.cancelRide(id,reason);
+        sendPassengerRideUpdate(ride);
+        return new ResponseEntity<>(ride, HttpStatus.OK);
+    }
 
-//    @PutMapping(value = "/{id}/cancel", consumes = "application/json")
-//    public ResponseEntity<RideDTO> cancelRoute(@PathVariable Integer id, @RequestBody String reason){
-//        //return new ResponseEntity<>(RideDTO.getCanceledMockupData(), HttpStatus.OK);
-//    }
+    @PutMapping(value = "/{id}/end")
+    public ResponseEntity<RideDTO> finishRoute(@PathVariable Integer id){
+        RideDTO ride = rideService.endRide(id);
+        return new ResponseEntity<>(ride, HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/{id}/start")
+    public ResponseEntity<RideDTO> startRoute(@PathVariable Integer id){
+        RideDTO ride = rideService.startRide(id);
+        return new ResponseEntity<>(ride, HttpStatus.OK);
+    }
+    @PostMapping(value = "/favourites", consumes = "application/json")
+    public ResponseEntity<FavouriteRideInfoDTO> addFavouriteRide(@RequestBody FavouriteRideDTO favouriteRide){
+        FavouriteRideInfoDTO response = rideService.addFavouriteRide(favouriteRide);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @GetMapping(value = "/favourites")
+    public ResponseEntity<List<FavouriteRideInfoDTO>> getFavouriteRides(@RequestHeader("Authorization") String authorization)
+    {
+        List<FavouriteRideInfoDTO> response = rideService.getFavouriteRides(authorization);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+
+
+    }
+    @DeleteMapping(value = "/favourites/{id}")
+    public ResponseEntity<String> deleteFavouriteRides(@PathVariable Integer id)
+    {
+        rideService.deleteFavouriteRides(id);
+        return new ResponseEntity<>("Successful deletion of favorite location!",HttpStatus.NO_CONTENT);
+
+
+    }
+
+
+
 
 
     @CrossOrigin(origins = "http://localhost:4200")
