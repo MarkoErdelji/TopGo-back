@@ -3,6 +3,7 @@ package com.example.topgoback.Users.Controller;
 import com.example.topgoback.Documents.DTO.CreateDocumentDTO;
 import com.example.topgoback.Documents.DTO.DocumentInfoDTO;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
+import com.example.topgoback.Users.DTO.AllActiveDriversDTO;
 import com.example.topgoback.Users.DTO.AllDriversDTO;
 import com.example.topgoback.Users.DTO.CreateDriverDTO;
 import com.example.topgoback.Users.DTO.DriverInfoDTO;
@@ -15,6 +16,10 @@ import com.example.topgoback.WorkHours.DTO.DriverWorkHoursDTO;
 import com.example.topgoback.WorkHours.DTO.WorkHoursDTO;
 import com.example.topgoback.WorkHours.Service.WorkHoursService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -44,15 +49,18 @@ public class DriverController {
 
 
     @GetMapping()
-    public ResponseEntity<AllDriversDTO> getAllDrivers()
+    public ResponseEntity<?> getAllDrivers(@RequestParam(required = false, defaultValue = "0") Integer page,
+                                           @RequestParam(required = false, defaultValue = "10") Integer size,
+                                           Pageable pageable)
     {
-        AllDriversDTO response = driverService.findAll();
+        pageable = (Pageable) PageRequest.of(page, size, Sort.by("id").ascending());
+        AllDriversDTO response = driverService.findAll(pageable);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping(value = "/active")
-    public ResponseEntity<AllDriversDTO> getActiveDrivers(){
-        AllDriversDTO activeDrivers = driverService.getActiveDrivers();
+    public ResponseEntity<AllActiveDriversDTO> getActiveDrivers(){
+        AllActiveDriversDTO activeDrivers = driverService.getActiveDrivers();
         return new ResponseEntity<>(activeDrivers, HttpStatus.OK);
     }
 

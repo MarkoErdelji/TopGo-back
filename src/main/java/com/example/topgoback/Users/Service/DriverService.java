@@ -9,6 +9,7 @@ import com.example.topgoback.Enums.UserType;
 import com.example.topgoback.GeoLocations.Model.GeoLocation;
 import com.example.topgoback.GeoLocations.Repository.GeoLocationRepository;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
+import com.example.topgoback.Users.DTO.AllActiveDriversDTO;
 import com.example.topgoback.Users.DTO.AllDriversDTO;
 import com.example.topgoback.Users.DTO.CreateDriverDTO;
 import com.example.topgoback.Users.DTO.DriverInfoDTO;
@@ -25,6 +26,9 @@ import com.example.topgoback.WorkHours.DTO.DriverWorkHoursDTO;
 import com.example.topgoback.WorkHours.DTO.WorkHoursDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -54,18 +58,15 @@ public class DriverService {
 
 
 
-    public AllDriversDTO findAll() {
+    public AllDriversDTO findAll(Pageable pageable) {
 
-        List<Driver> drivers = driverRepository.findAll();
+        Page<Driver> drivers = driverRepository.findAll(pageable);
         List<DriverInfoDTO> ddrivers = new ArrayList<DriverInfoDTO>();
         for (Driver d:drivers
         ) {
             ddrivers.add(new DriverInfoDTO(d));
         }
-        AllDriversDTO allDrivers = new AllDriversDTO();
-        allDrivers.setTotalCount(drivers.size());
-        allDrivers.setResults(ddrivers);
-
+        AllDriversDTO allDrivers = new AllDriversDTO(new PageImpl<>(ddrivers, pageable, drivers.getTotalElements()));
         return allDrivers;
 
     }
@@ -249,14 +250,14 @@ public class DriverService {
 
 
     }
-    public AllDriversDTO getActiveDrivers (){
+    public AllActiveDriversDTO getActiveDrivers (){
         List<Driver> drivers = driverRepository.findByIsActiveTrue();
         List<DriverInfoDTO> driversDTO = new ArrayList<>();
         for (Driver d:drivers
         ) {
             driversDTO.add(new DriverInfoDTO(d));
         }
-        AllDriversDTO allActiveDrivers = new AllDriversDTO();
+        AllActiveDriversDTO allActiveDrivers = new AllActiveDriversDTO();
         allActiveDrivers.setTotalCount(drivers.size());
         allActiveDrivers.setResults(driversDTO);
 
