@@ -121,15 +121,19 @@ public class UserController {
 
 
     @GetMapping(value = "{id}/message")
-    public ResponseEntity<?> getUsersMessages(@PathVariable Integer id)
+    public ResponseEntity<?> getUsersMessages(@PathVariable Integer id,
+                                              @RequestParam(required = false,defaultValue = "0") Integer page,
+                                              @RequestParam(required = false,defaultValue =  "0") Integer size,
+                                              Pageable pageable)
     {
 
-        UserMessagesListDTO userMessages = messageService.findBySenderOrReceiver(id);
-
-        if(userMessages == null){
-            return new ResponseEntity<>("No messages found for user with id " + id,HttpStatus.NOT_FOUND);
+        if (size == 0 || size == Pageable.unpaged().getPageSize()) {
+            pageable = PageRequest.of(pageable.getPageNumber(), Integer.MAX_VALUE, pageable.getSort());
+        } else {
+            pageable = PageRequest.of(pageable.getPageNumber(), size, pageable.getSort());
         }
 
+        UserMessagesListDTO userMessages = messageService.findBySenderOrReceiver(id,pageable);
         return new ResponseEntity<>(userMessages,HttpStatus.OK);
 
     }
