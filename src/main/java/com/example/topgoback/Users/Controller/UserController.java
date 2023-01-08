@@ -1,5 +1,6 @@
 package com.example.topgoback.Users.Controller;
 
+import com.example.topgoback.Email.Model.Email;
 import com.example.topgoback.Enums.AllowedSortFields;
 import com.example.topgoback.Messages.DTO.SendMessageDTO;
 import com.example.topgoback.Messages.DTO.UserMessagesDTO;
@@ -14,6 +15,8 @@ import com.example.topgoback.Rides.Service.RideService;
 import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Service.UserService;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +29,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -33,6 +37,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.security.auth.login.CredentialExpiredException;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
@@ -40,9 +45,6 @@ import java.util.Arrays;
 @RequestMapping(value = "api/user")
 @CrossOrigin(origins = "http://localhost:4200")
 public class UserController {
-
-    @Autowired
-    private final JavaMailSender mailSender;
     @Autowired
     private UserService userService;
 
@@ -57,7 +59,7 @@ public class UserController {
     @Autowired
     private PasswordResetTokenService passwordResetTokenService;
 
-    UserController(JavaMailSender mailSender){this.mailSender = mailSender;}
+    UserController(){}
 
     @GetMapping(value = "{id}/ride")
     public ResponseEntity<?> getUserRides(@PathVariable Integer id,
@@ -186,28 +188,16 @@ public class UserController {
     }
 
 
-    @PutMapping(value = "reset/{token}/{email}/{newPassword}")
-    public ResponseEntity<?> updateUserPasswordWithToken(@PathVariable String token, @PathVariable String email,@PathVariable String newPassword)
-    {
-        try{
-        passwordResetTokenService.findOne(token);
-        User user = userService.loadUserByUsername(email);
+    @GetMapping(value="{id}/resetPassword")
+    public ResponseEntity<?> sendEmail(@PathVariable Integer id) throws MessagingException, IOException {
+        userService.sendEmail(id);
+        return new ResponseEntity<>("Email with reset code has been sent!",HttpStatus.NO_CONTENT);
+    }
 
-        userService.updateUserPassword(user,newPassword);
-        } catch( CredentialExpiredException ce){
-            return new ResponseEntity<>("Token expired", HttpStatus.EXPECTATION_FAILED);
-        }
-        catch(UsernameNotFoundException unfe){
-            return new ResponseEntity<>("Email not found",HttpStatus.NOT_FOUND);
-
-        }
-        catch (Exception e){
-            return new ResponseEntity<>("Token not found", HttpStatus.BAD_REQUEST);
-        }
-
-        return new ResponseEntity<>("Password successfuly updated",HttpStatus.OK);
-
-
+    @PutMapping(value="{id}/resetPassword")
+    public ResponseEntity<?> resetUserPassword(@PathVariable Integer id,@RequestBody ResetPasswordDTO resetPasswordDTO) {
+        userService.resetUserPassword(id,resetPasswordDTO);
+        return new ResponseEntity<>("Password successfully changed!",HttpStatus.NO_CONTENT);
     }
 
 
