@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -120,15 +121,19 @@ public class UserController {
 
 
     @GetMapping(value = "{id}/message")
-    public ResponseEntity<?> getUsersMessages(@PathVariable Integer id)
+    public ResponseEntity<?> getUsersMessages(@PathVariable Integer id,
+                                              @RequestParam(required = false,defaultValue = "0") Integer page,
+                                              @RequestParam(required = false,defaultValue =  "0") Integer size,
+                                              Pageable pageable)
     {
 
-        UserMessagesListDTO userMessages = messageService.findBySenderOrReceiver(id);
-
-        if(userMessages == null){
-            return new ResponseEntity<>("No messages found for user with id " + id,HttpStatus.NOT_FOUND);
+        if (size == 0 || size == Pageable.unpaged().getPageSize()) {
+            pageable = PageRequest.of(pageable.getPageNumber(), Integer.MAX_VALUE, pageable.getSort());
+        } else {
+            pageable = PageRequest.of(pageable.getPageNumber(), size, pageable.getSort());
         }
 
+        UserMessagesListDTO userMessages = messageService.findBySenderOrReceiver(id,pageable);
         return new ResponseEntity<>(userMessages,HttpStatus.OK);
 
     }
@@ -137,17 +142,7 @@ public class UserController {
     @PostMapping(value = "{id}/message")
     public ResponseEntity<?> sendUsersMessage(@PathVariable Integer id, @RequestBody SendMessageDTO sendMessageDTO)
     {
-//        User sender = userService.findOne(id);
-//        User receiver = userService.findOne(sendMessageDTO.getReceiverId());
-//        if(receiver == null){
-//            return new ResponseEntity<>("User doesn't exist!",HttpStatus.NOT_FOUND);
-//        }
-//
-//        if (sendMessageDTO.getType().compareTo(MessageType.RIDE) != 0){
-//            sendMessageDTO.setRideId(null);
-//        }
-
-        UserMessagesDTO message = messageService.addOne(sendMessageDTO);
+        UserMessagesDTO message = messageService.addOne(id,sendMessageDTO);
         return new ResponseEntity<>(message,HttpStatus.OK);
 
     }
