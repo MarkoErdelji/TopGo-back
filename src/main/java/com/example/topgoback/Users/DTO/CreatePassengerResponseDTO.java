@@ -26,7 +26,12 @@ public class CreatePassengerResponseDTO {
         this.id = passenger.getId();
         this.name = passenger.getFirstName();
         this.surname = passenger.getLastName();
-        this.profilePicture = "placeholder";
+        if(passenger.getProfilePicture() != null){
+            this.profilePicture = passenger.getProfilePicture();
+        }
+        else {
+            this.profilePicture = "placeholder";
+        }
         this.telephoneNumber = passenger.getPhoneNumber();
         this.email = passenger.getEmail();
         this.address = passenger.getAddress();

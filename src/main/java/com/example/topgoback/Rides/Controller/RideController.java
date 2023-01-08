@@ -4,11 +4,16 @@ import com.example.topgoback.Panic.DTO.PanicDTO;
 import com.example.topgoback.Rides.DTO.CreateRideDTO;
 import com.example.topgoback.Rides.DTO.RideDTO;
 import com.example.topgoback.Rides.Service.RideService;
+import com.example.topgoback.Users.DTO.UserRef;
+import com.example.topgoback.Users.Model.Passenger;
 import com.example.topgoback.Vehicles.Model.VehicleType;
 import com.example.topgoback.Vehicles.Service.VehicleTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,9 +24,14 @@ public class RideController {
     private RideService rideService;
 
 
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+
     @PostMapping(consumes = "application/json")
     public ResponseEntity<RideDTO> createRide(@RequestBody CreateRideDTO createRideDTO){
         RideDTO response = rideService.createRide(createRideDTO);
+        sendDriverRideUpdate(response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     /*@GetMapping(value = "/driver/{driverId}/active")
@@ -50,19 +60,35 @@ public class RideController {
     }
 
 
-    /*@PutMapping(value = "/{id}/accept")
-    public ResponseEntity<RideDTO> acceptRoute(@PathVariable Integer id){
-        return new ResponseEntity<>(RideDTO.getAcceptedMockupData(), HttpStatus.OK);
-    }*/
+    @PutMapping(value = "/{id}/accept")
+    public ResponseEntity<RideDTO> acceptRide(@PathVariable Integer id){
+        RideDTO ride = rideService.acceptRide(id);
+        sendPassengerRideUpdate(ride);
+        return new ResponseEntity<>(ride, HttpStatus.OK);
+    }
 
    /* @PutMapping(value = "/{id}/end")
     public ResponseEntity<RideDTO> finishRoute(@PathVariable Integer id){
         return new ResponseEntity<>(RideDTO.getFinishMockupData(), HttpStatus.OK);
     }*/
 
-    /*@PutMapping(value = "/{id}/cancel", consumes = "application/json")
-    public ResponseEntity<RideDTO> cancelRoute(@PathVariable Integer id, @RequestBody String reason){
-        return new ResponseEntity<>(RideDTO.getCanceledMockupData(), HttpStatus.OK);
-    }*/
+//    @PutMapping(value = "/{id}/cancel", consumes = "application/json")
+//    public ResponseEntity<RideDTO> cancelRoute(@PathVariable Integer id, @RequestBody String reason){
+//        //return new ResponseEntity<>(RideDTO.getCanceledMockupData(), HttpStatus.OK);
+//    }
 
+
+    @CrossOrigin(origins = "http://localhost:4200")
+
+    public void sendDriverRideUpdate(RideDTO update) {
+        messagingTemplate.convertAndSend("/topic/driver/ride/"+update.driver.getId(), update);
+    }
+
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    public void sendPassengerRideUpdate(RideDTO update) {
+        for(UserRef p: update.getPassengers()){
+            messagingTemplate.convertAndSend("/topic/passenger/ride/"+p.getId(), update);
+        }
+    }
 }

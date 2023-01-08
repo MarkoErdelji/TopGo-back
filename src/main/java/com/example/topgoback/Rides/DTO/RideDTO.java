@@ -4,8 +4,11 @@ import com.example.topgoback.Enums.Status;
 import com.example.topgoback.Enums.VehicleName;
 import com.example.topgoback.GeoLocations.DTO.DepartureDestinationDTO;
 import com.example.topgoback.RejectionLetters.DTO.UserRejectionLetterDTO;
+import com.example.topgoback.Rides.Model.Ride;
 import com.example.topgoback.Routes.DTO.RouteForCreateRideDTO;
+import com.example.topgoback.Tools.DistanceCalculator;
 import com.example.topgoback.Users.DTO.UserRef;
+import com.example.topgoback.Users.Model.Passenger;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -40,6 +43,33 @@ public class RideDTO {
     public Status status;
 
     public RideDTO() {
+    }
+
+    public RideDTO(Ride r){
+        this.setBabyTransport(r.isForBabies());
+        this.setPetTransport(r.isForAnimals());
+
+        this.setLocations(new ArrayList<RouteForCreateRideDTO>());
+        this.getLocations().add(new RouteForCreateRideDTO(r.getRoute()));
+
+        this.setStartTime(LocalDateTime.now());
+        this.setStatus(r.getStatus());
+
+        this.setVehicleType(VehicleName.valueOf(r.getDriver().getVehicle().getVehicleType().getVehicleName()));
+        this.setTotalCost(r.getPrice());
+
+        this.setEstimatedTimeInMinutes(DistanceCalculator.getEstimatedTimeInMinutes(60,r.getRoute().getLenght()));
+
+        this.setEndTime(r.getEnd());
+        this.setDriver(new UserRef(r.getDriver()));
+
+        ArrayList<UserRef> userRefList = new ArrayList<>();
+        for(Passenger p:r.getPassenger()){
+            userRefList.add(new UserRef(p));
+        }
+        this.setPassengers(userRefList);
+
+        this.setId(r.getId());
     }
 
 
