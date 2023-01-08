@@ -1,6 +1,7 @@
 package com.example.topgoback.Messages.DTO;
 
 import com.example.topgoback.Enums.MessageType;
+import com.example.topgoback.Messages.Model.Message;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +15,16 @@ public class UserMessagesDTO {
     public MessageType type;
     public Integer rideId;
 
+
+    public UserMessagesDTO(Message m){
+        this.id = m.getId();
+        this.message = m.getMessage();
+        this.receiverId = m.getReceiver().getId();
+        this.senderId = m.getSender().getId();
+        this.rideId = m.getRideId();
+        this.timeOfSending = m.getTimeOfSending();
+        this.type = m.getType();
+    }
 
     public UserMessagesDTO() {
     }
