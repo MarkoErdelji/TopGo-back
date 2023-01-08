@@ -180,18 +180,14 @@ public class UserController {
 
     @GetMapping(value = "{id}/note")
     public ResponseEntity<?> getUserNotes(@PathVariable Integer id,
-                                        @RequestParam(required = false) Integer page,
-                                      @RequestParam(required = false) Integer size)
+                                          @RequestParam(required = false,defaultValue = "0") Integer page,
+                                          @RequestParam(required = false,defaultValue = "10") Integer size,
+                                          Pageable pageable)
     {
 
-        UserNoteListDTO userNotes = noteService.findUsersNotes(id);
-
-        if(userNotes == null){
-            return new ResponseEntity<>("No notes in database",HttpStatus.NOT_FOUND);
-        }
-        else {
-            return new ResponseEntity<>(userNotes, HttpStatus.OK);
-        }
+        pageable = (Pageable) PageRequest.of(page, size, Sort.by("id").ascending());
+        UserNoteListDTO userNotes = noteService.findUsersNotes(id,pageable);
+        return new ResponseEntity<>(userNotes, HttpStatus.OK);
     }
 
 
