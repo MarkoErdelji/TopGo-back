@@ -59,8 +59,12 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/panic", consumes = "application/json")
-    public ResponseEntity<PanicDTO> panic(@PathVariable Integer id, @RequestBody RejectionTextDTO reason){
-        PanicDTO response = rideService.panic(id,reason);
+    public ResponseEntity<PanicDTO> panic(@RequestHeader("Authorization") String authorization,
+                                          @PathVariable Integer id,
+                                          @RequestBody RejectionTextDTO reason)
+    {
+
+        PanicDTO response = rideService.panic(id,reason,authorization);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

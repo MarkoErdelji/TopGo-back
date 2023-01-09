@@ -2,6 +2,7 @@ package com.example.topgoback.Vehicles.Controller;
 
 import com.example.topgoback.GeoLocations.DTO.GeoLocationDTO;
 import com.example.topgoback.GeoLocations.Model.GeoLocation;
+import com.example.topgoback.RejectionLetters.DTO.RejectionTextDTO;
 import com.example.topgoback.Users.DTO.CreateDriverDTO;
 import com.example.topgoback.Users.DTO.DriverInfoDTO;
 import com.example.topgoback.Vehicles.DTO.VehicleInfoDTO;
@@ -17,9 +18,10 @@ public class VehicleController {
     @Autowired
     VehicleService vehicleService;
     @PutMapping(consumes = "application/json",value = "{id}/location")
-    public ResponseEntity<GeoLocationDTO> changeCurrentLocation(@PathVariable Integer id) {
+    public ResponseEntity<String> changeCurrentLocation(@PathVariable Integer id,
+                                                        @RequestBody GeoLocationDTO location) {
 
-        GeoLocationDTO response = vehicleService.changeCurrentLocation(id);
+        String response = vehicleService.changeCurrentLocation(id,location);
         return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
 
