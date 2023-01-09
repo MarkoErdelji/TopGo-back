@@ -2,7 +2,9 @@ package com.example.topgoback.Users.Controller;
 
 import com.example.topgoback.Documents.DTO.CreateDocumentDTO;
 import com.example.topgoback.Documents.DTO.DocumentInfoDTO;
+import com.example.topgoback.Enums.AllowedSortFields;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
+import com.example.topgoback.Rides.Service.RideService;
 import com.example.topgoback.Users.DTO.AllActiveDriversDTO;
 import com.example.topgoback.Users.DTO.AllDriversDTO;
 import com.example.topgoback.Users.DTO.CreateDriverDTO;
@@ -25,8 +27,10 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -38,6 +42,8 @@ public class DriverController {
 
     @Autowired
     WorkHoursService workHoursService;
+    @Autowired
+    RideService rideService;
 
     @PostMapping(consumes = "application/json")
     public ResponseEntity<DriverInfoDTO> saveDriver(@RequestBody CreateDriverDTO ddriver) {
@@ -145,7 +151,7 @@ public class DriverController {
         VehicleInfoDTO response = driverService.updateDriverVehicle(driverId,newVehicle);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-    
+
     @PostMapping(consumes = "application/json",value = "{driverId}/working-hour")
     public ResponseEntity<WorkHoursDTO> addDriverWorkingHour(@PathVariable Integer driverId, @RequestBody StartTimeDTO start)
     {
@@ -153,20 +159,13 @@ public class DriverController {
         return new ResponseEntity<>(new WorkHoursDTO(workHours), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{driverId}/ride")
-    public ResponseEntity<UserRidesListDTO> getDriverRides(@PathVariable Integer driverId)
-    {
-        UserRidesListDTO response = driverService.getDriverRides(driverId);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
     @GetMapping(value = "{id}/working-hour")
     public ResponseEntity<?> getDriverWorkingHours(@PathVariable Integer id,
-                                                             @RequestParam(required = false, defaultValue = "0") Integer page,
-                                                             @RequestParam(required = false, defaultValue = "10") Integer size,
-                                                             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beginDateInterval,
-                                                             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateInterval,
-                                                             Pageable pageable)
+                                                   @RequestParam(required = false, defaultValue = "0") Integer page,
+                                                   @RequestParam(required = false, defaultValue = "10") Integer size,
+                                                   @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beginDateInterval,
+                                                   @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateInterval,
+                                                   Pageable pageable)
     {
         if(beginDateInterval == null){
             beginDateInterval = LocalDateTime.of(0001, 01, 01, 00, 00, 00, 00);;
@@ -180,6 +179,56 @@ public class DriverController {
             return new ResponseEntity<>("Driver has no WorkingHours!",HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(driverWorkHoursDTO, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{id}/ride")
+    public ResponseEntity<?> getDriverRides(@PathVariable Integer id,
+                                                           @RequestParam(required = false, defaultValue = "0") Integer page,
+                                                           @RequestParam(required = false, defaultValue =  "10") Integer size,
+                                                           @RequestParam(required = false) String sort,
+                                                           @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime beginDateInterval,
+                                                           @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateInterval,
+                                                           Pageable pageable)
+    {
+        if(sort == null){
+            sort = "id";
+        }
+        else{
+            boolean isValidSortField = false;
+            for (AllowedSortFields allowedField : AllowedSortFields.values()) {
+                if (sort.equals(allowedField.getField())) {
+                    isValidSortField = true;
+                    break;
+                }
+            }
+            if (!isValidSortField) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid sort field. Allowed fields: " + Arrays.toString(AllowedSortFields.values()));
+            }
+        }
+        if(beginDateInterval == null){
+            beginDateInterval = LocalDateTime.of(0001, 01, 01, 00, 00, 00, 00);;
+        }
+        if(endDateInterval == null){
+            endDateInterval = LocalDateTime.of(9999, 12, 31, 23, 59, 59, 999999);
+        }
+        pageable = (Pageable) PageRequest.of(page, size, Sort.by(sort).ascending());
+
+        UserRidesListDTO rides = rideService.findRidesByDriversId(id,pageable,beginDateInterval,endDateInterval);
+
+
+        if(rides == null){
+            return new ResponseEntity<>("User has no rides!",HttpStatus.NOT_FOUND);
+        }
+        else {
+            return new ResponseEntity<>(rides, HttpStatus.OK);
+        }
+    }
+
+    @GetMapping(value = "/working-hour/{workingHourId}")
+    public ResponseEntity<?> getSpecificWorkingHour(@PathVariable Integer workingHourId){
+        WorkHours workHours = workHoursService.findById(workingHourId);
+        return  new ResponseEntity<>(new WorkHoursDTO(workHours), HttpStatus.OK);
+
     }
 
     @PutMapping(consumes = "application/json",value = "/working-hour/{workingHourId}")

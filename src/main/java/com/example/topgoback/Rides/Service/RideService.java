@@ -100,6 +100,20 @@ public class RideService {
 
         return userRidesListDTO;
     }
+    public UserRidesListDTO findRidesByDriversId(int driversId, Pageable pageable, LocalDateTime beginDateTimeInterval, LocalDateTime endDateTimeInterval) {
+
+        Optional<Driver> driver = driverRepository.findById(driversId);
+        if(driver.isEmpty()){
+            throw  new ResponseStatusException(HttpStatus.NOT_FOUND, "Driver does not exist!");
+        }
+
+        Page<Ride> rides = rideRepository.findByDriverAndBeginBetween(driver.get().getId(), beginDateTimeInterval, endDateTimeInterval, pageable);
+        List<UserRideDTO> userRideDTOList = UserRideDTO.convertToUserRideDTO(rides.getContent());
+        UserRidesListDTO userRidesListDTO = new UserRidesListDTO(new PageImpl<>(userRideDTOList, pageable, rides.getTotalElements()));
+        userRidesListDTO.setTotalCount((int) rides.getTotalElements());
+
+        return userRidesListDTO;
+    }
 
 
     public RideDTO createRide(CreateRideDTO createRideDTO) {
