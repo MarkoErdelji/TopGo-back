@@ -1,9 +1,13 @@
 package com.example.topgoback.Users.DTO;
 
+import javax.validation.constraints.NotBlank;
+
 public class LoginCredentialDTO {
 
+    @NotBlank(message= "{format}")
     private String email;
 
+    @NotBlank(message= "{format}")
     private String password;
 
     public String getEmail() {
