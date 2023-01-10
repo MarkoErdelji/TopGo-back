@@ -1,8 +1,10 @@
 package com.example.topgoback.WorkHours.DTO;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 public class StartTimeDTO {
+    @NotNull
     private LocalDateTime start;
 
     public StartTimeDTO(LocalDateTime start) {

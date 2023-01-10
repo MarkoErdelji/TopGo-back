@@ -19,6 +19,7 @@ import com.example.topgoback.WorkHours.DTO.StartTimeDTO;
 import com.example.topgoback.WorkHours.DTO.WorkHoursDTO;
 import com.example.topgoback.WorkHours.Model.WorkHours;
 import com.example.topgoback.WorkHours.Service.WorkHoursService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -46,7 +47,7 @@ public class DriverController {
     RideService rideService;
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<DriverInfoDTO> saveDriver(@RequestBody CreateDriverDTO ddriver) {
+    public ResponseEntity<DriverInfoDTO> saveDriver(@Valid @RequestBody CreateDriverDTO ddriver) {
 
         DriverInfoDTO response = driverService.addOne(ddriver);
 
@@ -55,6 +56,7 @@ public class DriverController {
 
 
     @GetMapping()
+    @Valid
     public ResponseEntity<?> getAllDrivers(@RequestParam(required = false, defaultValue = "0") Integer page,
                                            @RequestParam(required = false, defaultValue = "10") Integer size,
                                            Pageable pageable)
@@ -72,6 +74,7 @@ public class DriverController {
 
 
     @GetMapping(value = "/{driverId}")
+    @Valid
     public ResponseEntity<DriverInfoDTO> getDriver(@PathVariable Integer driverId)
     {
 
@@ -81,6 +84,7 @@ public class DriverController {
     }
 
     @GetMapping(value = "/{email}/byEmail")
+    @Valid
     public ResponseEntity<DriverInfoDTO> getDriverByEmail(@PathVariable String email)
     {
 
@@ -90,7 +94,8 @@ public class DriverController {
     }
 
     @PutMapping(value = "/{driverId}",consumes = "application/json")
-    public ResponseEntity<DriverInfoDTO> updateDriver(@RequestBody DriverInfoDTO newDriver,@PathVariable Integer driverId)
+    @Valid
+    public ResponseEntity<DriverInfoDTO> updateDriver(@Valid @RequestBody DriverInfoDTO newDriver, @PathVariable Integer driverId)
     {
         DriverInfoDTO response = driverService.updateOne(newDriver,driverId);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -99,25 +104,24 @@ public class DriverController {
 
 
     @GetMapping(value = "/{driverId}/documents")
+    @Valid
     public ResponseEntity<?> getDriverDocuments(@PathVariable Integer driverId)
         {
             List<DocumentInfoDTO> response = driverService.getDriverDocuments(driverId);
-            if(response == null){
-                return new ResponseEntity<>("Driver doesn't exist",HttpStatus.BAD_REQUEST);
-            }
-            else {
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            }
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
         }
 
     @PostMapping(consumes = "application/json",value = "/{driverId}/documents")
-    public ResponseEntity<DocumentInfoDTO> addDriverDocument(@PathVariable Integer driverId, @RequestBody CreateDocumentDTO newDTO)
+    @Valid
+    public ResponseEntity<DocumentInfoDTO> addDriverDocument(@PathVariable Integer driverId, @Valid @RequestBody CreateDocumentDTO newDTO)
     {
         DocumentInfoDTO response = driverService.addDriverDocument(driverId,newDTO);
         return new ResponseEntity<>(response, HttpStatus.OK);
 
     }
     @DeleteMapping(value = "/document/{documentId}")
+    @Valid
     public ResponseEntity<?> deleteDriverDocument(@PathVariable Integer documentId)
     {
         driverService.deleteDriverDocument(documentId);
@@ -126,40 +130,42 @@ public class DriverController {
     }
 
     @PostMapping(consumes = "application/json",value = "/{driverId}/vehicle")
-    public ResponseEntity<VehicleInfoDTO> addDriverVehicle(@PathVariable Integer driverId, @RequestBody CreateVehicleDTO newVehicle)
+    @Valid
+    public ResponseEntity<VehicleInfoDTO> addDriverVehicle(@PathVariable Integer driverId, @Valid @RequestBody CreateVehicleDTO newVehicle)
     {
         VehicleInfoDTO response = driverService.addDriverVehicle(driverId,newVehicle);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping(value = "/{driverId}/vehicle")
+    @Valid
     public ResponseEntity<?> getDriverVehicle(@PathVariable Integer driverId)
     {
-        try {
-            VehicleInfoDTO response = driverService.getDriverVehicle(driverId);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-        catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
-        }
+
+        VehicleInfoDTO response = driverService.getDriverVehicle(driverId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+
     }
 
 
     @PutMapping(consumes = "application/json",value = "/{driverId}/vehicle")
-    public ResponseEntity<VehicleInfoDTO> updateDriverVehicle(@PathVariable Integer driverId, @RequestBody CreateVehicleDTO newVehicle)
+    @Valid
+    public ResponseEntity<VehicleInfoDTO> updateDriverVehicle(@PathVariable Integer driverId, @Valid @RequestBody CreateVehicleDTO newVehicle)
     {
         VehicleInfoDTO response = driverService.updateDriverVehicle(driverId,newVehicle);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping(consumes = "application/json",value = "{driverId}/working-hour")
-    public ResponseEntity<WorkHoursDTO> addDriverWorkingHour(@PathVariable Integer driverId, @RequestBody StartTimeDTO start)
+    @Valid
+    public ResponseEntity<WorkHoursDTO> addDriverWorkingHour(@PathVariable Integer driverId, @Valid @RequestBody StartTimeDTO start)
     {
         WorkHours workHours = workHoursService.addOne(start.getStart(), driverId);
         return new ResponseEntity<>(new WorkHoursDTO(workHours), HttpStatus.OK);
     }
 
     @GetMapping(value = "{id}/working-hour")
+    @Valid
     public ResponseEntity<?> getDriverWorkingHours(@PathVariable Integer id,
                                                    @RequestParam(required = false, defaultValue = "0") Integer page,
                                                    @RequestParam(required = false, defaultValue = "10") Integer size,
@@ -182,6 +188,7 @@ public class DriverController {
     }
 
     @GetMapping(value = "/{id}/ride")
+    @Valid
     public ResponseEntity<?> getDriverRides(@PathVariable Integer id,
                                                            @RequestParam(required = false, defaultValue = "0") Integer page,
                                                            @RequestParam(required = false, defaultValue =  "10") Integer size,
@@ -225,6 +232,7 @@ public class DriverController {
     }
 
     @GetMapping(value = "/working-hour/{workingHourId}")
+    @Valid
     public ResponseEntity<?> getSpecificWorkingHour(@PathVariable Integer workingHourId){
         WorkHours workHours = workHoursService.findById(workingHourId);
         return  new ResponseEntity<>(new WorkHoursDTO(workHours), HttpStatus.OK);
@@ -232,7 +240,8 @@ public class DriverController {
     }
 
     @PutMapping(consumes = "application/json",value = "/working-hour/{workingHourId}")
-    public ResponseEntity<WorkHoursDTO> putDriverWorkingHour(@PathVariable Integer workingHourId, @RequestBody EndTimeDTO end)
+    @Valid
+    public ResponseEntity<WorkHoursDTO> putDriverWorkingHour(@PathVariable Integer workingHourId, @Valid @RequestBody EndTimeDTO end)
     {
         WorkHours workHours = workHoursService.updateOne(workingHourId, end.getEnd());
         return new ResponseEntity<>(new WorkHoursDTO(workHours), HttpStatus.OK);

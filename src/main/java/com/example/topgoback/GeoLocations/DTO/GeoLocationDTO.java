@@ -1,6 +1,7 @@
 package com.example.topgoback.GeoLocations.DTO;
 
 import com.example.topgoback.GeoLocations.Model.GeoLocation;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
