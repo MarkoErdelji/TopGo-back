@@ -17,6 +17,7 @@ import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Pageable;
@@ -38,7 +39,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.security.auth.login.CredentialExpiredException;
-import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -65,11 +65,11 @@ public class UserController {
 
     @GetMapping(value = "{id}/ride")
     public ResponseEntity<?> getUserRides(@Valid @PathVariable Integer id,
-                                          @Valid @RequestParam(required = false,defaultValue = "0") Integer page,
-                                          @Valid @RequestParam(required = false,defaultValue = "10") Integer size,
-                                          @Valid @RequestParam(required = false,defaultValue = "id") String sort,
-                                          @Valid @RequestParam(required = false,defaultValue = "0001-01-01T00:00:00") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beginDateInterval,
-                                          @Valid @RequestParam(required = false,defaultValue = "9999-12-31T23:59:59.999999") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateInterval,
+                                          @RequestParam(required = false,defaultValue = "0") @Valid Integer page,
+                                          @RequestParam(required = false,defaultValue = "10") @Valid  Integer size,
+                                          @RequestParam(required = false,defaultValue = "id")  @Valid String sort,
+                                          @RequestParam(required = false,defaultValue = "0001-01-01T00:00:00") @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beginDateInterval,
+                                          @RequestParam(required = false,defaultValue = "9999-12-31T23:59:59.999999") @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateInterval,
                                          Pageable pageable)
     {
         if(sort!=null){
@@ -105,7 +105,8 @@ public class UserController {
     }
 
     @PostMapping(value = "/login",consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> login(@Valid  @RequestBody LoginCredentialDTO loginCredentialDTO)
+    public ResponseEntity<?> login(@Valid @RequestBody LoginCredentialDTO loginCredentialDTO)
+
     {
         JWTTokenDTO jwtTokenDTO = userService.login(loginCredentialDTO);
 
@@ -113,6 +114,12 @@ public class UserController {
 
     }
 
+    @PostMapping(value="/refreshToken",consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> refreshToken(@RequestBody JWTTokenDTO jwtTokenDTO){
+
+        JWTTokenDTO jwtTokenDTO1 = userService.refreshToken(jwtTokenDTO);
+        return new ResponseEntity<>(jwtTokenDTO1,HttpStatus.OK);
+    }
 
     @PutMapping(value = "{id}/changePassword",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> changeUserPassword(@Valid  @PathVariable Integer id,@Valid @RequestBody ChangePasswordDTO changePasswordDTO)

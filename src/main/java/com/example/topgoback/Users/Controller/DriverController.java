@@ -61,7 +61,7 @@ public class DriverController {
     {
         pageable = (Pageable) PageRequest.of(page, size, Sort.by("id").ascending());
         AllDriversDTO response = driverService.findAll(pageable);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
 
     @GetMapping(value = "/active")
