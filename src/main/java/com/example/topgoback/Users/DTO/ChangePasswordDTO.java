@@ -1,8 +1,13 @@
 package com.example.topgoback.Users.DTO;
 
-public class ChangePasswordDTO {
+import jakarta.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.Length;
 
+public class ChangePasswordDTO {
+    @NotNull(message = "is required!")
+    @Length(min = 6,message = "cannot be shorter than 6 characters!")
     private String new_password;
+    @NotNull(message = "is required!")
     private String old_password;
 
     public ChangePasswordDTO() {
