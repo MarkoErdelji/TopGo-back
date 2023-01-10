@@ -13,7 +13,8 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 @Entity
-public class Ride {
+public class
+Ride {
     @Id
     @SequenceGenerator(name = "mySeqGenRide", sequenceName = "mySeqGenRide", initialValue = 7, allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenRide")

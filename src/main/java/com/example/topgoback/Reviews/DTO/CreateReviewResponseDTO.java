@@ -1,29 +1,50 @@
 package com.example.topgoback.Reviews.DTO;
 
+import com.example.topgoback.Reviews.Model.Review;
+import com.example.topgoback.Users.DTO.UserListResponseDTO;
 import com.example.topgoback.Users.DTO.UserRef;
+import com.example.topgoback.Users.Model.User;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CreateReviewResponseDTO {
-    Integer id;
-    Integer rating;
+    int id;
+    float rating;
     String comment;
     UserRef passenger;
 
     public CreateReviewResponseDTO() {
     }
 
-    public Integer getId() {
+    public CreateReviewResponseDTO(Review r){
+        this.id = r.getId();
+        this.rating = r.getRating();
+        this.passenger = new UserRef(r.getPassenger());
+        this.comment = r.getComment();
+    }
+
+    public static List<CreateReviewResponseDTO> convertToCreateReviewResponseDTO(List<Review> content) {
+        List<CreateReviewResponseDTO> createReviewResponseDTOS = new ArrayList<CreateReviewResponseDTO>();
+        for(Review r:content){
+            createReviewResponseDTOS.add(new CreateReviewResponseDTO(r));
+        }
+        return createReviewResponseDTOS;
+    }
+
+    public int getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public Integer getRating() {
+    public float getRating() {
         return rating;
     }
 
-    public void setRating(Integer rating) {
+    public void setRating(float rating) {
         this.rating = rating;
     }
 

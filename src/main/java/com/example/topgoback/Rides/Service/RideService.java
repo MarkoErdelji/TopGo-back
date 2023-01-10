@@ -9,6 +9,8 @@ import com.example.topgoback.GeoLocations.DTO.GeoLocationDTO;
 import com.example.topgoback.GeoLocations.Model.GeoLocation;
 import com.example.topgoback.GeoLocations.Repository.GeoLocationRepository;
 import com.example.topgoback.Panic.DTO.PanicDTO;
+import com.example.topgoback.Panic.Model.Panic;
+import com.example.topgoback.Panic.Repository.PanicRepository;
 import com.example.topgoback.RejectionLetters.DTO.RejectionTextDTO;
 import com.example.topgoback.RejectionLetters.Model.RejectionLetter;
 import com.example.topgoback.RejectionLetters.Repository.RejectionLetterRepository;
@@ -71,6 +73,8 @@ public class RideService {
     @Autowired
     FavouriteRideRepository favouriteRideRepository;
     @Autowired
+    PanicRepository panicRepository;
+    @Autowired
     JwtTokenUtil jwtTokenUtil;
 
     public void addOne(Ride ride) {
@@ -94,6 +98,20 @@ public class RideService {
 
         Passenger passenger = passengerService.findById(passengerId);
         Page<Ride> rides = rideRepository.findByPassengerAndBeginBetween(passenger.getId(), beginDateTimeInterval, endDateTimeInterval, pageable);
+        List<UserRideDTO> userRideDTOList = UserRideDTO.convertToUserRideDTO(rides.getContent());
+        UserRidesListDTO userRidesListDTO = new UserRidesListDTO(new PageImpl<>(userRideDTOList, pageable, rides.getTotalElements()));
+        userRidesListDTO.setTotalCount((int) rides.getTotalElements());
+
+        return userRidesListDTO;
+    }
+    public UserRidesListDTO findRidesByDriversId(int driversId, Pageable pageable, LocalDateTime beginDateTimeInterval, LocalDateTime endDateTimeInterval) {
+
+        Optional<Driver> driver = driverRepository.findById(driversId);
+        if(driver.isEmpty()){
+            throw  new ResponseStatusException(HttpStatus.NOT_FOUND, "Driver does not exist!");
+        }
+
+        Page<Ride> rides = rideRepository.findByDriverAndBeginBetween(driver.get().getId(), beginDateTimeInterval, endDateTimeInterval, pageable);
         List<UserRideDTO> userRideDTOList = UserRideDTO.convertToUserRideDTO(rides.getContent());
         UserRidesListDTO userRidesListDTO = new UserRidesListDTO(new PageImpl<>(userRideDTOList, pageable, rides.getTotalElements()));
         userRidesListDTO.setTotalCount((int) rides.getTotalElements());
@@ -306,9 +324,33 @@ public class RideService {
     }
 
 
-    public PanicDTO panic(Integer id, RejectionTextDTO reason) {
+    public PanicDTO panic(Integer id, RejectionTextDTO reason, String authorization) {
+        String jwtToken = null;
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            jwtToken = authorization.substring(7);
+        }
+        int userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
+        String type = jwtTokenUtil.getRoleFromToken(jwtToken);
 
-        return new PanicDTO();
+        Panic panic = new Panic();
+        if (type.equals("USER")) panic.setUser(passengerRepository.findById(userId).get());
+        if (type.equals("DRIVER")) panic.setUser(driverRepository.findById(userId).get());
+
+        Optional<Ride> optionalRide = rideRepository.findById(id);
+        if (optionalRide.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Ride does not exist!");
+        Ride ride = optionalRide.get();
+        if (ride.getStatus() != Status.ACTIVE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot panic on a ride than is not ACTIVE!");
+        }
+        panic.setRide(ride);
+        panic.setTime(LocalDateTime.now());
+        panic.setReason(reason.getReason());
+        panicRepository.save(panic);
+
+
+
+
+        return new PanicDTO(panic);
     }
 
     public RideDTO endRide(Integer id) {

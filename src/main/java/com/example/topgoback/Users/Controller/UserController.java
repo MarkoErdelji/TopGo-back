@@ -34,6 +34,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -63,12 +64,12 @@ public class UserController {
     UserController(){}
 
     @GetMapping(value = "{id}/ride")
-    public ResponseEntity<?> getUserRides(@PathVariable Integer id,
-                                         @RequestParam(required = false,defaultValue = "0") Integer page,
-                                         @RequestParam(required = false,defaultValue = "10") Integer size,
-                                         @RequestParam(required = false,defaultValue = "id") String sort,
-                                         @RequestParam(required = false,defaultValue = "0001-01-01T00:00:00") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beginDateInterval,
-                                         @RequestParam(required = false,defaultValue = "9999-12-31T23:59:59.999999") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateInterval,
+    public ResponseEntity<?> getUserRides(@Valid @PathVariable Integer id,
+                                          @RequestParam(required = false,defaultValue = "0") @Valid Integer page,
+                                          @RequestParam(required = false,defaultValue = "10") @Valid  Integer size,
+                                          @RequestParam(required = false,defaultValue = "id")  @Valid String sort,
+                                          @RequestParam(required = false,defaultValue = "0001-01-01T00:00:00") @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beginDateInterval,
+                                          @RequestParam(required = false,defaultValue = "9999-12-31T23:59:59.999999") @Valid @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateInterval,
                                          Pageable pageable)
     {
         if(sort!=null){
@@ -94,8 +95,8 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<?> getUsers(@RequestParam(required = false,defaultValue = "0") Integer page,
-                                      @RequestParam(required = false,defaultValue = "10") Integer size,
+    public ResponseEntity<?> getUsers(@Valid @RequestParam(required = false,defaultValue = "0") Integer page,
+                                      @Valid @RequestParam(required = false,defaultValue = "10") Integer size,
                                       Pageable pageable)
     {
         pageable = (Pageable) PageRequest.of(page, size, Sort.by("id").ascending());
@@ -105,6 +106,7 @@ public class UserController {
 
     @PostMapping(value = "/login",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> login(@Valid @RequestBody LoginCredentialDTO loginCredentialDTO)
+
     {
         JWTTokenDTO jwtTokenDTO = userService.login(loginCredentialDTO);
 
@@ -120,9 +122,12 @@ public class UserController {
     }
 
     @PutMapping(value = "{id}/changePassword",consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> changeUserPassword(@PathVariable Integer id,@RequestBody ChangePasswordDTO changePasswordDTO)
+    public ResponseEntity<?> changeUserPassword(@Valid  @PathVariable Integer id,@Valid @RequestBody ChangePasswordDTO changePasswordDTO)
     {
         userService.changeUserPassword(id, changePasswordDTO);
+
+        ResponseEntity re = new ResponseEntity<>("Password successfully changed!",HttpStatus.NO_CONTENT);
+        System.out.println(re);
 
         return new ResponseEntity<>("Password successfully changed!",HttpStatus.NO_CONTENT);
     }
@@ -130,9 +135,9 @@ public class UserController {
 
 
     @GetMapping(value = "{id}/message")
-    public ResponseEntity<?> getUsersMessages(@PathVariable Integer id,
-                                              @RequestParam(required = false,defaultValue = "0") Integer page,
-                                              @RequestParam(required = false,defaultValue =  "0") Integer size,
+    public ResponseEntity<?> getUsersMessages(@Valid  @PathVariable Integer id,
+                                              @Valid  @RequestParam(required = false,defaultValue = "0") Integer page,
+                                              @Valid  @RequestParam(required = false,defaultValue =  "0") Integer size,
                                               Pageable pageable)
     {
 
@@ -149,7 +154,7 @@ public class UserController {
 
 
     @PostMapping(value = "{id}/message")
-    public ResponseEntity<?> sendUsersMessage(@PathVariable Integer id, @RequestBody SendMessageDTO sendMessageDTO)
+    public ResponseEntity<?> sendUsersMessage(@Valid @PathVariable Integer id, @Valid @RequestBody SendMessageDTO sendMessageDTO)
     {
         UserMessagesDTO message = messageService.addOne(id,sendMessageDTO);
         return new ResponseEntity<>(message,HttpStatus.OK);
@@ -157,7 +162,7 @@ public class UserController {
     }
 
     @PutMapping(value = "{id}/block")
-    public ResponseEntity<?> blockUser(@PathVariable Integer id)
+    public ResponseEntity<?> blockUser(@Valid @PathVariable Integer id)
     {
         userService.blockUser(id);
         return new ResponseEntity<>("User is successfuly blocked",HttpStatus.NO_CONTENT);
@@ -165,7 +170,7 @@ public class UserController {
     }
 
     @PutMapping(value = "{id}/unblock")
-    public ResponseEntity<?> unblockUser(@PathVariable Integer id)
+    public ResponseEntity<?> unblockUser(@Valid @PathVariable Integer id)
     {
         userService.unblockUser(id);
         return new ResponseEntity<>("User is successfuly unblocked",HttpStatus.NO_CONTENT);
@@ -173,7 +178,7 @@ public class UserController {
     }
 
     @PostMapping(value = "{id}/note")
-    public ResponseEntity<?> addNote(@PathVariable Integer id,@RequestBody CreateNoteDTO note)
+    public ResponseEntity<?> addNote(@Valid @PathVariable Integer id,@Valid @RequestBody CreateNoteDTO note)
     {
         NoteResponseDTO noteResponseDTO = noteService.addOne(id,note);
 
@@ -183,9 +188,9 @@ public class UserController {
 
 
     @GetMapping(value = "{id}/note")
-    public ResponseEntity<?> getUserNotes(@PathVariable Integer id,
-                                          @RequestParam(required = false,defaultValue = "0") Integer page,
-                                          @RequestParam(required = false,defaultValue = "10") Integer size,
+    public ResponseEntity<?> getUserNotes(@Valid @PathVariable Integer id,
+                                          @Valid @RequestParam(required = false,defaultValue = "0") Integer page,
+                                          @Valid @RequestParam(required = false,defaultValue = "10") Integer size,
                                           Pageable pageable)
     {
 
@@ -196,13 +201,13 @@ public class UserController {
 
 
     @GetMapping(value="{id}/resetPassword")
-    public ResponseEntity<?> sendEmail(@PathVariable Integer id) throws MessagingException, IOException {
+    public ResponseEntity<?> sendEmail(@Valid @PathVariable Integer id) throws MessagingException, IOException {
         userService.sendEmail(id);
         return new ResponseEntity<>("Email with reset code has been sent!",HttpStatus.NO_CONTENT);
     }
 
     @PutMapping(value="{id}/resetPassword")
-    public ResponseEntity<?> resetUserPassword(@PathVariable Integer id,@RequestBody ResetPasswordDTO resetPasswordDTO) {
+    public ResponseEntity<?> resetUserPassword(@Valid @PathVariable Integer id,@Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
         userService.resetUserPassword(id,resetPasswordDTO);
         return new ResponseEntity<>("Password successfully changed!",HttpStatus.NO_CONTENT);
     }
@@ -210,7 +215,7 @@ public class UserController {
 
 
     @GetMapping(value = "/{email}")
-    public ResponseEntity<?> getUserRefByEmail(@PathVariable String email)
+    public ResponseEntity<?> getUserRefByEmail(@Valid @PathVariable String email)
     {
         try{
             UserRef user = userService.loadUserReferenceByUsername(email);

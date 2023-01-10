@@ -1,6 +1,5 @@
 package com.example.topgoback.Tools;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -37,9 +37,15 @@ public class ResponseErrorHandler {
         return new ResponseEntity(paramErrorList, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public final ResponseEntity<?> handleParamWrongFormatException(MethodArgumentTypeMismatchException ex)
+    {
+        String paramErrorList = "Field " + ex.getName() + " " + "format is not valid!";
+        return new ResponseEntity(paramErrorList, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(ResponseStatusException.class)
     public final ResponseEntity<?> handleBaseException(ResponseStatusException ex) {
         return new ResponseEntity(ex.getReason(), HttpStatusCode.valueOf(ex.getBody().getStatus()));
     }
-
 }
