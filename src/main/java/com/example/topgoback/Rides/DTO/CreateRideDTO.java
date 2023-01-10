@@ -6,15 +6,22 @@ import com.example.topgoback.GeoLocations.Model.GeoLocation;
 import com.example.topgoback.Routes.DTO.RouteForCreateRideDTO;
 import com.example.topgoback.Users.DTO.RidePassengerDTO;
 import com.example.topgoback.Users.Model.Passenger;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
 public class CreateRideDTO {
 
+
     private List<RouteForCreateRideDTO> locations ;
+
     private List<RidePassengerDTO> passengers;
+
     private VehicleName vehicleType;
+
     private boolean babyTransport;
+
     private boolean petTransport;
 
     public List<RouteForCreateRideDTO> getLocations() {

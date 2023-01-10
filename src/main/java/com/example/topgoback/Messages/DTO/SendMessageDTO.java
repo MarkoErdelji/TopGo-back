@@ -1,14 +1,21 @@
 package com.example.topgoback.Messages.DTO;
 
 import com.example.topgoback.Enums.MessageType;
+import jakarta.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.Length;
 
 public class SendMessageDTO {
+    @NotNull(message = "is required!")
     private Integer receiverId;
 
+    @NotNull(message = "is required!")
+    @Length(max=255,message= "cannot be longer than 255 characters!")
     private String message;
 
+    @NotNull(message = "is required!")
     private MessageType type;
 
+    @NotNull(message = "is required!")
     private Integer rideId;
 
     public Integer getReceiverId() {
