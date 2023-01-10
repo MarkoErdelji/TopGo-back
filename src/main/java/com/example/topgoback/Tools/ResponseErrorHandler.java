@@ -23,7 +23,7 @@ import java.util.List;
 public class ResponseErrorHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public final ResponseEntity<?> handleAccessDeniedException(Exception ex, WebRequest request) {
-        return new ResponseEntity("Access Denied", HttpStatus.FORBIDDEN);
+        return new ResponseEntity("Access Denied!", HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
