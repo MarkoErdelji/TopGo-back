@@ -1,8 +1,12 @@
 package com.example.topgoback.Documents.DTO;
 
+import javax.validation.constraints.NotNull;
+
 public class CreateDocumentDTO {
 
+    @NotNull
     private String name;
+    @NotNull
     private String documentImage;
 
     public CreateDocumentDTO() {

@@ -11,7 +11,7 @@ public class Document {
     @Column(name="id")
     private int id;
     private String name;
-    @Column(length = 500000)
+    @Column(length = 5000000)
     private String documentImage;
     @ManyToOne
     private Driver driver;

@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
@@ -34,7 +35,8 @@ public class PassengerController {
     private RideService rideService;
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<?> create(@RequestBody CreatePassengerDTO createPassengerDTO) {
+
+    public ResponseEntity<?> create(@Valid @RequestBody CreatePassengerDTO createPassengerDTO) {
 
     Passenger passenger = passengerService.addOne(createPassengerDTO);
     return new ResponseEntity<>(new CreatePassengerResponseDTO(passenger), HttpStatus.OK);
@@ -43,6 +45,7 @@ public class PassengerController {
     }
 
     @GetMapping(value = "/{id}")
+    @Valid
     public  ResponseEntity<CreatePassengerResponseDTO> getOne(@PathVariable Integer id){
         Passenger passenger = passengerService.findById(id);
 
@@ -50,13 +53,15 @@ public class PassengerController {
 
     }
     @PutMapping(value = "/{id}", consumes = "application/json")
-    public ResponseEntity<CreatePassengerResponseDTO> updateOne(@PathVariable Integer id, @RequestBody CreatePassengerDTO createPassengerDTO){
+    @Valid
+    public ResponseEntity<CreatePassengerResponseDTO> updateOne(@PathVariable Integer id, @Valid @RequestBody CreatePassengerDTO createPassengerDTO){
         Passenger passenger = new Passenger();
         passenger = passengerService.update(createPassengerDTO, id);
 
         return new ResponseEntity<>(new CreatePassengerResponseDTO(passenger), HttpStatus.OK);
     }
     @GetMapping
+    @Valid
     public  ResponseEntity<?> getPaginated(@RequestParam(required = false, defaultValue = "0") Integer page,
                                            @RequestParam(required = false, defaultValue = "10") Integer size,
                                            Pageable pageable){
@@ -68,12 +73,14 @@ public class PassengerController {
     }
 
     @GetMapping(value = "/activate/{activationId}")
+    @Valid
     public ResponseEntity<?> getActivation(@PathVariable int activationId){
         activationTokenService.findAndActivate(activationId);
         return new ResponseEntity<>("Succesfull account activation", HttpStatus.OK);
     }
 
     @GetMapping(value = "{id}/ride")
+    @Valid
     public ResponseEntity<?> getRides(@PathVariable Integer id,
                                       @RequestParam(required = false) Integer page,
                                       @RequestParam(required = false) Integer size,
