@@ -1,12 +1,17 @@
 package com.example.topgoback.Users.DTO;
 
+import jakarta.validation.constraints.NotNull;
+
 public class RidePassengerDTO {
    /* "id": 123,
             "email": "user@example.com",
             "type": "VOZAC"*/
 
+
     private Integer id;
+
     private String email;
+
     private String type;
 
     public Integer getId() {

@@ -14,7 +14,7 @@ public class UnregisteredUserService {
 
     public UnregisteredUserAssumptionDTO getAssumptionFromData(UnregisteredUserDTO data){
 
-        double distance = DistanceCalculator.getDistanceFromLocations(data.getLocations().get(0).getDeparture(),data.getLocations().get(0).getDestination());
+        double distance = DistanceCalculator.getDistanceFromLocations(data.getLocations().get(0).getDeparture(),data.getLocations().get(data.getLocations().size()-1).getDestination());
 
         double basePrice = 100;
         double vehicleModifier = 1;

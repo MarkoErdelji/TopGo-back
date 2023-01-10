@@ -1,8 +1,17 @@
 package com.example.topgoback.GeoLocations.DTO;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+
 public class DepartureDestinationDTO {
+
+    @Valid
+    @NotNull(message = "is required!")
     GeoLocationDTO departure;
 
+
+    @Valid
+    @NotNull(message = "is required!")
     GeoLocationDTO destination;
 
 
