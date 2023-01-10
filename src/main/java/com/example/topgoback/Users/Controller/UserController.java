@@ -17,6 +17,7 @@ import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.data.domain.Pageable;
@@ -103,7 +104,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/login",consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> login(@RequestBody LoginCredentialDTO loginCredentialDTO)
+    public ResponseEntity<?> login(@Valid @RequestBody LoginCredentialDTO loginCredentialDTO)
     {
         JWTTokenDTO jwtTokenDTO = userService.login(loginCredentialDTO);
 
@@ -111,6 +112,12 @@ public class UserController {
 
     }
 
+    @PostMapping(value="/refreshToken",consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> refreshToken(@RequestBody JWTTokenDTO jwtTokenDTO){
+
+        JWTTokenDTO jwtTokenDTO1 = userService.refreshToken(jwtTokenDTO);
+        return new ResponseEntity<>(jwtTokenDTO1,HttpStatus.OK);
+    }
 
     @PutMapping(value = "{id}/changePassword",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> changeUserPassword(@PathVariable Integer id,@RequestBody ChangePasswordDTO changePasswordDTO)

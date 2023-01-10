@@ -3,7 +3,9 @@ package com.example.topgoback.Tools;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,6 +21,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.io.IOException;
 import java.util.Collections;
 

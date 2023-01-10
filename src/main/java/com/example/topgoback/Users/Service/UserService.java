@@ -30,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -120,11 +121,12 @@ public class UserService implements UserDetailsService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Wrong username or password!");
         }
         final String token = jwtTokenUtil.generateToken(userRes);
+        final String refreshToken = jwtTokenUtil.generateRefreshToken(userRes);
 
         JWTTokenDTO jwtTokenDTO = new JWTTokenDTO();
 
         jwtTokenDTO.setAccessToken(token);
-        jwtTokenDTO.setRefreshToken(token);
+        jwtTokenDTO.setRefreshToken(refreshToken);
 
         return jwtTokenDTO;
     }
@@ -189,5 +191,22 @@ public class UserService implements UserDetailsService {
         }
         user.setPassword(passwordEncoder.encode(resetPasswordDTO.getNew_password()));
         userRepository.save(user);
+    }
+
+    public JWTTokenDTO refreshToken(JWTTokenDTO jwtTokenDTO) {
+
+        if(jwtTokenUtil.isTokenExpired(jwtTokenDTO.getRefreshToken())){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Your refresh token has expired,please log in again!");
+        }
+        User user = userRepository.findByEmail(jwtTokenUtil.getUsernameFromToken(jwtTokenDTO.getRefreshToken()));
+
+        String newJWT = jwtTokenUtil.generateToken(user);
+        String newRefresh = jwtTokenUtil.generateRefreshToken(user);
+
+        JWTTokenDTO newTokenDto = new JWTTokenDTO();
+
+        newTokenDto.setAccessToken(newJWT);
+        newTokenDto.setRefreshToken(newRefresh);
+        return newTokenDto;
     }
 }
