@@ -9,19 +9,21 @@ import com.example.topgoback.Users.Model.Passenger;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
+import jakarta.validation.Valid;
 import java.util.List;
 
 public class CreateRideDTO {
-
-
+    @Valid
+    @NotNull
     private List<RouteForCreateRideDTO> locations ;
-
+    @Valid
+    @NotNull
     private List<RidePassengerDTO> passengers;
-
+    @NotNull(message = "is required!")
     private VehicleName vehicleType;
-
+    @NotNull(message = "is required!")
     private boolean babyTransport;
-
+    @NotNull(message = "is required!")
     private boolean petTransport;
 
     public List<RouteForCreateRideDTO> getLocations() {

@@ -291,6 +291,13 @@ public class RideService {
         return new RideDTO(activeRides.get(0));
 
     }
+    public RideDTO getDriverAcceptedRide(Integer driverId) {
+        List<Ride> activeRides = rideRepository.findRidesByDriveridAndIsAccepted(driverId);
+        if (activeRides.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Active ride does not exist!");
+
+        return new RideDTO(activeRides.get(0));
+    }
 
     public RideDTO getPassengerActiveRide(Integer passengerId) {
         List<Ride> activeRides = rideRepository.findRidesByPassengeridAndIsActive(passengerId);
@@ -335,13 +342,15 @@ public class RideService {
         Panic panic = new Panic();
         if (type.equals("USER")) panic.setUser(passengerRepository.findById(userId).get());
         if (type.equals("DRIVER")) panic.setUser(driverRepository.findById(userId).get());
-
+        System.out.print(jwtToken);
         Optional<Ride> optionalRide = rideRepository.findById(id);
         if (optionalRide.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Ride does not exist!");
         Ride ride = optionalRide.get();
         if (ride.getStatus() != Status.ACTIVE) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot panic on a ride than is not ACTIVE!");
         }
+        ride.setStatus(Status.PANIC);
+        rideRepository.save(ride);
         panic.setRide(ride);
         panic.setTime(LocalDateTime.now());
         panic.setReason(reason.getReason());
@@ -365,6 +374,7 @@ public class RideService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot end a ride that is not in status FINISHED!");
         }
         ride.setStatus(Status.FINISHED);
+        ride.setEnd(LocalDateTime.now());
         rideRepository.save(ride);
         return new RideDTO(ride);
     }
@@ -439,4 +449,6 @@ public class RideService {
         if (fr.isEmpty()) throw  new ResponseStatusException(HttpStatus.NOT_FOUND,"Favorite location does not exist!");
         favouriteRideRepository.delete(fr.get());
     }
+
+
 }

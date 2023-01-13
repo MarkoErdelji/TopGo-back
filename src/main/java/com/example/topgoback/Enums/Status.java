@@ -6,5 +6,6 @@ public enum Status {
     REJECTED,
     ACTIVE,
     FINISHED,
-    CANCELED
+    CANCELED,
+    PANIC
 }

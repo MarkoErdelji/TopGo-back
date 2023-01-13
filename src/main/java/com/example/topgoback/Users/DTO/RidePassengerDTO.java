@@ -6,9 +6,9 @@ public class RidePassengerDTO {
    /* "id": 123,
             "email": "user@example.com",
             "type": "VOZAC"*/
-
-
+    @NotNull(message = "is required!")
     private Integer id;
+    @NotNull(message = "is required!")
 
     private String email;
 

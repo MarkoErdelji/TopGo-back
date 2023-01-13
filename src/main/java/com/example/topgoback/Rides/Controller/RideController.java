@@ -13,10 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping(value = "api/ride")
 public class RideController {
@@ -30,7 +33,7 @@ public class RideController {
 
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<RideDTO> createRide(@RequestBody CreateRideDTO createRideDTO){
+    public ResponseEntity<RideDTO> createRide(@Valid @RequestBody CreateRideDTO createRideDTO){
         RideDTO response = rideService.createRide(createRideDTO);
         sendDriverRideUpdate(response);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -38,6 +41,11 @@ public class RideController {
     @GetMapping(value = "/driver/{driverId}/active")
     public ResponseEntity<RideDTO> getActiveRideForDriver(@PathVariable Integer driverId){
         RideDTO response = rideService.getDriverActiveRide(driverId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @GetMapping(value = "/driver/{driverId}/accepted")
+    public ResponseEntity<RideDTO> getAcceptedRideForDriver(@PathVariable Integer driverId){
+        RideDTO response = rideService.getDriverAcceptedRide(driverId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
