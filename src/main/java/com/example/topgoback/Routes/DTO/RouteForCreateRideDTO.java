@@ -2,11 +2,11 @@ package com.example.topgoback.Routes.DTO;
 
 import com.example.topgoback.GeoLocations.DTO.GeoLocationDTO;
 import com.example.topgoback.Routes.Model.Route;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
-import jakarta.validation.Valid;
-
 public class RouteForCreateRideDTO {
+
     @Valid
     @NotNull
     private GeoLocationDTO departure;

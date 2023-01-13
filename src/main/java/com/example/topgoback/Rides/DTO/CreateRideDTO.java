@@ -6,6 +6,7 @@ import com.example.topgoback.GeoLocations.Model.GeoLocation;
 import com.example.topgoback.Routes.DTO.RouteForCreateRideDTO;
 import com.example.topgoback.Users.DTO.RidePassengerDTO;
 import com.example.topgoback.Users.Model.Passenger;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 import jakarta.validation.Valid;

@@ -9,7 +9,9 @@ public class RidePassengerDTO {
     @NotNull(message = "is required!")
     private Integer id;
     @NotNull(message = "is required!")
+
     private String email;
+
     private String type;
 
     public Integer getId() {

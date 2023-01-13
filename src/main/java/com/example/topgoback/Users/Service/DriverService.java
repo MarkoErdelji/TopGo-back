@@ -36,6 +36,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -126,13 +127,24 @@ public class DriverService {
 
     }
     public List<DocumentInfoDTO> getDriverDocuments(Integer driverId) {
-        Driver driver = driverRepository.findById(driverId).orElse(null);
+        Optional<Driver> driver = driverRepository.findById(driverId);
+        if(driver.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Driver does not exist!");
+        }
         List<DocumentInfoDTO> allDocuments = new ArrayList<DocumentInfoDTO>();
-        for (Document d: driver.getDocuments()
+        for (Document d: driver.get().getDocuments()
              ) {
             allDocuments.add(new DocumentInfoDTO(d));
         }
         return  allDocuments;
+    }
+    public boolean isBase64(String path) {
+        try {
+            Base64.getDecoder().decode(path);
+            return true;
+        } catch(IllegalArgumentException e) {
+            return false;
+        }
     }
 
     public DocumentInfoDTO addDriverDocument(Integer driverId, CreateDocumentDTO newDTO) {
@@ -141,6 +153,15 @@ public class DriverService {
         if(driver.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Driver does not exist!");
         }
+        if(!isBase64(newDTO.getDocumentImage())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is not an image!");
+        }
+        int x = (int) (newDTO.getDocumentImage().getBytes().length * (3.0/4));
+        if(x>5000000){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is bigger than 5mb!");
+        }
+
+
         Document document = new Document();
         document.setDocumentImage(newDTO.getDocumentImage());
         document.setDriver(driver.get());

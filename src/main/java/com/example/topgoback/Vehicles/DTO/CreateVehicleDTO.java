@@ -1,16 +1,24 @@
 package com.example.topgoback.Vehicles.DTO;
 
 import com.example.topgoback.GeoLocations.DTO.GeoLocationDTO;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 public class CreateVehicleDTO {
-
+    @NotNull(message = "is required!")
     public String vehicleType;
-
+    @NotNull(message = "is required!")
     public String model;
+    @NotNull(message = "is required!")
     public String licenseNumber;
+    @Valid
+    @NotNull(message = "is required!")
     public GeoLocationDTO currentLocation;
+    @NotNull(message = "is required!")
     public int passengerSeats;
+    @NotNull(message = "is required!")
     public boolean babyTransport;
+    @NotNull(message = "is required!")
     public boolean petTransport;
 
 
