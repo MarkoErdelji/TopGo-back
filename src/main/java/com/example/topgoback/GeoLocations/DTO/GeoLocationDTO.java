@@ -1,12 +1,16 @@
 package com.example.topgoback.GeoLocations.DTO;
 
 import com.example.topgoback.GeoLocations.Model.GeoLocation;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotNull;
 
 public class GeoLocationDTO {
-
+    @NotNull(message = "is required!")
     private String address;
+    @NotNull(message = "is required!")
 
     private float latitude;
+    @NotNull(message = "is required!")
 
     private float longitude;
 
