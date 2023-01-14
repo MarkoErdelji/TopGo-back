@@ -84,5 +84,12 @@ public class ReviewController {
         List<RideReviewsDTO> rideReviews = reviewService.getRideReviews(id,authorization);
         return new ResponseEntity<>(rideReviews, HttpStatus.OK);
     }
+    @GetMapping(value = "ride/{id}")
+    @Valid
+    public ResponseEntity<List<CreateReviewResponseDTO>> getAllRideReviews(@PathVariable(name="id") Integer id) {
+
+        List<CreateReviewResponseDTO> rideReviews = reviewService.getAllRideReviews(id);
+        return new ResponseEntity<>(rideReviews, HttpStatus.OK);
+    }
 
 }

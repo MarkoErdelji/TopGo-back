@@ -16,6 +16,7 @@ public interface ReviewRepository extends JpaRepository<Review,Integer> {
 
     Optional<Review> findByPassengerIdAndReviewType(int passengerId,ReviewType reviewType);
     Optional<Review> findByRideIdAndPassengerIdAndReviewType(int rideId, int passengerId, ReviewType reviewType);
+    List<Review> findByRideId(int rideId);
 
 
 }

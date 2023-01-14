@@ -298,6 +298,17 @@ public class RideService {
 
         return new RideDTO(activeRides.get(0));
     }
+    public List<RideDTO> getDriverFinishedRides(Integer driverId) {
+        List<Ride> finishedRides = rideRepository.findRidesByDriveridAndIsFinished(driverId);
+        List<RideDTO> finishedRidesDTOS = new ArrayList<RideDTO>();
+        if (finishedRides.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Active ride does not exist!");
+        for(Ride ride: finishedRides){
+            finishedRidesDTOS.add(new RideDTO(ride));
+        }
+
+        return finishedRidesDTOS;
+    }
 
     public RideDTO getPassengerActiveRide(Integer passengerId) {
         List<Ride> activeRides = rideRepository.findRidesByPassengeridAndIsActive(passengerId);
