@@ -7,6 +7,7 @@ import com.example.topgoback.Rides.Service.RideService;
 import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.Passenger;
 import com.example.topgoback.Users.Service.PassengerService;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
@@ -36,7 +38,7 @@ public class PassengerController {
 
     @PostMapping(consumes = "application/json")
 
-    public ResponseEntity<?> create(@Valid @RequestBody CreatePassengerDTO createPassengerDTO) {
+    public ResponseEntity<?> create(@Valid @RequestBody CreatePassengerDTO createPassengerDTO) throws MessagingException, IOException {
 
     Passenger passenger = passengerService.addOne(createPassengerDTO);
     return new ResponseEntity<>(new CreatePassengerResponseDTO(passenger), HttpStatus.OK);

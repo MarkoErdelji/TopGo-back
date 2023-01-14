@@ -56,6 +56,11 @@ public class RideController {
         RideDTO response = rideService.getDriverAcceptedRide(driverId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+    @GetMapping(value = "/driver/{driverId}/finished")
+    public ResponseEntity<?> getFinishedRidesForDriver(@PathVariable Integer driverId){
+        List<RideDTO> response = rideService.getDriverFinishedRides(driverId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     @GetMapping(value = "/passenger/{passengerId}/active")
     public ResponseEntity<RideDTO> getActiveRideForPassenger(@PathVariable Integer passengerId){

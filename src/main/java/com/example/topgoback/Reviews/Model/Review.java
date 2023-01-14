@@ -14,12 +14,14 @@ public class Review {
     private float rating;
     @Column(name = "comment")
     private String comment;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "passenger_id")
     private Passenger passenger;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "ride_id")
     private Ride ride ;
 
-    @Column
+    @Column(name="review_type")
     private ReviewType reviewType;
 
     public Review() {

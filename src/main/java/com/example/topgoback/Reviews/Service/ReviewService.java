@@ -129,6 +129,15 @@ public class ReviewService {
         return driverReviewListDTO;
     }
 
+    public List<CreateReviewResponseDTO> getAllRideReviews(Integer id){
+        List<Review> reviews = reviewRepository.findByRideId(id);
+        List<CreateReviewResponseDTO> reviewsDTOS = new ArrayList<CreateReviewResponseDTO>();
+        for(Review review : reviews){
+            reviewsDTOS.add(new CreateReviewResponseDTO(review));
+        }
+        return reviewsDTOS;
+    }
+
     public List<RideReviewsDTO> getRideReviews(Integer id,String authorization) {
 
         RideReviewsDTO rideReviewsDTO = new RideReviewsDTO();
