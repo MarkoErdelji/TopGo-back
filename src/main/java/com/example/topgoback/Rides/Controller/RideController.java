@@ -17,6 +17,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import org.springframework.web.socket.WebSocketSession;
+
 import java.util.List;
 
 @Validated
@@ -35,7 +37,13 @@ public class RideController {
     @PostMapping(consumes = "application/json")
     public ResponseEntity<RideDTO> createRide(@Valid @RequestBody CreateRideDTO createRideDTO){
         RideDTO response = rideService.createRide(createRideDTO);
-        sendDriverRideUpdate(response);
+        WebSocketSession webSocketSession = CreateRideHandler.driverSessions.get(response.getDriver().getId().toString());
+        if(webSocketSession != null) {
+            CreateRideHandler.notifyDriver(webSocketSession);
+        }
+        else {
+            sendDriverRideUpdate(response);
+        }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @GetMapping(value = "/driver/{driverId}/active")
@@ -130,10 +138,11 @@ public class RideController {
 
 
     @CrossOrigin(origins = "http://localhost:4200")
-
     public void sendDriverRideUpdate(RideDTO update) {
         messagingTemplate.convertAndSend("/topic/driver/ride/"+update.driver.getId(), update);
     }
+
+
 
 
     @CrossOrigin(origins = "http://localhost:4200")
