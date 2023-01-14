@@ -7,7 +7,8 @@ import jakarta.persistence.*;
 @Entity
 public class Vehicle {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "mySeqGenVehicle", sequenceName = "mySeqGenVehicle", initialValue = 4, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenVehicle")
     private Integer id;
     @OneToOne
     @JoinColumn(name="driver_id", unique=false, nullable=true)

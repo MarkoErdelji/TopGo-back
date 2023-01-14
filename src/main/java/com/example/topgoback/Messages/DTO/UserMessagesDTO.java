@@ -1,9 +1,13 @@
 package com.example.topgoback.Messages.DTO;
 
 import com.example.topgoback.Enums.MessageType;
+import com.example.topgoback.Messages.Model.Message;
+import com.example.topgoback.Users.DTO.UserMessagesListDTO;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserMessagesDTO {
     public Integer id;
@@ -15,7 +19,25 @@ public class UserMessagesDTO {
     public Integer rideId;
 
 
+    public UserMessagesDTO(Message m){
+        this.id = m.getId();
+        this.message = m.getMessage();
+        this.receiverId = m.getReceiver().getId();
+        this.senderId = m.getSender().getId();
+        this.rideId = m.getRideId();
+        this.timeOfSending = m.getTimeOfSending();
+        this.type = m.getType();
+    }
+
     public UserMessagesDTO() {
+    }
+
+    public static List<UserMessagesDTO> convertToUserMessagesListDTO(List<Message> content) {
+        List<UserMessagesDTO> userMessagesListDTO = new ArrayList<UserMessagesDTO>();
+        for (Message m:content){
+            userMessagesListDTO.add(new UserMessagesDTO(m));
+        }
+        return userMessagesListDTO;
     }
 
     public static UserMessagesDTO getMockupData(){

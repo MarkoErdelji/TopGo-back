@@ -55,15 +55,15 @@ public class WebSecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		CorsConfiguration corsConfiguration = new CorsConfiguration();
 		corsConfiguration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
-		corsConfiguration.setAllowedOrigins(List.of("http://localhost:4200"));
+		corsConfiguration.setAllowedOrigins(List.of("http://localhost:4200","http://localhost:8000"));
 		corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PUT","OPTIONS","PATCH", "DELETE"));
 		corsConfiguration.setAllowCredentials(true);
 		corsConfiguration.setExposedHeaders(List.of("Authorization"));
-		http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 		http.cors().configurationSource(request -> corsConfiguration).and().csrf().disable().headers().frameOptions().disable().and()
 				.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 				.authenticationProvider(authenticationProvider());
+		http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 				;
 		// http....;
 
@@ -82,7 +82,7 @@ public class WebSecurityConfig {
 
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
-		return (web) -> web.ignoring().requestMatchers("/api/user/login", "/api/user/login/","/h2/**","api/passenger/");
+		return (web) -> web.ignoring().requestMatchers("/api/user/login", "/api/user/login/","api/passenger/","/api/email/","api/passwordResetToken*");
 	}
 
 

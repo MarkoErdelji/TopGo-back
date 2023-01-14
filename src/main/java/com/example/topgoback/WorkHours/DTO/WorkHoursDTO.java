@@ -1,6 +1,10 @@
 package com.example.topgoback.WorkHours.DTO;
 
+import com.example.topgoback.WorkHours.Model.WorkHours;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WorkHoursDTO {
 
@@ -9,6 +13,18 @@ public class WorkHoursDTO {
     public LocalDateTime end;
 
     public WorkHoursDTO() {
+    }
+    public WorkHoursDTO(WorkHours workHours) {
+        this.id = workHours.getId();
+        this.start = workHours.getStartHours();
+        this.end = workHours.getEndHours();
+    }
+    public static List<WorkHoursDTO> convertToWorkHourDTO(List<WorkHours> workHours){
+        List<WorkHoursDTO> workHoursDTOS = new ArrayList<WorkHoursDTO>();
+        for(WorkHours wr : workHours){
+            workHoursDTOS.add(new WorkHoursDTO(wr));
+        }
+        return workHoursDTOS;
     }
 
     public int getId() {

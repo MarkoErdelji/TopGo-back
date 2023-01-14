@@ -1,5 +1,6 @@
 package com.example.topgoback.Reviews.Model;
 
+import com.example.topgoback.Enums.ReviewType;
 import com.example.topgoback.Rides.Model.Ride;
 import com.example.topgoback.Users.Model.Passenger;
 import jakarta.persistence.*;
@@ -13,19 +14,44 @@ public class Review {
     private float rating;
     @Column(name = "comment")
     private String comment;
-    @OneToOne(optional=false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "passenger_id")
     private Passenger passenger;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "ride_id")
     private Ride ride ;
+
+    @Column(name="review_type")
+    private ReviewType reviewType;
 
     public Review() {
     }
 
-    public Review(int id, float rating, String comment, Passenger passenger) {
+
+
+    public Review(int id, float rating, String comment, Passenger passenger, Ride ride, ReviewType reviewType) {
         this.id = id;
         this.rating = rating;
         this.comment = comment;
         this.passenger = passenger;
+        this.ride = ride;
+        this.reviewType = reviewType;
+    }
+
+    public Ride getRide() {
+        return ride;
+    }
+
+    public void setRide(Ride ride) {
+        this.ride = ride;
+    }
+
+    public ReviewType getReviewType() {
+        return reviewType;
+    }
+
+    public void setReviewType(ReviewType reviewType) {
+        this.reviewType = reviewType;
     }
 
     public int getId() {

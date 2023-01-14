@@ -3,17 +3,21 @@ package com.example.topgoback.Users.DTO;
 import com.example.topgoback.Rides.Model.Ride;
 import com.example.topgoback.Tools.PaginatedResponse;
 import com.example.topgoback.Users.Model.User;
+import org.springframework.data.domain.Page;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class UserListDTO {
 
     private PaginatedResponse totalCount;
 
-    private ArrayList<UserListResponseDTO> results;
+    private List<UserListResponseDTO> results;
 
-    public UserListDTO(){
+    public UserListDTO(Page<UserListResponseDTO> page){
         totalCount = new PaginatedResponse();
+        totalCount.setTotalCount((int) page.getTotalElements());
+        this.results = page.getContent();
     }
 
     public Integer getTotalCount() {
@@ -24,7 +28,7 @@ public class UserListDTO {
         this.totalCount.setTotalCount(totalCount);
     }
 
-    public ArrayList<UserListResponseDTO> getResults() {
+    public List<UserListResponseDTO> getResults() {
         return results;
     }
 

@@ -2,18 +2,19 @@ package com.example.topgoback.GeoLocations.Model;
 
 import com.example.topgoback.GeoLocations.DTO.GeoLocationDTO;
 import com.example.topgoback.Routes.DTO.RouteForCreateRideDTO;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class GeoLocation {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @SequenceGenerator(name = "mySeqGenLocation", sequenceName = "mySeqGenLocation", initialValue = 590)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenLocation")
     private Integer id;
+    @Column(name = "address", unique = false, nullable = true)
     private String address;
+    @Column(name = "latitude", unique = false, nullable = true)
     private float latitude;
+    @Column(name = "longitude", unique = false, nullable = true)
     private float longitude;
 
     public GeoLocation() {

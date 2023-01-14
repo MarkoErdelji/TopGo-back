@@ -1,6 +1,8 @@
 package com.example.topgoback.Users.DTO;
 
 import com.example.topgoback.Users.Model.Driver;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 
 public class DriverInfoDTO {
     /*{
@@ -13,12 +15,20 @@ public class DriverInfoDTO {
   "address": "Bulevar Oslobodjenja 74"
 }*/
 
+    @NotNull(message = "is required!")
     private Integer id;
+    @NotNull(message = "is required!")
     private String name;
+    @NotNull(message = "is required!")
     private String surname;
+    @NotNull(message = "is required!")
     private String profilePicture;
+    @NotNull(message = "is required!")
     private String telephoneNumber;
+    @NotNull(message = "is required!")
+    @Email(regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$",message="format is not valid!")
     private String email;
+    @NotNull(message = "is required!")
     private String address;
 
 
@@ -29,7 +39,7 @@ public class DriverInfoDTO {
         this.id = driver.getId();
         this.name = driver.getFirstName();
         this.surname = driver.getLastName();
-        this.profilePicture = "placeholder";
+        this.profilePicture = driver.getProfilePicture();
         this.telephoneNumber = driver.getPhoneNumber();
         this.email = driver.getEmail();
         this.address = driver.getAddress();

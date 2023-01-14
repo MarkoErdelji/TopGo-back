@@ -20,6 +20,8 @@ public class JwtTokenUtil implements Serializable {
 
     public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
 
+    public static final long JWT_REFRESH_TOKEN_VALIDITY = 24*60*60;
+
     @Value("${jwt.secret}")
     private String secret;
 
@@ -32,6 +34,12 @@ public class JwtTokenUtil implements Serializable {
         Map<String, Object> claims;
         claims = getAllClaimsFromToken(token);
         return (String) claims.get("role");
+    }
+
+    public int getUserIdFromToken(String token) {
+        Map<String, Object> claims;
+        claims = getAllClaimsFromToken(token);
+        return (int) claims.get("id");
     }
 
     //retrieve expiration date from jwt token
@@ -49,7 +57,7 @@ public class JwtTokenUtil implements Serializable {
     }
 
     //check if the token has expired
-    private Boolean isTokenExpired(String token) {
+    public Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
@@ -58,6 +66,12 @@ public class JwtTokenUtil implements Serializable {
     public String generateToken(User userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role",userDetails.getUserType());
+        claims.put("id",userDetails.getId());
+        return doGenerateToken(claims, userDetails.getEmail());
+    }
+
+    public String generateRefreshToken(User userDetails){
+        Map<String, Object> claims = new HashMap<>();
         return doGenerateToken(claims, userDetails.getEmail());
     }
 
@@ -73,9 +87,16 @@ public class JwtTokenUtil implements Serializable {
                 .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
 
+    private String doGenerateRefreshToken(Map<String, Object> claims, String subject) {
+
+        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+                .signWith(SignatureAlgorithm.HS512, secret).compact();
+    }
+
     //validate token
     public Boolean validateToken(String token, User userDetails) {
         final String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getEmail()) && !isTokenExpired(token));
+        return (username.equals(userDetails.getEmail()) && !isTokenExpired(token) && !userDetails.isBlocked());
     }
 }

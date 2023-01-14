@@ -6,9 +6,12 @@ import jakarta.persistence.*;
 @Entity
 public class Document {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "mySeqGenDoc", sequenceName = "mySeqGenDoc", initialValue = 4, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenDoc")
+    @Column(name="id")
     private int id;
     private String name;
+    @Column(length = 5000000)
     private String documentImage;
     @ManyToOne
     private Driver driver;

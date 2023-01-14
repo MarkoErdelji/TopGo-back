@@ -1,5 +1,6 @@
 package com.example.topgoback.Panic.DTO;
 
+import com.example.topgoback.Panic.Model.Panic;
 import com.example.topgoback.Rides.DTO.UserRideDTO;
 import com.example.topgoback.Users.DTO.UserListResponseDTO;
 
@@ -23,19 +24,16 @@ public class PanicDTO {
     }
     public PanicDTO(){}
 
-    public static PanicDTO getMokap(){
-        PanicDTO panicDTO = new PanicDTO();
-        panicDTO.setId(10);
-        panicDTO.setUser(UserListResponseDTO.getMockupData());
-        panicDTO.setRide(UserRideDTO.getMockupData());
-        String str = "2022-12-11T13:31:10Z";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX");
-        LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
-        panicDTO.setTime(dateTime);
-        panicDTO.setReason("Driver is drinking while he drives");
+    public PanicDTO(Panic panic) {
+        this.setId(panic.getId());
+        this.setUser(new UserListResponseDTO(panic.getUser()));
+        this.setRide(new UserRideDTO(panic.getRide()));
+        this.setTime(panic.getTime());
+        this.setReason(panic.getReason());
 
-        return panicDTO;
+
     }
+
 
     public Integer getId() {
         return id;

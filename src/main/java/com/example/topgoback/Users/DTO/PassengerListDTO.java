@@ -1,17 +1,21 @@
 package com.example.topgoback.Users.DTO;
 
 import com.example.topgoback.Tools.PaginatedResponse;
+import org.springframework.data.domain.Page;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class PassengerListDTO {
 
     private PaginatedResponse totalCount;
 
-    private ArrayList<PassengerListResponseDTO> results;
+    private List<PassengerListResponseDTO> results;
 
-    public PassengerListDTO(){
+    public PassengerListDTO(Page<PassengerListResponseDTO> page){
         totalCount = new PaginatedResponse();
+        totalCount.setTotalCount((int) page.getTotalElements());
+        this.results = page.getContent();
     }
 
     public Integer getTotalCount() {
@@ -22,11 +26,11 @@ public class PassengerListDTO {
         this.totalCount.setTotalCount(totalCount);
     }
 
-    public ArrayList<PassengerListResponseDTO> getResults() {
+    public List<PassengerListResponseDTO> getResults() {
         return results;
     }
 
-    public void setResults(ArrayList<PassengerListResponseDTO> results) {
+    public void setResults(List<PassengerListResponseDTO> results) {
         this.results = results;
     }
 

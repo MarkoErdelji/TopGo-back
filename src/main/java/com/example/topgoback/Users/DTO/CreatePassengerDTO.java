@@ -1,12 +1,25 @@
 package com.example.topgoback.Users.DTO;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.Length;
+
 public class CreatePassengerDTO {
+    @NotNull(message = "is required!")
     private String name;
+    @NotNull(message = "is required!")
     private String surname;
+    @NotNull(message = "is required!")
     private String profilePicture;
+    @NotNull(message = "is required!")
     private String telephoneNumber;
+    @NotNull(message = "is required!")
+    @Email(regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$",message="format is not valid!")
     private String email;
+    @NotNull(message = "is required!")
     private String address;
+    @NotNull(message = "is required!")
+    @Length(min = 6, message = "cannot be less than 6 characters!")
     private String password;
 
     public CreatePassengerDTO(String name, String surname, String profilePicture, String telephoneNumber, String email, String address, String password) {

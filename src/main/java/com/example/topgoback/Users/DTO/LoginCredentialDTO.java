@@ -1,9 +1,16 @@
 package com.example.topgoback.Users.DTO;
 
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+
 public class LoginCredentialDTO {
 
+    @NotNull(message = "is required!")
+    @Email(regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+(?:\\.[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+)*@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$",message="format is not valid!")
     private String email;
 
+    @NotNull(message = "is required!")
     private String password;
 
     public String getEmail() {

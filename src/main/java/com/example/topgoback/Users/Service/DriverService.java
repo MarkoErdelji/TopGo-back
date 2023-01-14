@@ -1,12 +1,15 @@
 package com.example.topgoback.Users.Service;
 
+import ch.qos.logback.core.encoder.EchoEncoder;
 import com.example.topgoback.Documents.DTO.CreateDocumentDTO;
 import com.example.topgoback.Documents.DTO.DocumentInfoDTO;
 import com.example.topgoback.Documents.DocumentRepository;
 import com.example.topgoback.Documents.Model.Document;
+import com.example.topgoback.Enums.UserType;
 import com.example.topgoback.GeoLocations.Model.GeoLocation;
 import com.example.topgoback.GeoLocations.Repository.GeoLocationRepository;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
+import com.example.topgoback.Users.DTO.AllActiveDriversDTO;
 import com.example.topgoback.Users.DTO.AllDriversDTO;
 import com.example.topgoback.Users.DTO.CreateDriverDTO;
 import com.example.topgoback.Users.DTO.DriverInfoDTO;
@@ -18,13 +21,24 @@ import com.example.topgoback.Vehicles.Model.Vehicle;
 import com.example.topgoback.Vehicles.Model.VehicleType;
 import com.example.topgoback.Vehicles.Repository.VehicleRepository;
 import com.example.topgoback.Vehicles.Repository.VehicleTypeRepository;
+import com.example.topgoback.Vehicles.Service.VehicleTypeService;
 import com.example.topgoback.WorkHours.DTO.DriverWorkHoursDTO;
 import com.example.topgoback.WorkHours.DTO.WorkHoursDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DriverService {
@@ -40,90 +54,131 @@ public class DriverService {
     @Autowired
     private VehicleRepository vehicleRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    public AllDriversDTO findAll() {
 
-        List<Driver> drivers = driverRepository.findAll();
+
+    public AllDriversDTO findAll(Pageable pageable) {
+
+        Page<Driver> drivers = driverRepository.findAll(pageable);
         List<DriverInfoDTO> ddrivers = new ArrayList<DriverInfoDTO>();
         for (Driver d:drivers
         ) {
             ddrivers.add(new DriverInfoDTO(d));
         }
-        AllDriversDTO allDrivers = new AllDriversDTO();
-        allDrivers.setTotalCount(drivers.size());
-        allDrivers.setResults(ddrivers);
-
+        AllDriversDTO allDrivers = new AllDriversDTO(new PageImpl<>(ddrivers, pageable, drivers.getTotalElements()));
         return allDrivers;
 
     }
 
     public DriverInfoDTO addOne(CreateDriverDTO ddriver) {
-
-
-        Driver driver= new Driver();
-        driver.setFirstName(ddriver.getName());
-        driver.setLastName(ddriver.getSurname());
-        driver.setAddress(ddriver.getAddress());
-        driver.setPhoneNumber(ddriver.getTelephoneNumber());
-        driver.setPassword(ddriver.getPassword());
-        driver.setEmail(ddriver.getEmail());
-
-        driverRepository.save(driver);
-
-        return new DriverInfoDTO(driver);
-
+        Optional<Driver> existingDriver = Optional.ofNullable(driverRepository.findByEmail(ddriver.getEmail()));
+        if(existingDriver.isEmpty()){
+            Driver driver = new Driver();
+            driver.setProfilePicture(ddriver.getProfilePicture());
+            driver.setFirstName(ddriver.getName());
+            driver.setLastName(ddriver.getSurname());
+            driver.setAddress(ddriver.getAddress());
+            driver.setPhoneNumber(ddriver.getTelephoneNumber());
+            String hashedPassword = passwordEncoder.encode(ddriver.getPassword());
+            driver.setPassword(hashedPassword);
+            driver.setEmail(ddriver.getEmail());
+            driver.setUserType(UserType.DRIVER);
+            driverRepository.save(driver);
+            return new DriverInfoDTO(driver);
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User with that email already exists!");
     }
     public DriverInfoDTO findById(Integer id)
     {
+
+        Optional<Driver> driver  = driverRepository.findById(id);
+        if(driver.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Driver does not exist!");
+        }
         DriverInfoDTO driverdto = new DriverInfoDTO();
-        Driver driver  = driverRepository.findById(id).orElse(null);
-        driverdto.setId(driver.getId());
-        driverdto.setAddress(driver.getAddress());
-        driverdto.setEmail(driver.getEmail());
-        driverdto.setName(driver.getFirstName());
-        driverdto.setProfilePicture(driver.getProfilePicture());
-        driverdto.setSurname(driver.getLastName());
-        driverdto.setTelephoneNumber(driver.getPhoneNumber());
+        driverdto.setId(driver.get().getId());
+        driverdto.setAddress(driver.get().getAddress());
+        driverdto.setEmail(driver.get().getEmail());
+        driverdto.setName(driver.get().getFirstName());
+        driverdto.setProfilePicture(driver.get().getProfilePicture());
+        driverdto.setSurname(driver.get().getLastName());
+        driverdto.setTelephoneNumber(driver.get().getPhoneNumber());
         return (driverdto);
     }
 
     public DriverInfoDTO updateOne(DriverInfoDTO newDriver, Integer driverId) {
 
-        Driver driver = driverRepository.findById(driverId).orElse(null);
-        driver.setFirstName(newDriver.getName());
-        driver.setLastName(newDriver.getSurname());
-        driver.setPhoneNumber(newDriver.getTelephoneNumber());
-        driver.setAddress(newDriver.getAddress());
-        driver.setEmail(newDriver.getEmail());
+        Optional<Driver> driver = driverRepository.findById(driverId);
+        if(driver.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Driver does not exist!");
+        }
+        driver.get().setFirstName(newDriver.getName());
+        driver.get().setLastName(newDriver.getSurname());
+        driver.get().setPhoneNumber(newDriver.getTelephoneNumber());
+        driver.get().setProfilePicture(newDriver.getProfilePicture());
+        driver.get().setAddress(newDriver.getAddress());
+        driver.get().setEmail(newDriver.getEmail());
 
-        driverRepository.save(driver);
+        driverRepository.save(driver.get());
 
-        return new DriverInfoDTO(driver);
+        return new DriverInfoDTO(driver.get());
 
     }
     public List<DocumentInfoDTO> getDriverDocuments(Integer driverId) {
-        Driver driver = driverRepository.findById(driverId).orElse(null);
+        Optional<Driver> driver = driverRepository.findById(driverId);
+        if(driver.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Driver does not exist!");
+        }
         List<DocumentInfoDTO> allDocuments = new ArrayList<DocumentInfoDTO>();
-        for (Document d: driver.getDocuments()
+        for (Document d: driver.get().getDocuments()
              ) {
             allDocuments.add(new DocumentInfoDTO(d));
         }
         return  allDocuments;
     }
+    public boolean isBase64(String path) {
+        try {
+            Base64.getDecoder().decode(path);
+            return true;
+        } catch(IllegalArgumentException e) {
+            return false;
+        }
+    }
 
     public DocumentInfoDTO addDriverDocument(Integer driverId, CreateDocumentDTO newDTO) {
 
-        Driver driver = driverRepository.findById(driverId).orElse(null);
+        Optional<Driver> driver = driverRepository.findById(driverId);
+        if(driver.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Driver does not exist!");
+        }
+        if(!isBase64(newDTO.getDocumentImage())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is not an image!");
+        }
+        int x = (int) (newDTO.getDocumentImage().getBytes().length * (3.0/4));
+        if(x>5000000){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is bigger than 5mb!");
+        }
+
+
         Document document = new Document();
         document.setDocumentImage(newDTO.getDocumentImage());
-        document.setDriver(driver);
+        document.setDriver(driver.get());
         document.setName(newDTO.getName());
         documentRepository.save(document);
-        driver.getDocuments().add(document);
+        driver.get().getDocuments().add(document);
 
 
         return new DocumentInfoDTO(document);
 
+    }
+    public void deleteDriverDocument(int id){
+        Optional<Document> document = documentRepository.findById(id);
+        if(document.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Document does not exist!");
+        }
+        documentRepository.deleteById(id);
     }
     public Vehicle updateVehicle(GeoLocation location,Driver driver,
             VehicleType vehicleType,Vehicle vehicle,CreateVehicleDTO newVehicle)
@@ -152,22 +207,29 @@ public class DriverService {
 
 
     public VehicleInfoDTO addDriverVehicle(Integer driverId, CreateVehicleDTO newVehicle) {
-        Driver driver = driverRepository.findById(driverId).orElse(null);
-
+        Optional<Driver> driver = driverRepository.findById(driverId);
+        if(driver.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Driver does not exist!");
+        }
         GeoLocation location = new GeoLocation();
         updateLocation(location,newVehicle);
         geoLocationRepository.save(location);
 
-        VehicleType vehicleType = new VehicleType();
-        vehicleType.setVehicleName(newVehicle.vehicleType);
-        vehicleTypeRepository.save(vehicleType);
+
+        String vehileTypeName = newVehicle.vehicleType;
+        VehicleType vehicleType = switch (vehileTypeName) {
+            case "STANDARD" -> this.vehicleTypeRepository.findById(1).orElseGet(null);
+            case "LUXURY" -> this.vehicleTypeRepository.findById(2).orElseGet(null);
+            case "VAN" -> this.vehicleTypeRepository.findById(3).orElseGet(null);
+            default -> new VehicleType();
+        };
 
         Vehicle vehicle = new Vehicle();
-        vehicle = updateVehicle(location,driver,vehicleType,vehicle,newVehicle);
+        vehicle = updateVehicle(location,driver.get(),vehicleType,vehicle,newVehicle);
         vehicleRepository.save(vehicle);
 
-        driver.setVehicle(vehicle);
-        driverRepository.save(driver);
+        driver.get().setVehicle(vehicle);
+        driverRepository.save(driver.get());
 
         return new VehicleInfoDTO(vehicle);
 
@@ -175,13 +237,22 @@ public class DriverService {
     }
 
     public VehicleInfoDTO getDriverVehicle(Integer driverId) {
-        Driver driver = driverRepository.findById(driverId).orElse(null);
-        return new VehicleInfoDTO(driver.getVehicle());
+        Optional<Driver> driver = driverRepository.findById(driverId);
+        if(driver.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Driver does not exist!");
+        }
+        if(driver.get().getVehicle() == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Vehicle is not assigned!");
+        }
+        return new VehicleInfoDTO(driver.get().getVehicle());
 
     }
 
     public VehicleInfoDTO updateDriverVehicle(Integer driverId, CreateVehicleDTO newVehicle) {
-        Driver driver = driverRepository.findById(driverId).orElse(null);
+        Optional<Driver> driver = driverRepository.findById(driverId);
+        if(driver.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Driver does not exist!");
+        }
 
         GeoLocation location = new GeoLocation();
         updateLocation(location,newVehicle);
@@ -191,27 +262,31 @@ public class DriverService {
         vehicleType.setVehicleName(newVehicle.vehicleType);
         vehicleTypeRepository.save(vehicleType);
 
-        driver.setVehicle(updateVehicle(location,driver,vehicleType,driver.getVehicle(),newVehicle));
-        vehicleRepository.save(driver.getVehicle());
+        driver.get().setVehicle(updateVehicle(location,driver.get(),vehicleType,driver.get().getVehicle(),newVehicle));
+        vehicleRepository.save(driver.get().getVehicle());
 
-        driverRepository.save(driver);
+        driverRepository.save(driver.get());
 
-        return new VehicleInfoDTO(driver.getVehicle());
+        return new VehicleInfoDTO(driver.get().getVehicle());
 
 
     }
-    public AllDriversDTO getActiveDrivers (){
+    public AllActiveDriversDTO getActiveDrivers (){
         List<Driver> drivers = driverRepository.findByIsActiveTrue();
         List<DriverInfoDTO> driversDTO = new ArrayList<>();
         for (Driver d:drivers
         ) {
             driversDTO.add(new DriverInfoDTO(d));
         }
-        AllDriversDTO allActiveDrivers = new AllDriversDTO();
+        AllActiveDriversDTO allActiveDrivers = new AllActiveDriversDTO();
         allActiveDrivers.setTotalCount(drivers.size());
         allActiveDrivers.setResults(driversDTO);
 
         return allActiveDrivers;
+    }
+
+    public Driver getByEmail(String email){
+        return this.driverRepository.findByEmail(email);
     }
 
     public WorkHoursDTO addDriverWorkingHour(Integer workingHourId, WorkHoursDTO newWorkHour) {

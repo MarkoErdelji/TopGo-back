@@ -3,7 +3,9 @@ package com.example.topgoback.Tools;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,7 +21,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.io.IOException;
+import java.util.Collections;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -34,6 +39,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
 
+
+		System.out.println(request.getRequestURL());
 		final String requestTokenHeader = request.getHeader("Authorization");
 
 		String username = null;
@@ -67,6 +74,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				// After setting the Authentication in the context, we specify
 				// that the current user is authenticated. So it passes the Spring Security Configurations successfully.
 				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+				SecurityContext securityContext = SecurityContextHolder.getContext();
+				Authentication authentication = securityContext.getAuthentication();
+				if (authentication != null) {
+					// log the authentication object
+					logger.info(authentication);
+				} else {
+					logger.info("No authentication object found in security context.");
+				}
 			}
 		}
 		chain.doFilter(request, response);

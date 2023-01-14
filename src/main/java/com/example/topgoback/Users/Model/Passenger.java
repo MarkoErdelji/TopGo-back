@@ -1,6 +1,7 @@
 package com.example.topgoback.Users.Model;
 
 import com.example.topgoback.Enums.UserType;
+import com.example.topgoback.FavouriteRides.Model.FavouriteRide;
 import com.example.topgoback.Payments.Model.Payment;
 import com.example.topgoback.Rides.Model.Ride;
 import com.example.topgoback.Routes.Model.Route;
@@ -15,20 +16,17 @@ public class Passenger extends  User{
     @JoinTable(name = "passenger_rides", joinColumns = @JoinColumn(name = "passenger_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "ride_id", referencedColumnName = "id"))
     private List<Ride> rides;
     @ManyToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.DETACH})
-    @JoinTable(name = "favourite_routes", joinColumns = @JoinColumn(name = "route_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "passanger_id", referencedColumnName = "id"))
-    private List<Route> favouriteRoutes;
+    @JoinTable(name = "passenger_favourite_rides", joinColumns = @JoinColumn(name = "passenger_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "favourite_ride_id", referencedColumnName = "id"))
+    private List<FavouriteRide> favouriteRoutes;
+
+    @Column(name = "is_active")
+    private boolean isActive;
 
     public Passenger() {
 
     }
 
-    public Passenger(String firstName, String lastName, String profilePicture,String email, String password, String phoneNumber, String address, List<Payment> payments, List<Ride> rides, List<Route> favouriteRoutes) {
-        super(firstName, lastName, email,profilePicture, password, phoneNumber, address, UserType.USER);
 
-        this.payments = payments;
-        this.rides = rides;
-        this.favouriteRoutes = favouriteRoutes;
-    }
 
     public List<Payment> getPayments() {
         return payments;
@@ -46,11 +44,12 @@ public class Passenger extends  User{
         this.rides = rides;
     }
 
-    public List<Route> getFavouriteRoutes() {
-        return favouriteRoutes;
+
+    public boolean isActive() {
+        return isActive;
     }
 
-    public void setFavouriteRoutes(List<Route> favouriteRoutes) {
-        this.favouriteRoutes = favouriteRoutes;
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }
