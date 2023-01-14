@@ -39,7 +39,7 @@ public class RideController {
         RideDTO response = rideService.createRide(createRideDTO);
         WebSocketSession webSocketSession = CreateRideHandler.driverSessions.get(response.getDriver().getId().toString());
         if(webSocketSession != null) {
-            CreateRideHandler.notifyDriver(webSocketSession);
+            CreateRideHandler.notifyDriver(webSocketSession,response);
         }
         else {
             sendDriverRideUpdate(response);

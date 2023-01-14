@@ -1,5 +1,7 @@
 package com.example.topgoback.Rides.Controller;
 
+import com.example.topgoback.Rides.DTO.RideDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
@@ -40,9 +42,11 @@ public class CreateRideHandler implements WebSocketHandler {
 
 
 
-    public static void notifyDriver(WebSocketSession session) {
-        TextMessage textMessage = new TextMessage(session.getId() + ": Hello, drajver!");
+    public static void notifyDriver(WebSocketSession session, RideDTO rideDTO) {
+        ObjectMapper mapper = new ObjectMapper();
+
         try {
+            TextMessage textMessage = new TextMessage(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rideDTO));
             session.sendMessage(textMessage);
         } catch (IOException e) {
             throw new RuntimeException(e);
