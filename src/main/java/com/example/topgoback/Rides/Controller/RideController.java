@@ -8,6 +8,7 @@ import com.example.topgoback.Rides.DTO.CreateRideDTO;
 import com.example.topgoback.Rides.DTO.RideDTO;
 import com.example.topgoback.Rides.Service.RideService;
 import com.example.topgoback.Users.DTO.UserRef;
+import com.example.topgoback.Users.Model.Passenger;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Validated
@@ -39,7 +41,7 @@ public class RideController {
         RideDTO response = rideService.createRide(createRideDTO);
         WebSocketSession webSocketSession = CreateRideHandler.driverSessions.get(response.getDriver().getId().toString());
         if(webSocketSession != null) {
-            CreateRideHandler.notifyDriver(webSocketSession,response);
+            CreateRideHandler.notifyDriverAboutCreatedRide(webSocketSession,response);
         }
         else {
             sendDriverRideUpdate(response);
@@ -94,14 +96,29 @@ public class RideController {
     @PutMapping(value = "/{id}/accept")
     public ResponseEntity<RideDTO> acceptRide(@PathVariable Integer id){
         RideDTO ride = rideService.acceptRide(id);
-        sendPassengerRideUpdate(ride);
+        sendRideUpdateToPassenger(ride);
         return new ResponseEntity<>(ride, HttpStatus.OK);
+    }
+
+    public void sendRideUpdateToPassenger(RideDTO ride){
+        List<WebSocketSession> sessions = new ArrayList<>();
+        for(UserRef p:ride.getPassengers()){
+            WebSocketSession webSocketSession = CreateRideHandler.passengerSessions.get(p.getId().toString());
+            if(webSocketSession != null){
+                sessions.add(webSocketSession);
+            }
+        }
+        if(!sessions.isEmpty()) {
+            CreateRideHandler.notifyPassengerAboutAcceptedRide(sessions,ride);
+        }
+        sendPassengerRideUpdate(ride);
     }
 
     @PutMapping(value = "/{id}/cancel")
     public ResponseEntity<RideDTO> cancelRide(@PathVariable Integer id, @RequestBody RejectionTextDTO reason){
         RideDTO ride = rideService.cancelRide(id,reason);
-        sendPassengerRideUpdate(ride);
+        WebSocketSession webSocketSession = CreateRideHandler.passengerSessions.get(ride.getDriver().getId().toString());
+        sendRideUpdateToPassenger(ride);
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
 
