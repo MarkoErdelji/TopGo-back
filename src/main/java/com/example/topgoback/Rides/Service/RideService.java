@@ -512,7 +512,7 @@ public class RideService {
     }
 
 
-    public RideDTO declineRide(Integer id) {
+    public RideDTO declineRide(Integer id, RejectionTextDTO reason) {
         Optional<Ride> optionalRide = rideRepository.findById(id);
         if (optionalRide.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride does not exist!");
@@ -523,7 +523,17 @@ public class RideService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot decline a ride that is not in status PENDING!");
         }
         ride.setStatus(Status.REJECTED);
+
+        RejectionLetter rejectionLetter = new RejectionLetter();
+        rejectionLetter.setTimeOfRejection(LocalDateTime.now());
+        rejectionLetter.setReason(reason.getReason());
+        rejectionLetter.setRide(ride);
+
+        rejectionLetterRepository.save(rejectionLetter);
+        ride.setRejectionLetter(rejectionLetter);
+
         rideRepository.save(ride);
+
         CreateRideDTO createRideDTO = new CreateRideDTO();
         createRideDTO.setBabyTransport(ride.isForBabies());
         createRideDTO.setPetTransport(ride.isForAnimals());

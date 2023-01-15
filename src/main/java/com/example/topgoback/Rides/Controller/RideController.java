@@ -134,8 +134,8 @@ public class RideController {
 
     @PutMapping(value = "/{id}/decline")
     @Valid
-    public ResponseEntity<RideDTO> declineRide(@PathVariable Integer id){
-        RideDTO ride = rideService.declineRide(id);
+    public ResponseEntity<RideDTO> declineRide(@PathVariable Integer id, @RequestBody RejectionTextDTO rejectionTextDTO){
+        RideDTO ride = rideService.declineRide(id, rejectionTextDTO);
         sendRideUpdateToPassenger(ride);
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
