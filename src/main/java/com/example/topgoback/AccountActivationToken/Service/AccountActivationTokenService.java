@@ -39,6 +39,7 @@ public class AccountActivationTokenService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Activation expired. Register again!");
         }
         passengerService.activate(accountActivationToken.get().getPassenger().getId());
+        accountActivationTokenRepository.deleteById(accountActivationToken.get().getId());
         return accountActivationToken.get();
     }
     public List<AccountActivationToken> getAll(){

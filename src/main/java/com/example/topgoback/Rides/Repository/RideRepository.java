@@ -1,5 +1,6 @@
 package com.example.topgoback.Rides.Repository;
 
+import com.example.topgoback.Enums.Status;
 import com.example.topgoback.Rides.Model.Ride;
 import com.example.topgoback.Users.Model.Driver;
 import com.example.topgoback.Users.Model.Passenger;
@@ -37,6 +38,10 @@ public interface RideRepository extends JpaRepository<Ride,Integer> {
 
     @Query("SELECT DISTINCT r FROM Ride r  WHERE (r.driver.id = :driverId) AND (r.status = 1)")
     List<Ride> findRidesByDriveridAndIsAccepted(@Param("driverId") int driverId);
+    @Query("SELECT DISTINCT r FROM Ride r  WHERE (r.driver.id = :driverId) AND (r.status = 4)")
+    List<Ride> findRidesByDriveridAndIsFinished(@Param("driverId") int driverId);
+
+    List<Ride> findRidesByStatus(Status status);
 
 
 

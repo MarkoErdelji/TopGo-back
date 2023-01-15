@@ -82,7 +82,7 @@ public class WebSecurityConfig {
 
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
-		return (web) -> web.ignoring().requestMatchers("/api/user/login", "/api/user/login/","api/passenger/","/api/email/","api/passwordResetToken*");
+		return (web) -> web.ignoring().requestMatchers("/websocket","/api/user/login", "/api/user/login/","api/passenger/","/api/email/","api/passwordResetToken*");
 	}
 
 
