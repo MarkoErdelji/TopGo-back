@@ -189,10 +189,23 @@ public class RideService {
 
         rideRepository.save(ride);
         RideDTO response = new RideDTO(ride);
+        WebSocketSession webSocketSession = CreateRideHandler.driverSessions.get(response.getDriver().getId().toString());
+        if(webSocketSession != null) {
+            CreateRideHandler.notifyDriverAboutCreatedRide(webSocketSession,response);
+        }
+        else {
+            sendDriverRideUpdate(response);
+        }
         return response;
 
 
     }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    public void sendDriverRideUpdate(RideDTO update) {
+        messagingTemplate.convertAndSend("/topic/driver/ride/"+update.driver.getId(), update);
+    }
+
 
     public void sendNoMoreDriversUpdateToPassenger(List<RidePassengerDTO> passengers){
         List<WebSocketSession> sessions = new ArrayList<>();
