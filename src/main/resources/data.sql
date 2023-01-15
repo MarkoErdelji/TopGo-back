@@ -53,16 +53,16 @@ WHERE id = 6;
 
 
 INSERT INTO passenger (ID, ADDRESS, EMAIL, FIRST_NAME, IS_BLOCKED, LAST_NAME, PASSWORD, PHONE_NUMBER, PROFILE_PICTURE, USER_TYPE, IS_ACTIVE)
-VALUES (21, '123 Main Street', 'passenger@example.com', 'John', false, 'Doe', '$2a$10$Wn4A5JzgizcMBttHv/MA7Omunwewqv5h6Wn1dbLmR9lp40bmxY0y6', '123-456-7890', NULL, 0, TRUE);
+VALUES (21, '123 Main Street', 'passenger@example.com', 'Boris', false, 'Kesa', '$2a$10$Wn4A5JzgizcMBttHv/MA7Omunwewqv5h6Wn1dbLmR9lp40bmxY0y6', '123-456-7890', NULL, 0, TRUE);
 
 INSERT INTO passenger (ID, ADDRESS, EMAIL, FIRST_NAME, IS_BLOCKED, LAST_NAME, PASSWORD, PHONE_NUMBER, PROFILE_PICTURE, USER_TYPE, IS_ACTIVE)
-VALUES (22, '123 Main Street', 'passenger3@example.com', 'John', false, 'Doe', '$2a$10$Wn4A5JzgizcMBttHv/MA7Omunwewqv5h6Wn1dbLmR9lp40bmxY0y6', '123-456-7890', NULL, 0, TRUE);
+VALUES (22, '123 Main Street', 'passenger3@example.com', 'Denis', false, 'Tucan', '$2a$10$Wn4A5JzgizcMBttHv/MA7Omunwewqv5h6Wn1dbLmR9lp40bmxY0y6', '123-456-7890', NULL, 0, TRUE);
 
 INSERT INTO passenger (ID, ADDRESS, EMAIL, FIRST_NAME, IS_BLOCKED, LAST_NAME, PASSWORD, PHONE_NUMBER, PROFILE_PICTURE, USER_TYPE, IS_ACTIVE)
-VALUES (23, '123 Main Street', 'passenger2@example.com', 'John', false, 'Doe', '$2a$10$Wn4A5JzgizcMBttHv/MA7Omunwewqv5h6Wn1dbLmR9lp40bmxY0y6', '123-456-7890', NULL, 0, TRUE);
+VALUES (23, '123 Main Street', 'passenger2@example.com', 'Danijel', false, 'Krs', '$2a$10$Wn4A5JzgizcMBttHv/MA7Omunwewqv5h6Wn1dbLmR9lp40bmxY0y6', '123-456-7890', NULL, 0, TRUE);
 
 INSERT INTO passenger (ID, ADDRESS, EMAIL, FIRST_NAME, IS_BLOCKED, LAST_NAME, PASSWORD, PHONE_NUMBER, PROFILE_PICTURE, USER_TYPE, IS_ACTIVE)
-VALUES (24, '123 Main Street', 'passenger4@example.com', 'John', false, 'Doe', '$2a$10$Wn4A5JzgizcMBttHv/MA7Omunwewqv5h6Wn1dbLmR9lp40bmxY0y6', '123-456-7890', NULL, 0, TRUE);
+VALUES (24, '123 Main Street', 'passenger4@example.com', 'Predrag', false, 'Strvina', '$2a$10$Wn4A5JzgizcMBttHv/MA7Omunwewqv5h6Wn1dbLmR9lp40bmxY0y6', '123-456-7890', NULL, 0, TRUE);
 
 INSERT INTO GEO_LOCATION (ID, ADDRESS, LATITUDE, LONGITUDE)
 VALUES (4, '123 Main Street', 45.251636,19.814594),
@@ -91,6 +91,9 @@ VALUES (4, '2023-01-03T12:00:00', true, true, false, 1570.00, '2023-01-02T09:00:
 
 INSERT INTO PASSENGER_RIDES (PASSENGER_ID, RIDE_ID)
 VALUES (21, 1),(22, 1),(23, 1),(21,3),(21,2);
+
+INSERT INTO MESSAGES (ID,MESSAGE,RIDE_ID,TIME_OF_SENDING,TYPE,RECEIVER_ID,SENDER_ID)
+VALUES (1,'ALO BRE',1,'2023-01-03T12:00:01',1,4,21),(2,'BUDALOO',1,'2023-01-03T12:00:00',1,4,21),(3,'STA JE',1,'2023-01-03T12:00:00',1,4,22),(5,'MA NEMOJ!',1,'2023-01-03T12:00:01',1,4,23),(4,'PREBICU TE!',1,'2023-01-03T12:00:00',1,23,4);
 
 -- alter table if exists messages add constraint sender_id_fk foreign key (sender_id) references users;
 -- alter table if exists messages add constraint receiver_id_fk foreign key (receiver_id) references users;

@@ -23,6 +23,8 @@ public class UserMessagesListDTO{
         this.results = page.getContent();
     }
 
+    public UserMessagesListDTO() {
+    }
 
     public List<UserMessagesDTO> getResults() {
         return results;
@@ -39,4 +41,8 @@ public class UserMessagesListDTO{
     public void setTotalCount(int totalCount) {
         this.totalCount.setTotalCount(totalCount);
     }
+    public void setTotalCount(PaginatedResponse totalCount) {
+        this.totalCount = totalCount;
+    }
+
 }

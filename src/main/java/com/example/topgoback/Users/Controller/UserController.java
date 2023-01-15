@@ -159,6 +159,19 @@ public class UserController {
 
     }
 
+    @GetMapping(value = "/{userId}/messages")
+    @Valid
+    public ResponseEntity<?> getMessagesBeetwenUsers(@PathVariable Integer userId,
+                                                     @RequestHeader("Authorization") String authorization)
+    {
+
+
+
+        UserMessagesListDTO userMessages = messageService.findBySenderandReceiver(userId,authorization);
+        return new ResponseEntity<>(userMessages,HttpStatus.OK);
+
+    }
+
 
     @PostMapping(value = "{id}/message")
     @Valid
