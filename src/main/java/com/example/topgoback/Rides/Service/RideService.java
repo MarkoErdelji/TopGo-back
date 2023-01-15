@@ -632,7 +632,7 @@ public class RideService {
                     timer.cancel();
                 }
             }
-        }, 5000, 3000);
+        }, 5000, 5000);
 
 
 

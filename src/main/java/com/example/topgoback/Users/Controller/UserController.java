@@ -240,7 +240,15 @@ public class UserController {
     }
 
 
+    @GetMapping(value = "id/{id}")
+    @Valid
+    public ResponseEntity<?> getUserById(@PathVariable Integer id)
+    {
 
+        UserListResponseDTO user = userService.getOne(id);
+        return new ResponseEntity<>(user,HttpStatus.OK);
+
+    }
     @GetMapping(value = "/{email}")
     @Valid
     public ResponseEntity<?> getUserRefByEmail(@PathVariable String email)
