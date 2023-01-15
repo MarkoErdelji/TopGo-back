@@ -14,12 +14,14 @@ import com.example.topgoback.Panic.Repository.PanicRepository;
 import com.example.topgoback.RejectionLetters.DTO.RejectionTextDTO;
 import com.example.topgoback.RejectionLetters.Model.RejectionLetter;
 import com.example.topgoback.RejectionLetters.Repository.RejectionLetterRepository;
+import com.example.topgoback.Rides.Controller.CreateRideHandler;
 import com.example.topgoback.Rides.DTO.CreateRideDTO;
 import com.example.topgoback.Rides.DTO.RideDTO;
 import com.example.topgoback.Rides.DTO.UserRideDTO;
 import com.example.topgoback.Rides.Model.Ride;
 import com.example.topgoback.Rides.Repository.RideRepository;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
+import com.example.topgoback.Routes.DTO.RouteForCreateRideDTO;
 import com.example.topgoback.Routes.Model.Route;
 import com.example.topgoback.Routes.Repository.RouteRepository;
 import com.example.topgoback.Tools.DistanceCalculator;
@@ -40,13 +42,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class RideService {
@@ -58,6 +62,9 @@ public class RideService {
     PassengerRepository passengerRepository;
     @Autowired
     RouteRepository routeRepository;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
     @Autowired
     GeoLocationRepository geoLocationRepository;
     @Autowired
@@ -169,8 +176,10 @@ public class RideService {
 
 
         Driver driver = this.DriverSelection(ride, DistanceCalculator.getEstimatedTimeInMinutes(60, ride.getRoute().getLenght()));
-        if (driver == null)
+        if (driver == null) {
+            sendNoMoreDriversUpdateToPassenger(createRideDTO.getPassengers());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No avaliable drivers at this moment");
+        }
 
         ride.setDriver(driver);
         UserRef driverRef = new UserRef();
@@ -185,11 +194,44 @@ public class RideService {
 
     }
 
+    public void sendNoMoreDriversUpdateToPassenger(List<RidePassengerDTO> passengers){
+        List<WebSocketSession> sessions = new ArrayList<>();
+        for(RidePassengerDTO p:passengers){
+            WebSocketSession webSocketSession = CreateRideHandler.passengerSessions.get(p.getId().toString());
+            if(webSocketSession != null){
+                sessions.add(webSocketSession);
+            }
+        }
+        if(!sessions.isEmpty()) {
+            CreateRideHandler.notifyPassengerAboutNoDriversLeft(sessions,new Error());
+        }
+        sendPassengerNoDriversLeftUpdate(passengers);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    public void sendPassengerNoDriversLeftUpdate(List<RidePassengerDTO> passengers) {
+        for(RidePassengerDTO p: passengers){
+            messagingTemplate.convertAndSend("/topic/passenger/ride/"+p.getId(), "No drivers left!");
+        }
+    }
+
     private Driver DriverSelection(Ride ride, float estimatedTime) {
         List<Driver> drivers = driverRepository.findAll();
+        List<Ride> rides = rideRepository.findRidesByStatus(Status.REJECTED);
         List<Driver> viableDrivers = new ArrayList<Driver>();
         for (Driver driver : drivers
         ) {
+            boolean hasRejected = false;
+            for (Ride rejectedRide: rides){
+                if(Objects.equals(rejectedRide.getDriver().getId(), driver.getId()) && arePassengerListsEqual(rejectedRide.getPassenger(),ride.getPassenger())
+                   && (ride.getStart().isAfter(LocalDateTime.now().minusMinutes(20)) && ride.getStart().isBefore(LocalDateTime.now()))) {
+                    hasRejected = true;
+                    break;
+                }
+            }
+            if(hasRejected){
+                continue;
+            }
             Vehicle vehicle = driver.getVehicle();
             if (!driver.isActive()) continue;
             if (!vehicle.getVehicleType().getVehicleName().equals(ride.getVehicleName().toString()))
@@ -205,6 +247,7 @@ public class RideService {
             viableDrivers.add(driver);
 
         }
+
         double minimumDistance = Double.MAX_VALUE;
         Driver bestDriver = null;
         for (Driver driver : viableDrivers) {
@@ -219,6 +262,13 @@ public class RideService {
         }
 
         return bestDriver;
+    }
+
+
+    public static boolean arePassengerListsEqual(List<Passenger> list1, List<Passenger> list2) {
+        Set<Integer> set1 = list1.stream().map(Passenger::getId).collect(Collectors.toSet());
+        Set<Integer> set2 = list2.stream().map(Passenger::getId).collect(Collectors.toSet());
+        return set1.equals(set2);
     }
 
     private boolean checkForAcceptedRide(Driver driver, float estimatedTime) {
@@ -257,10 +307,10 @@ public class RideService {
         }
 
         Ride ride = optionalRide.get();
-        if (ride.getStatus() != Status.PENDING) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot cancel a ride that is not in status PENDING!");
+        if (ride.getStatus() != Status.ACCEPTED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot cancel a ride that is not in status ACCEPTED!");
         }
-        ride.setStatus(Status.REJECTED);
+        ride.setStatus(Status.CANCELED);
         RejectionLetter rejectionLetter = new RejectionLetter();
 
         rejectionLetter.setTimeOfRejection(LocalDateTime.now());
@@ -462,4 +512,37 @@ public class RideService {
     }
 
 
+    public RideDTO declineRide(Integer id) {
+        Optional<Ride> optionalRide = rideRepository.findById(id);
+        if (optionalRide.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride does not exist!");
+        }
+
+        Ride ride = optionalRide.get();
+        if (ride.getStatus() != Status.PENDING) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot decline a ride that is not in status PENDING!");
+        }
+        ride.setStatus(Status.REJECTED);
+        rideRepository.save(ride);
+        CreateRideDTO createRideDTO = new CreateRideDTO();
+        createRideDTO.setBabyTransport(ride.isForBabies());
+        createRideDTO.setPetTransport(ride.isForAnimals());
+        List<RouteForCreateRideDTO> routeForCreateRideDTOS = new ArrayList<>();
+        RouteForCreateRideDTO routeForCreateRideDTO = new RouteForCreateRideDTO(ride.getRoute());
+        routeForCreateRideDTOS.add(routeForCreateRideDTO);
+        createRideDTO.setLocations(routeForCreateRideDTOS);
+        createRideDTO.setVehicleType(ride.getVehicleName());
+        List<RidePassengerDTO> ridePassengerDTOS = new ArrayList<>();
+        for(Passenger p:ride.getPassenger()){
+            RidePassengerDTO ridePassengerDTO = new RidePassengerDTO();
+            ridePassengerDTO.setEmail(p.getEmail());
+            ridePassengerDTO.setId(p.getId());
+            ridePassengerDTOS.add(ridePassengerDTO);
+        }
+        createRideDTO.setPassengers(ridePassengerDTOS);
+
+        RideDTO newRide = createRide(createRideDTO);
+        return newRide;
+
+    }
 }

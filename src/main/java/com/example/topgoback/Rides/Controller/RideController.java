@@ -37,6 +37,7 @@ public class RideController {
 
 
     @PostMapping(consumes = "application/json")
+    @Valid
     public ResponseEntity<RideDTO> createRide(@Valid @RequestBody CreateRideDTO createRideDTO){
         RideDTO response = rideService.createRide(createRideDTO);
         WebSocketSession webSocketSession = CreateRideHandler.driverSessions.get(response.getDriver().getId().toString());
@@ -49,43 +50,50 @@ public class RideController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @GetMapping(value = "/driver/{driverId}/active")
+    @Valid
     public ResponseEntity<RideDTO> getActiveRideForDriver(@PathVariable Integer driverId){
         RideDTO response = rideService.getDriverActiveRide(driverId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @GetMapping(value = "/driver/{driverId}/accepted")
+    @Valid
     public ResponseEntity<RideDTO> getAcceptedRideForDriver(@PathVariable Integer driverId){
         RideDTO response = rideService.getDriverAcceptedRide(driverId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @GetMapping(value = "/driver/{driverId}/finished")
+    @Valid
     public ResponseEntity<?> getFinishedRidesForDriver(@PathVariable Integer driverId){
         List<RideDTO> response = rideService.getDriverFinishedRides(driverId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping(value = "/passenger/{passengerId}/active")
+    @Valid
     public ResponseEntity<RideDTO> getActiveRideForPassenger(@PathVariable Integer passengerId){
         RideDTO response = rideService.getPassengerActiveRide(passengerId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}")
+    @Valid
     public ResponseEntity<RideDTO> getRide(@PathVariable Integer id){
         RideDTO response = rideService.getRideById(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/withdraw")
+    @Valid
     public ResponseEntity<RideDTO> withdrawRoute(@PathVariable Integer id){
         RideDTO response = rideService.withdrawRide(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/panic", consumes = "application/json")
+    @Valid
     public ResponseEntity<PanicDTO> panic(@RequestHeader("Authorization") String authorization,
                                           @PathVariable Integer id,
-                                          @RequestBody RejectionTextDTO reason)
+                                          @Valid @RequestBody RejectionTextDTO reason)
     {
 
         PanicDTO response = rideService.panic(id,reason,authorization);
@@ -94,6 +102,7 @@ public class RideController {
 
 
     @PutMapping(value = "/{id}/accept")
+    @Valid
     public ResponseEntity<RideDTO> acceptRide(@PathVariable Integer id){
         RideDTO ride = rideService.acceptRide(id);
         sendRideUpdateToPassenger(ride);
@@ -115,6 +124,7 @@ public class RideController {
     }
 
     @PutMapping(value = "/{id}/cancel")
+    @Valid
     public ResponseEntity<RideDTO> cancelRide(@PathVariable Integer id, @RequestBody RejectionTextDTO reason){
         RideDTO ride = rideService.cancelRide(id,reason);
         WebSocketSession webSocketSession = CreateRideHandler.passengerSessions.get(ride.getDriver().getId().toString());
@@ -122,23 +132,35 @@ public class RideController {
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
 
+    @PutMapping(value = "/{id}/decline")
+    @Valid
+    public ResponseEntity<RideDTO> declineRide(@PathVariable Integer id){
+        RideDTO ride = rideService.declineRide(id);
+        sendRideUpdateToPassenger(ride);
+        return new ResponseEntity<>(ride, HttpStatus.OK);
+    }
+
     @PutMapping(value = "/{id}/end")
+    @Valid
     public ResponseEntity<RideDTO> finishRoute(@PathVariable Integer id){
         RideDTO ride = rideService.endRide(id);
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{id}/start")
+    @Valid
     public ResponseEntity<RideDTO> startRoute(@PathVariable Integer id){
         RideDTO ride = rideService.startRide(id);
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
     @PostMapping(value = "/favourites", consumes = "application/json")
-    public ResponseEntity<FavouriteRideInfoDTO> addFavouriteRide(@RequestBody FavouriteRideDTO favouriteRide){
+    @Valid
+    public ResponseEntity<FavouriteRideInfoDTO> addFavouriteRide(@Valid @RequestBody FavouriteRideDTO favouriteRide){
         FavouriteRideInfoDTO response = rideService.addFavouriteRide(favouriteRide);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @GetMapping(value = "/favourites")
+    @Valid
     public ResponseEntity<List<FavouriteRideInfoDTO>> getFavouriteRides(@RequestHeader("Authorization") String authorization)
     {
         List<FavouriteRideInfoDTO> response = rideService.getFavouriteRides(authorization);
@@ -147,6 +169,7 @@ public class RideController {
 
     }
     @DeleteMapping(value = "/favourites/{id}")
+    @Valid
     public ResponseEntity<String> deleteFavouriteRides(@PathVariable Integer id)
     {
         rideService.deleteFavouriteRides(id);

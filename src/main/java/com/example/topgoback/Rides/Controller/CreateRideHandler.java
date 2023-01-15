@@ -3,10 +3,8 @@ package com.example.topgoback.Rides.Controller;
 import com.example.topgoback.Rides.DTO.RideDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.socket.*;
-import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 
 import java.io.IOException;
 import java.util.List;
@@ -62,6 +60,20 @@ public class CreateRideHandler implements WebSocketHandler {
         mapper.registerModule(new JSR310Module());
         try {
             TextMessage textMessage = new TextMessage(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rideDTO));
+            for(WebSocketSession webSocketSession:sessions){
+                webSocketSession.sendMessage(textMessage);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public static void notifyPassengerAboutNoDriversLeft(List<WebSocketSession> sessions, Error error) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JSR310Module());
+        try {
+            TextMessage textMessage = new TextMessage(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(error));
             for(WebSocketSession webSocketSession:sessions){
                 webSocketSession.sendMessage(textMessage);
             }
