@@ -40,13 +40,6 @@ public class RideController {
     @Valid
     public ResponseEntity<RideDTO> createRide(@Valid @RequestBody CreateRideDTO createRideDTO){
         RideDTO response = rideService.createRide(createRideDTO);
-        WebSocketSession webSocketSession = CreateRideHandler.driverSessions.get(response.getDriver().getId().toString());
-        if(webSocketSession != null) {
-            CreateRideHandler.notifyDriverAboutCreatedRide(webSocketSession,response);
-        }
-        else {
-            sendDriverRideUpdate(response);
-        }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @GetMapping(value = "/driver/{driverId}/active")
@@ -181,11 +174,6 @@ public class RideController {
 
 
 
-
-    @CrossOrigin(origins = "http://localhost:4200")
-    public void sendDriverRideUpdate(RideDTO update) {
-        messagingTemplate.convertAndSend("/topic/driver/ride/"+update.driver.getId(), update);
-    }
 
 
 
