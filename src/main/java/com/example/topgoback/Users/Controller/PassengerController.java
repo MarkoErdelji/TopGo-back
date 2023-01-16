@@ -2,6 +2,7 @@ package com.example.topgoback.Users.Controller;
 
 import com.example.topgoback.AccountActivationToken.Service.AccountActivationTokenService;
 import com.example.topgoback.Enums.AllowedSortFields;
+import com.example.topgoback.Rides.DTO.RideDTO;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
 import com.example.topgoback.Rides.Service.RideService;
 import com.example.topgoback.Users.DTO.*;
@@ -21,7 +22,9 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "api/passenger")
@@ -131,4 +134,16 @@ public class PassengerController {
             return new ResponseEntity<>(rides, HttpStatus.OK);
         }
     }
+
+    @GetMapping(value = "/ride/finished")
+    @Valid
+    public ResponseEntity<List<RideDTO>> getPassengerFinishedRides(@RequestHeader("Authorization") String authorization){
+        List<RideDTO> response = passengerService.getPassengerFinishedRides(authorization);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+
+
 }
