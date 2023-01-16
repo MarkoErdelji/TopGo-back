@@ -10,7 +10,7 @@ import java.util.List;
 
 public class CreateReviewResponseDTO {
     int id;
-    float rating;
+    Float rating;
     String comment;
     UserRef passenger;
 
@@ -40,11 +40,11 @@ public class CreateReviewResponseDTO {
         this.id = id;
     }
 
-    public float getRating() {
+    public Float getRating() {
         return rating;
     }
 
-    public void setRating(float rating) {
+    public void setRating(Float rating) {
         this.rating = rating;
     }
 

@@ -8,7 +8,9 @@ import jakarta.persistence.*;
 @Entity
 public class Review {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "mySeqGenReview", sequenceName = "mySeqGenReview", initialValue = 7, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenReview")
+    @Column(name="id")
     private int id;
     @Column(name = "rating")
     private float rating;

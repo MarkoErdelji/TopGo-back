@@ -45,7 +45,6 @@ public class PassengerController {
 
 
     }
-
     @GetMapping(value = "/{id}")
     @Valid
     public  ResponseEntity<CreatePassengerResponseDTO> getOne(@PathVariable Integer id){
