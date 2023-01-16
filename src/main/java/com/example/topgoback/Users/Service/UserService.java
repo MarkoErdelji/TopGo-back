@@ -4,6 +4,7 @@ import com.example.topgoback.PasswordResetTokens.Model.PasswordResetToken;
 import com.example.topgoback.PasswordResetTokens.Repository.PasswordResetTokenRepository;
 import com.example.topgoback.Tools.JwtTokenUtil;
 import com.example.topgoback.Users.DTO.*;
+import com.example.topgoback.Users.Model.Driver;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Repository.UserRepository;
 import jakarta.mail.MessagingException;
@@ -208,5 +209,21 @@ public class UserService implements UserDetailsService {
         newTokenDto.setAccessToken(newJWT);
         newTokenDto.setRefreshToken(newRefresh);
         return newTokenDto;
+    }
+
+    public UserListResponseDTO getOne(Integer id) {
+        Optional<User> user  = userRepository.findById(id);
+        if(user.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist!");
+        }
+        UserListResponseDTO userDto = new UserListResponseDTO();
+        userDto.setId(user.get().getId());
+        userDto.setAddress(user.get().getAddress());
+        userDto.setEmail(user.get().getEmail());
+        userDto.setName(user.get().getFirstName());
+        userDto.setProfilePicture(user.get().getProfilePicture());
+        userDto.setSurname(user.get().getLastName());
+        userDto.setTelephoneNumber(user.get().getPhoneNumber());
+        return (userDto);
     }
 }

@@ -185,11 +185,11 @@ public class RideController {
 
     }
 
-
-
-
-
-
+    @PutMapping(value="/simulate/{id}")
+    public ResponseEntity<String> simulateRide(@PathVariable Integer id){
+        rideService.simulate(id);
+        return new ResponseEntity<>("Simulating ...",HttpStatus.OK);
+    }
 
 
     @CrossOrigin(origins = "http://localhost:4200")

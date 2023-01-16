@@ -15,6 +15,7 @@ import com.example.topgoback.RejectionLetters.DTO.RejectionTextDTO;
 import com.example.topgoback.RejectionLetters.Model.RejectionLetter;
 import com.example.topgoback.RejectionLetters.Repository.RejectionLetterRepository;
 import com.example.topgoback.Rides.Controller.CreateRideHandler;
+import com.example.topgoback.Rides.Controller.SimulationHandler;
 import com.example.topgoback.Rides.DTO.CreateRideDTO;
 import com.example.topgoback.Rides.DTO.RideDTO;
 import com.example.topgoback.Rides.DTO.UserRideDTO;
@@ -26,6 +27,7 @@ import com.example.topgoback.Routes.Model.Route;
 import com.example.topgoback.Routes.Repository.RouteRepository;
 import com.example.topgoback.Tools.DistanceCalculator;
 import com.example.topgoback.Tools.JwtTokenUtil;
+import com.example.topgoback.Tools.WebSocketConfig;
 import com.example.topgoback.Users.DTO.RidePassengerDTO;
 import com.example.topgoback.Users.DTO.UserRef;
 import com.example.topgoback.Users.Model.Driver;
@@ -36,15 +38,19 @@ import com.example.topgoback.Users.Repository.PassengerRepository;
 import com.example.topgoback.Users.Service.PassengerService;
 import com.example.topgoback.Users.Service.UserService;
 import com.example.topgoback.Vehicles.Model.Vehicle;
+import com.example.topgoback.Vehicles.Repository.VehicleRepository;
 import com.example.topgoback.Vehicles.Repository.VehicleTypeRepository;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -58,6 +64,9 @@ public class RideService {
     private RideRepository rideRepository;
     @Autowired
     private VehicleTypeRepository vehicleTypeRepository;
+
+    @Autowired
+    private VehicleRepository vehicleRepository;
     @Autowired
     PassengerRepository passengerRepository;
     @Autowired
@@ -575,5 +584,98 @@ public class RideService {
         RideDTO newRide = createRide(createRideDTO);
         return newRide;
 
+    }
+
+    public void simulate(Integer rideId){
+
+        Ride ride = rideRepository.findById(rideId).get();
+        String apiKey = "5b3ce3597851110001cf624865f18297bb26459a9f779c015d573b96";
+        String baseUrl = "https://api.openrouteservice.org/v2/directions/driving-car";
+        String start = ride.getRoute().getStart().getLongitude() + "," + ride.getRoute().getStart().getLatitude();
+        String end = ride.getRoute().getFinish().getLongitude() + "," +  ride.getRoute().getFinish().getLatitude();
+
+        List<GeoLocationDTO> routePoints;
+
+        if(ride.getStatus() == Status.ACCEPTED){
+            end = start;
+            start = ride.getDriver().getVehicle().getCurrentLocation().getLongitude() + "," + ride.getDriver().getVehicle().getCurrentLocation().getLatitude();
+            routePoints = callEndpointForRoute(apiKey,start,end,baseUrl);
+        }
+        else if(ride.getStatus() == Status.ACTIVE){
+            routePoints = callEndpointForRoute(apiKey,start,end,baseUrl);
+        }
+        else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Can't simulate a ride that isnt active or accepted");
+        }
+
+
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            int i = 0;
+            @Override
+            public void run() {
+                if (i < routePoints.size() && (ride.getStatus() == Status.ACCEPTED || ride.getStatus() == Status.ACTIVE)) {
+                    GeoLocation currentLocation = ride.getDriver().getVehicle().getCurrentLocation();
+                    currentLocation.setLatitude(routePoints.get(i).getLatitude());
+                    currentLocation.setLongitude(routePoints.get(i).getLongitude());
+                    geoLocationRepository.save(currentLocation);
+                    ride.getDriver().getVehicle().setCurrentLocation(currentLocation);
+                    vehicleRepository.save(ride.getDriver().getVehicle());
+                    List<WebSocketSession> allsessions = new ArrayList<>();
+                    for(Passenger p:ride.getPassenger()){
+                        WebSocketSession passengerSession = SimulationHandler.passengerSessions.get(p.getId().toString());
+                        if(passengerSession != null) {
+                            allsessions.add(passengerSession);
+                        }
+                    }
+                    WebSocketSession driverSession = SimulationHandler.driverSessions.get(ride.getDriver().getId().toString());
+                    if(driverSession != null ){
+                        allsessions.add(driverSession);
+
+                    }
+                    SimulationHandler.sendNewVehicleLocationData(allsessions,currentLocation);
+                    i++;
+                } else {
+                    // End of route, stop updating the location
+                    timer.cancel();
+                }
+            }
+        }, 5000, 5000);
+
+
+
+    }
+
+    public List<GeoLocationDTO> callEndpointForRoute(String apiKey, String start, String end, String baseUrl){
+        String url = baseUrl+"?api_key="+apiKey+"&start="+start+"&end="+end;
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+
+        HttpEntity<String> request = new HttpEntity<>(headers);
+
+
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                url, HttpMethod.GET, request, String.class);
+
+        String responseString = response.getBody();
+        JSONObject json = new JSONObject(responseString);
+        JSONArray features = json.getJSONArray("features");
+        JSONObject firstFeature = features.getJSONObject(0);
+        JSONObject geometry = firstFeature.getJSONObject("geometry");
+        JSONArray coordinates = geometry.getJSONArray("coordinates");
+        List<GeoLocationDTO> routePoints = new ArrayList<>();
+        for (int i = 0; i < coordinates.length(); i++) {
+            JSONArray coord = coordinates.getJSONArray(i);
+
+            double lon = coord.getDouble(0);
+            double lat = coord.getDouble(1);
+            GeoLocationDTO geoLocationDTO = new GeoLocationDTO();
+            geoLocationDTO.setLongitude(Double.valueOf(lon).floatValue());
+            geoLocationDTO.setLatitude(Double.valueOf(lat).floatValue());
+            routePoints.add(geoLocationDTO);
+        }
+        return routePoints;
     }
 }

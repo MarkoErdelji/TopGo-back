@@ -159,6 +159,19 @@ public class UserController {
 
     }
 
+    @GetMapping(value = "/{userId}/messages")
+    @Valid
+    public ResponseEntity<?> getMessagesBeetwenUsers(@PathVariable Integer userId,
+                                                     @RequestHeader("Authorization") String authorization)
+    {
+
+
+
+        UserMessagesListDTO userMessages = messageService.findBySenderandReceiver(userId,authorization);
+        return new ResponseEntity<>(userMessages,HttpStatus.OK);
+
+    }
+
 
     @PostMapping(value = "{id}/message")
     @Valid
@@ -227,7 +240,15 @@ public class UserController {
     }
 
 
+    @GetMapping(value = "id/{id}")
+    @Valid
+    public ResponseEntity<?> getUserById(@PathVariable Integer id)
+    {
 
+        UserListResponseDTO user = userService.getOne(id);
+        return new ResponseEntity<>(user,HttpStatus.OK);
+
+    }
     @GetMapping(value = "/{email}")
     @Valid
     public ResponseEntity<?> getUserRefByEmail(@PathVariable String email)

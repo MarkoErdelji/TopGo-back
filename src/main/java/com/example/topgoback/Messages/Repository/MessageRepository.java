@@ -11,4 +11,7 @@ import java.util.Optional;
 
 public interface MessageRepository extends JpaRepository<Message,Integer> {
     Page<Message> findBySenderOrReceiver(User sender, User receiver, Pageable pageable);
+    List<Message> findBySenderAndReceiver(User sender, User receiver);
+
+
 }
