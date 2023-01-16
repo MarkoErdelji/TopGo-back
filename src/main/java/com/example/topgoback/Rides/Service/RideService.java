@@ -135,7 +135,15 @@ public class RideService {
         return userRidesListDTO;
     }
 
+    public RideDTO findRideByPassengerAndIsPending(int passengerId){
+        List<Ride> rides = rideRepository.findRidesByPassengeridAndIsPending(passengerId);
+        return new RideDTO(rides.get(0));
+    }
 
+    public RideDTO getPassengersAcceptedRide(int passengerId){
+        List<Ride> rides = rideRepository.findRidesByPassengeridAndIsAccepted(passengerId);
+        return new RideDTO(rides.get(0));
+    }
     public RideDTO createRide(CreateRideDTO createRideDTO) {
         Ride ride = new Ride();
 
@@ -632,7 +640,7 @@ public class RideService {
                     timer.cancel();
                 }
             }
-        }, 5000, 5000);
+        }, 5000, 1000);
 
 
 
