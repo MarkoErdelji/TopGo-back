@@ -2,6 +2,9 @@ package com.example.topgoback.Users.Service;
 
 import com.example.topgoback.AccountActivationToken.Service.AccountActivationTokenService;
 import com.example.topgoback.Enums.UserType;
+import com.example.topgoback.Rides.DTO.RideDTO;
+import com.example.topgoback.Rides.Model.Ride;
+import com.example.topgoback.Tools.JwtTokenUtil;
 import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.Passenger;
 import com.example.topgoback.Users.Repository.PassengerRepository;
@@ -24,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +44,8 @@ public class PassengerService {
     private UserRepository userRepository;
     @Autowired
     private final JavaMailSender mailSender;
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
 
     public PassengerService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
@@ -113,5 +119,19 @@ public class PassengerService {
     }
 
 
+    public List<RideDTO> getPassengerFinishedRides(String authorization) {
+        String jwtToken = null;
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            jwtToken = authorization.substring(7);
+        }
+        int id = jwtTokenUtil.getUserIdFromToken(jwtToken);
+        List<Ride> rides = passengerRepository.findRidesByPassengerIdAndIsFinished(id);
+        List<RideDTO> ridesDTO = new ArrayList<>();
+        for (Ride ride:rides)
+        {
+            ridesDTO.add(new RideDTO(ride));
+        }
+        return ridesDTO;
 
+    }
 }
