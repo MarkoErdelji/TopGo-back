@@ -116,6 +116,18 @@ public class RideController {
         sendPassengerRideUpdate(ride);
     }
 
+    @GetMapping(value = "passenger/{id}/pending")
+    public ResponseEntity<?> getPassengerPendingRides(@PathVariable Integer id){
+        RideDTO rideDTO = rideService.findRideByPassengerAndIsPending(id);
+        return new ResponseEntity<>(rideDTO, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "passenger/{id}/accepted")
+    public ResponseEntity<?> getPassengerAcceptedRides(@PathVariable Integer id){
+        RideDTO rideDTO = rideService.getPassengersAcceptedRide(id);
+        return new ResponseEntity<>(rideDTO, HttpStatus.OK);
+    }
+
     @PutMapping(value = "/{id}/cancel")
     @Valid
     public ResponseEntity<RideDTO> cancelRide(@PathVariable Integer id, @RequestBody RejectionTextDTO reason){
@@ -137,6 +149,7 @@ public class RideController {
     @Valid
     public ResponseEntity<RideDTO> finishRoute(@PathVariable Integer id){
         RideDTO ride = rideService.endRide(id);
+        sendRideUpdateToPassenger(ride);
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
 
@@ -144,6 +157,7 @@ public class RideController {
     @Valid
     public ResponseEntity<RideDTO> startRoute(@PathVariable Integer id){
         RideDTO ride = rideService.startRide(id);
+        sendRideUpdateToPassenger(ride);
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
     @PostMapping(value = "/favourites", consumes = "application/json")

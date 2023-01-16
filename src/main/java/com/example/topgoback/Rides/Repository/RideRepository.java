@@ -33,6 +33,9 @@ public interface RideRepository extends JpaRepository<Ride,Integer> {
     @Query("SELECT DISTINCT r FROM Ride r  INNER JOIN r.passenger p WHERE (p.id = :passengerId) AND (r.status = 1)")
     List<Ride> findRidesByPassengeridAndIsAccepted(@Param("passengerId") int passengerId);
 
+    @Query("SELECT DISTINCT r FROM Ride r  INNER JOIN r.passenger p WHERE (p.id = :passengerId) AND (r.status = 0)")
+    List<Ride> findRidesByPassengeridAndIsPending(@Param("passengerId") int passengerId);
+
     @Query("SELECT DISTINCT r FROM Ride r  WHERE (r.driver.id = :driverId) AND (r.status = 3)")
     List<Ride> findRidesByDriveridAndIsActive(@Param("driverId") int driverId);
 
