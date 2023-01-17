@@ -1,7 +1,9 @@
 package com.example.topgoback.Users.DTO;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.Length;
 
 public class CreatePassengerDTO {
@@ -19,7 +21,7 @@ public class CreatePassengerDTO {
     @NotNull(message = "is required!")
     private String address;
     @NotNull(message = "is required!")
-    @Length(min = 6, message = "cannot be less than 6 characters!")
+    @Size(min = 6, message = "cannot be less than 6 characters!")
     private String password;
 
     public CreatePassengerDTO(String name, String surname, String profilePicture, String telephoneNumber, String email, String address, String password) {

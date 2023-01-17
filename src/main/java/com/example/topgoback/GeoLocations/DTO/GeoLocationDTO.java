@@ -13,11 +13,11 @@ public class GeoLocationDTO {
     private String address;
     @NotNull(message = "is required!")
 
-    private float latitude;
+    private Float latitude;
     @NotNull(message = "is required!")
 
 
-    private float longitude;
+    private Float longitude;
 
     public GeoLocationDTO(GeoLocation location) {
         this.address = location.getAddress();
@@ -36,19 +36,19 @@ public class GeoLocationDTO {
         this.address = address;
     }
 
-    public float getLatitude() {
+    public Float getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(float latitude) {
+    public void setLatitude(Float latitude) {
         this.latitude = latitude;
     }
 
-    public float getLongitude() {
+    public Float getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(float longitude) {
+    public void setLongitude(Float longitude) {
         this.longitude = longitude;
     }
 }

@@ -10,6 +10,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 import jakarta.validation.Valid;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class CreateRideDTO {
@@ -22,12 +24,22 @@ public class CreateRideDTO {
     @NotNull(message = "is required!")
     private VehicleName vehicleType;
     @NotNull(message = "is required!")
-    private boolean babyTransport;
+    private Boolean babyTransport;
     @NotNull(message = "is required!")
-    private boolean petTransport;
+    private Boolean petTransport;
+
+    private LocalDateTime scheduledTime;
 
     public List<RouteForCreateRideDTO> getLocations() {
         return locations;
+    }
+
+    public LocalDateTime getScheduledTime() {
+        return scheduledTime;
+    }
+
+    public void setScheduledTime(LocalDateTime scheduledTime) {
+        this.scheduledTime = scheduledTime;
     }
 
     public void setLocations(List<RouteForCreateRideDTO> locations) {

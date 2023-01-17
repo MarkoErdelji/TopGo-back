@@ -22,8 +22,8 @@ public class ReviewController {
     @Autowired
     private ReviewService reviewService;
     @PostMapping(consumes = "application/json",value = "{rideId}/vehicle")
-    @PreAuthorize("hasAnyRole('USER')")
     @Valid
+    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('USER')")
     public ResponseEntity<CreateReviewResponseDTO> addVehicleReview(@PathVariable(name="rideId") Integer rideId,
                                                                     @Valid @RequestBody CreateReviewDTO createReviewDTO,
                                                                     @RequestHeader("Authorization") String authorization) {
@@ -35,6 +35,7 @@ public class ReviewController {
 
     @GetMapping(value = "vehicle/{id}")
     @Valid
+    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('USER') || hasAnyRole('DRIVER')")
     public ResponseEntity<VehicleReviewListDTO> getVehicleReviews(@PathVariable(name="id") Integer id,
                                                                   @RequestParam(required = false,defaultValue = "0") Integer page,
                                                                   @RequestParam(required = false,defaultValue =  "0") Integer size,
@@ -52,6 +53,7 @@ public class ReviewController {
 
     @PostMapping(consumes = "application/json",value = "{rideId}/driver")
     @Valid
+    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('USER')")
     public ResponseEntity<CreateReviewResponseDTO> addDriverReview(@PathVariable(name="rideId") Integer rideId,
                                                                    @Valid @RequestBody CreateReviewDTO createReviewDTO,
                                                                    @RequestHeader("Authorization") String authorization) {
@@ -63,6 +65,7 @@ public class ReviewController {
 
     @GetMapping(value = "driver/{id}")
     @Valid
+    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('USER') || hasAnyRole('DRIVER')")
     public ResponseEntity<DriverReviewListDTO> getDriverReviews(@PathVariable(name="id") Integer id,
                                                                 @RequestParam(required = false,defaultValue = "0") Integer page,
                                                                 @RequestParam(required = false,defaultValue =  "0") Integer size,
@@ -79,6 +82,7 @@ public class ReviewController {
 
     @GetMapping(value = "{id}")
     @Valid
+    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('USER') || hasAnyRole('DRIVER')")
     public ResponseEntity<List<RideReviewsDTO>> getRideReviews(@PathVariable(name="id") Integer id,@RequestHeader("Authorization") String authorization) {
 
         List<RideReviewsDTO> rideReviews = reviewService.getRideReviews(id,authorization);
@@ -86,6 +90,7 @@ public class ReviewController {
     }
     @GetMapping(value = "ride/{id}")
     @Valid
+    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('USER') || hasAnyRole('DRIVER')")
     public ResponseEntity<List<CreateReviewResponseDTO>> getAllRideReviews(@PathVariable(name="id") Integer id) {
 
         List<CreateReviewResponseDTO> rideReviews = reviewService.getAllRideReviews(id);

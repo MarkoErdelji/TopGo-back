@@ -1,12 +1,15 @@
 package com.example.topgoback.Documents.DTO;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class CreateDocumentDTO {
 
-    @NotNull
+    @NotNull(message = "is required!")
+    @Size(max = 100)
     private String name;
-    @NotNull
+    @NotNull(message = "is required!")
     private String documentImage;
 
     public CreateDocumentDTO() {

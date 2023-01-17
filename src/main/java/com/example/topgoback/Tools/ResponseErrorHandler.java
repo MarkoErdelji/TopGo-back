@@ -9,6 +9,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,10 +24,6 @@ import java.util.List;
 @ControllerAdvice
 @RestController
 public class ResponseErrorHandler {
-    @ExceptionHandler(AccessDeniedException.class)
-    public final ResponseEntity<?> handleAccessDeniedException(Exception ex, WebRequest request) {
-        return new ResponseEntity("Access Denied!", HttpStatus.FORBIDDEN);
-    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public final ResponseEntity<?> handleParamException(MethodArgumentNotValidException ex) {
@@ -57,5 +54,10 @@ public class ResponseErrorHandler {
     @ExceptionHandler(ResponseStatusException.class)
     public final ResponseEntity<?> handleBaseException(ResponseStatusException ex) {
         return new ResponseEntity(ex.getReason(), HttpStatusCode.valueOf(ex.getBody().getStatus()));
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public final ResponseEntity<?> handleHeaderException(MissingRequestHeaderException ex) {
+        return new ResponseEntity(ex.getBody().getDetail(), HttpStatus.UNAUTHORIZED);
     }
 }

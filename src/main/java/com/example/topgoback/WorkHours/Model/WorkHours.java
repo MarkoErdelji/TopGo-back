@@ -2,8 +2,11 @@ package com.example.topgoback.WorkHours.Model;
 
 import com.example.topgoback.Users.Model.Driver;
 import jakarta.persistence.*;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 @Entity
 public class WorkHours {
     @Id
@@ -39,6 +42,9 @@ public class WorkHours {
         this.endHours = endHours;
     }
 
+    public long getDifferenceInSeconds(){
+        return this.endHours.minusSeconds(this.startHours.toEpochSecond(ZoneOffset.UTC)).toEpochSecond(ZoneOffset.UTC);
+    }
     public Driver getDriver() {
         return driver;
     }

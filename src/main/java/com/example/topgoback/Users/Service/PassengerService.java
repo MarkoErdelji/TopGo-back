@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -47,6 +48,9 @@ public class PassengerService {
     @Autowired
     JwtTokenUtil jwtTokenUtil;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public PassengerService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
@@ -62,7 +66,7 @@ public class PassengerService {
             passenger.setPhoneNumber(passengerDTO.getTelephoneNumber());
             passenger.setEmail(passengerDTO.getEmail());
             passenger.setAddress(passengerDTO.getAddress());
-            passenger.setPassword(passengerDTO.getPassword());
+            passenger.setPassword(passwordEncoder.encode(passengerDTO.getPassword()));
             passenger.setUserType(UserType.USER);
             passengerRepository.save(passenger);
             activationTokenService.addOne(passenger.getId());
@@ -93,8 +97,14 @@ public class PassengerService {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Passenger does not exist!");
     }
 
-    public Passenger update(CreatePassengerDTO createPassengerDTO, Integer id){
+    public Passenger update(UpdatePassengerDTO createPassengerDTO, Integer id){
         Passenger passenger = findById(id);
+        passenger.setFirstName(createPassengerDTO.getName());
+        passenger.setLastName(createPassengerDTO.getSurname());
+        passenger.setProfilePicture(createPassengerDTO.getProfilePicture());
+        passenger.setPhoneNumber(createPassengerDTO.getTelephoneNumber());
+        passenger.setAddress(createPassengerDTO.getAddress());
+        passenger.setEmail(createPassengerDTO.getEmail());
         passengerRepository.save(passenger);
         return passenger;
     }

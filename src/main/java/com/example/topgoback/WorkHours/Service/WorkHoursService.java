@@ -47,6 +47,23 @@ public class WorkHoursService {
         return allHours;
     }
 
+    public boolean checkIfDriverExceeded8Hours(List<WorkHours> workHours){
+        long fullWorkTime = 0;
+        for (WorkHours workHour: workHours){
+            fullWorkTime += workHour.getDifferenceInSeconds();
+        }
+        long hoursInSeconds = 8 * 60 * 60;
+        return fullWorkTime > hoursInSeconds;
+    }
+
+    public boolean isShiftAlreadyOngoing(List<WorkHours> workHours){
+        for (WorkHours workHour:workHours){
+            if(workHour.getEndHours() == null){
+                return true;
+            }
+        }
+        return false;
+    }
     public WorkHours addOne(LocalDateTime start, int driverId){
         Optional<Driver> driver = driverRepository.findById(driverId);
         if(driver.isEmpty()){
@@ -60,12 +77,17 @@ public class WorkHoursService {
         LocalDateTime startInterval = now.minusDays(1);
         List<WorkHours> workHoursWithinLast24Hours = workHoursRepository.findWorkHoursWithinLast24Hours(startInterval,
                 now, driver.get());
-        if(workHoursWithinLast24Hours.size()>0){
+
+        if(isShiftAlreadyOngoing(workHoursWithinLast24Hours)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Shift already ongoing!");
+
+        }
+        if(checkIfDriverExceeded8Hours(workHoursWithinLast24Hours)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot start shift because you exceeded the 8 hours limit in last 24 hours!");
         }
         WorkHours workHours = new WorkHours();
         workHours.setStartHours(start);
-        workHours.setEndHours(start.plusHours(8));
+        workHours.setEndHours(null);
         workHours.setDriver(driver.get());
         workHoursRepository.save(workHours);
         return workHours;
@@ -81,10 +103,11 @@ public class WorkHoursService {
     public WorkHours updateOne(int id, LocalDateTime end){
         WorkHours workHours = findById(id);
         Driver driver = workHours.getDriver();
+        List<WorkHours> driverWorkHours = workHoursRepository.findByDriver(driver);
         if(driver.getVehicle() == null){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot end shift because the vehicle is not defined!");
         }
-        if(workHours.getEndHours().isBefore(LocalDateTime.now())){
+        if(!isShiftAlreadyOngoing(driverWorkHours)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No shift is ongoing!");
         }
         workHours.setEndHours(end);
@@ -97,6 +120,7 @@ public class WorkHoursService {
         if(driver.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Driver does not exist!");
         }
+
         Page<WorkHours> workHoursPage = workHoursRepository.findByDriverAndBeginBetween(driver.get().getId(), beginDateTimeInterval, endDateTimeInterval, pageable);
         List<WorkHoursDTO> workHoursDTOS = WorkHoursDTO.convertToWorkHourDTO(workHoursPage.getContent());
         DriverWorkHoursDTO driverWorkHoursDTO = new DriverWorkHoursDTO(new PageImpl<>(workHoursDTOS, pageable, workHoursPage.getTotalElements()));
