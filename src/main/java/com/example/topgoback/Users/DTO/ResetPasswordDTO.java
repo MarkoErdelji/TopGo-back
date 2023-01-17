@@ -10,7 +10,7 @@ public class ResetPasswordDTO {
 
     @NotNull(message = "is required!")
     @Length(min = 6,message = "cannot be shorter than 6 characters!")
-    String new_password;
+    String newPassword;
 
     public ResetPasswordDTO() {
     }
@@ -23,11 +23,11 @@ public class ResetPasswordDTO {
         this.code = code;
     }
 
-    public String getNew_password() {
-        return new_password;
+    public String getNewPassword() {
+        return newPassword;
     }
 
-    public void setNew_password(String new_password) {
-        this.new_password = new_password;
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
     }
 }

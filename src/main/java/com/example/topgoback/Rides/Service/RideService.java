@@ -27,7 +27,6 @@ import com.example.topgoback.Routes.Model.Route;
 import com.example.topgoback.Routes.Repository.RouteRepository;
 import com.example.topgoback.Tools.DistanceCalculator;
 import com.example.topgoback.Tools.JwtTokenUtil;
-import com.example.topgoback.Tools.WebSocketConfig;
 import com.example.topgoback.Users.DTO.RidePassengerDTO;
 import com.example.topgoback.Users.DTO.UserRef;
 import com.example.topgoback.Users.Model.Driver;
@@ -148,6 +147,7 @@ public class RideService {
         Ride ride = new Ride();
 
 
+
         ride.setForBabies(createRideDTO.getBabyTransport());
         ride.setForAnimals(createRideDTO.getPetTransport());
 
@@ -167,7 +167,12 @@ public class RideService {
         routeRepository.save(route);
 
         ride.setRoute(route);
-        ride.setStart(LocalDateTime.now());
+        if(createRideDTO.getScheduledTime() != null) {
+            ride.setStart(createRideDTO.getScheduledTime());
+        }
+        else{
+            ride.setStart(LocalDateTime.now());
+        }
 
         ride.setStatus(Status.PENDING);
 
@@ -191,7 +196,9 @@ public class RideService {
 
         }
 
-
+        if(doPassengersHavePendingRide(createRideDTO.getPassengers())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot create a ride while you have one already pending!");
+        };
         Driver driver = this.DriverSelection(ride, DistanceCalculator.getEstimatedTimeInMinutes(60, ride.getRoute().getLenght()));
         if (driver == null) {
             sendNoMoreDriversUpdateToPassenger(createRideDTO.getPassengers());
@@ -216,6 +223,18 @@ public class RideService {
         return response;
 
 
+    }
+
+    private boolean doPassengersHavePendingRide(List<RidePassengerDTO> passengers) {
+        for (RidePassengerDTO passengerDTO:passengers){
+            Passenger passenger = passengerRepository.findById(passengerDTO.getId()).get();
+            for(Ride r:passenger.getRides()){
+                if(r.getStatus() == Status.PENDING){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @CrossOrigin(origins = "http://localhost:4200")
@@ -337,10 +356,10 @@ public class RideService {
         }
 
         Ride ride = optionalRide.get();
-        if (ride.getStatus() != Status.ACCEPTED) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot cancel a ride that is not in status ACCEPTED!");
+        if (ride.getStatus() != Status.PENDING && ride.getStatus() != Status.ACCEPTED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot cancel a ride that is not in status PENDING or ACCEPTED!");
         }
-        ride.setStatus(Status.CANCELED);
+        ride.setStatus(Status.REJECTED);
         RejectionLetter rejectionLetter = new RejectionLetter();
 
         rejectionLetter.setTimeOfRejection(LocalDateTime.now());

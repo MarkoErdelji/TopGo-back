@@ -1,7 +1,9 @@
 package com.example.topgoback.Tools;
 
 import com.example.topgoback.Users.Service.UserService;
+import jakarta.validation.Validation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.validation.beanvalidation.MethodValidationExcludeFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -59,6 +61,7 @@ public class WebSecurityConfig {
 		corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PUT","OPTIONS","PATCH", "DELETE"));
 		corsConfiguration.setAllowCredentials(true);
 		corsConfiguration.setExposedHeaders(List.of("Authorization"));
+
 		http.cors().configurationSource(request -> corsConfiguration).and().csrf().disable().headers().frameOptions().disable().and()
 				.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
@@ -82,7 +85,7 @@ public class WebSecurityConfig {
 
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
-		return (web) -> web.ignoring().requestMatchers("/websocket","/api/user/login", "/api/user/login/","api/passenger/","/api/email/","api/passwordResetToken*");
+		return (web) -> web.ignoring().requestMatchers("/websocket","/api/user/login", "/api/user/login/","/api/email/","api/passwordResetToken*");
 	}
 
 

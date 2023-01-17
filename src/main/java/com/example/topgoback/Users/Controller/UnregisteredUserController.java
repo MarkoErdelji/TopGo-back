@@ -11,7 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "api/unregisteredUser/")
+@RequestMapping(value = "api/unregisteredUser")
 @CrossOrigin(origins = "http://localhost:4200")
 @Validated
 public class UnregisteredUserController {

@@ -5,8 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 
 public class SendMessageDTO {
-    @NotNull(message = "is required!")
-    private Integer receiverId;
 
     @NotNull(message = "is required!")
     @Length(max=255,message= "cannot be longer than 255 characters!")
@@ -18,13 +16,7 @@ public class SendMessageDTO {
     @NotNull(message = "is required!")
     private Integer rideId;
 
-    public Integer getReceiverId() {
-        return receiverId;
-    }
 
-    public void setReceiverId(Integer receiverId) {
-        this.receiverId = receiverId;
-    }
 
     public String getMessage() {
         return message;

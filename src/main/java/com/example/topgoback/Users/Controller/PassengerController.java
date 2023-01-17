@@ -5,6 +5,7 @@ import com.example.topgoback.Enums.AllowedSortFields;
 import com.example.topgoback.Rides.DTO.RideDTO;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
 import com.example.topgoback.Rides.Service.RideService;
+import com.example.topgoback.Tools.JwtCheckAnnotation;
 import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.Passenger;
 import com.example.topgoback.Users.Service.PassengerService;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -50,7 +52,8 @@ public class PassengerController {
     }
     @GetMapping(value = "/{id}")
     @Valid
-    public  ResponseEntity<CreatePassengerResponseDTO> getOne(@PathVariable Integer id){
+    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('USER')")
+    public  ResponseEntity<CreatePassengerResponseDTO> getOne(@PathVariable(value = "id") Integer id){
         Passenger passenger = passengerService.findById(id);
 
         return new ResponseEntity<>(new CreatePassengerResponseDTO(passenger), HttpStatus.OK);
@@ -58,14 +61,15 @@ public class PassengerController {
     }
     @PutMapping(value = "/{id}", consumes = "application/json")
     @Valid
-    public ResponseEntity<CreatePassengerResponseDTO> updateOne(@PathVariable Integer id, @Valid @RequestBody CreatePassengerDTO createPassengerDTO){
-        Passenger passenger = new Passenger();
-        passenger = passengerService.update(createPassengerDTO, id);
+    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('USER')")
+    public ResponseEntity<CreatePassengerResponseDTO> updateOne(@PathVariable Integer id, @Valid @RequestBody UpdatePassengerDTO createPassengerDTO){
+        Passenger passenger = passengerService.update(createPassengerDTO, id);
 
         return new ResponseEntity<>(new CreatePassengerResponseDTO(passenger), HttpStatus.OK);
     }
     @GetMapping
     @Valid
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public  ResponseEntity<?> getPaginated(@RequestParam(required = false, defaultValue = "0") Integer page,
                                            @RequestParam(required = false, defaultValue = "10") Integer size,
                                            Pageable pageable){
@@ -85,6 +89,7 @@ public class PassengerController {
 
     @GetMapping(value = "{id}/ride")
     @Valid
+    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('USER')")
     public ResponseEntity<?> getRides(@PathVariable Integer id,
                                       @RequestParam(required = false) Integer page,
                                       @RequestParam(required = false) Integer size,
