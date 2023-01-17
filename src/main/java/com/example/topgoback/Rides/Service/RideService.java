@@ -197,7 +197,7 @@ public class RideService {
         }
 
         if(doPassengersHavePendingRide(createRideDTO.getPassengers())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot create a ride while you or your friends have one already pending!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot create a ride while you have one already pending!");
         };
         Driver driver = this.DriverSelection(ride, DistanceCalculator.getEstimatedTimeInMinutes(60, ride.getRoute().getLenght()));
         if (driver == null) {
@@ -356,8 +356,8 @@ public class RideService {
         }
 
         Ride ride = optionalRide.get();
-        if (ride.getStatus() != Status.ACCEPTED) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot cancel a ride that is not in status ACCEPTED!");
+        if (ride.getStatus() != Status.PENDING && ride.getStatus() != Status.ACCEPTED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot cancel a ride that is not in status PENDING or ACCEPTED!");
         }
         ride.setStatus(Status.REJECTED);
         RejectionLetter rejectionLetter = new RejectionLetter();

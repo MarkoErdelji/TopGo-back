@@ -11,6 +11,7 @@ import com.example.topgoback.Users.DTO.UserRef;
 import com.example.topgoback.Users.Model.Passenger;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -84,7 +85,7 @@ public class RideController {
 
     @PutMapping(value = "/{id}/withdraw")
     @Valid
-    @PreAuthorize("hasAnyRole('DRIVER')")
+    @PreAuthorize("hasAnyRole('USER')")
     public ResponseEntity<RideDTO> withdrawRoute(@PathVariable Integer id){
         RideDTO response = rideService.withdrawRide(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -147,6 +148,7 @@ public class RideController {
         sendRideUpdateToPassenger(ride);
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
+
 
     @PutMapping(value = "/{id}/decline")
     @Valid
