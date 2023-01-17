@@ -1,5 +1,6 @@
 package com.example.topgoback.Rides.Repository;
 
+import com.example.topgoback.Enums.Status;
 import com.example.topgoback.Rides.Model.Ride;
 import com.example.topgoback.Users.Model.Driver;
 import com.example.topgoback.Users.Model.Passenger;
@@ -32,6 +33,9 @@ public interface RideRepository extends JpaRepository<Ride,Integer> {
     @Query("SELECT DISTINCT r FROM Ride r  INNER JOIN r.passenger p WHERE (p.id = :passengerId) AND (r.status = 1)")
     List<Ride> findRidesByPassengeridAndIsAccepted(@Param("passengerId") int passengerId);
 
+    @Query("SELECT DISTINCT r FROM Ride r  INNER JOIN r.passenger p WHERE (p.id = :passengerId) AND (r.status = 0)")
+    List<Ride> findRidesByPassengeridAndIsPending(@Param("passengerId") int passengerId);
+    
     @Query("SELECT DISTINCT r FROM Ride r  WHERE (r.driver.id = :driverId) AND (r.status = 3)")
     List<Ride> findRidesByDriveridAndIsActive(@Param("driverId") int driverId);
 
@@ -39,6 +43,8 @@ public interface RideRepository extends JpaRepository<Ride,Integer> {
     List<Ride> findRidesByDriveridAndIsAccepted(@Param("driverId") int driverId);
     @Query("SELECT DISTINCT r FROM Ride r  WHERE (r.driver.id = :driverId) AND (r.status = 4)")
     List<Ride> findRidesByDriveridAndIsFinished(@Param("driverId") int driverId);
+    List<Ride> findRidesByStatus(Status status);
+
 
 
 

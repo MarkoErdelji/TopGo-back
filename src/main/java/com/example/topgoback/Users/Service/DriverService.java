@@ -9,10 +9,7 @@ import com.example.topgoback.Enums.UserType;
 import com.example.topgoback.GeoLocations.Model.GeoLocation;
 import com.example.topgoback.GeoLocations.Repository.GeoLocationRepository;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
-import com.example.topgoback.Users.DTO.AllActiveDriversDTO;
-import com.example.topgoback.Users.DTO.AllDriversDTO;
-import com.example.topgoback.Users.DTO.CreateDriverDTO;
-import com.example.topgoback.Users.DTO.DriverInfoDTO;
+import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.Driver;
 import com.example.topgoback.Users.Repository.DriverRepository;
 import com.example.topgoback.Vehicles.DTO.CreateVehicleDTO;
@@ -88,7 +85,7 @@ public class DriverService {
             driverRepository.save(driver);
             return new DriverInfoDTO(driver);
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User with that email already exists!");
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User with that email already exists");
     }
     public DriverInfoDTO findById(Integer id)
     {
@@ -108,7 +105,7 @@ public class DriverService {
         return (driverdto);
     }
 
-    public DriverInfoDTO updateOne(DriverInfoDTO newDriver, Integer driverId) {
+    public DriverInfoDTO updateOne(UpdateDriverDTO newDriver, Integer driverId) {
 
         Optional<Driver> driver = driverRepository.findById(driverId);
         if(driver.isEmpty()){
@@ -143,7 +140,18 @@ public class DriverService {
             Base64.getDecoder().decode(path);
             return true;
         } catch(IllegalArgumentException e) {
-            return false;
+            if(e.getMessage().equals("Input byte array has wrong 4-byte ending unit")){
+                int paddingNeeded = 4 - path.length() % 4;
+                StringBuilder padding = new StringBuilder();
+                for (int i = 0; i < paddingNeeded; i++) {
+                    padding.append("=");
+                }
+                path = path + padding;
+                return true;
+            }
+            else{
+                return false;
+            }
         }
     }
 
@@ -153,12 +161,13 @@ public class DriverService {
         if(driver.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Driver does not exist!");
         }
+
         if(!isBase64(newDTO.getDocumentImage())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is not an image!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is not an image");
         }
         int x = (int) (newDTO.getDocumentImage().getBytes().length * (3.0/4));
         if(x>5000000){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is bigger than 5mb!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is bigger than 5mb");
         }
 
 
@@ -242,7 +251,7 @@ public class DriverService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Driver does not exist!");
         }
         if(driver.get().getVehicle() == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Vehicle is not assigned!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Vehicle is not assigned");
         }
         return new VehicleInfoDTO(driver.get().getVehicle());
 
@@ -258,9 +267,13 @@ public class DriverService {
         updateLocation(location,newVehicle);
         geoLocationRepository.save(location);
 
-        VehicleType vehicleType = new VehicleType();
-        vehicleType.setVehicleName(newVehicle.vehicleType);
-        vehicleTypeRepository.save(vehicleType);
+        String vehileTypeName = newVehicle.vehicleType;
+        VehicleType vehicleType = switch (vehileTypeName) {
+            case "STANDARD" -> this.vehicleTypeRepository.findById(1).orElseGet(null);
+            case "LUXURY" -> this.vehicleTypeRepository.findById(2).orElseGet(null);
+            case "VAN" -> this.vehicleTypeRepository.findById(3).orElseGet(null);
+            default -> new VehicleType();
+        };
 
         driver.get().setVehicle(updateVehicle(location,driver.get(),vehicleType,driver.get().getVehicle(),newVehicle));
         vehicleRepository.save(driver.get().getVehicle());

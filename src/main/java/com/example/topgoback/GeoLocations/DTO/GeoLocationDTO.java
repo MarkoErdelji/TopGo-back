@@ -1,10 +1,8 @@
 package com.example.topgoback.GeoLocations.DTO;
 
 import com.example.topgoback.GeoLocations.Model.GeoLocation;
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public class GeoLocationDTO {
@@ -12,12 +10,11 @@ public class GeoLocationDTO {
     @NotNull(message = "is required!")
     private String address;
     @NotNull(message = "is required!")
-
-    private float latitude;
+    @Positive
+    private Float latitude;
     @NotNull(message = "is required!")
-
-
-    private float longitude;
+    @Positive
+    private Float longitude;
 
     public GeoLocationDTO(GeoLocation location) {
         this.address = location.getAddress();
@@ -36,19 +33,19 @@ public class GeoLocationDTO {
         this.address = address;
     }
 
-    public float getLatitude() {
+    public Float getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(float latitude) {
+    public void setLatitude(Float latitude) {
         this.latitude = latitude;
     }
 
-    public float getLongitude() {
+    public Float getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(float longitude) {
+    public void setLongitude(Float longitude) {
         this.longitude = longitude;
     }
 }

@@ -14,12 +14,15 @@ import com.example.topgoback.Panic.Repository.PanicRepository;
 import com.example.topgoback.RejectionLetters.DTO.RejectionTextDTO;
 import com.example.topgoback.RejectionLetters.Model.RejectionLetter;
 import com.example.topgoback.RejectionLetters.Repository.RejectionLetterRepository;
+import com.example.topgoback.Rides.Controller.CreateRideHandler;
+import com.example.topgoback.Rides.Controller.SimulationHandler;
 import com.example.topgoback.Rides.DTO.CreateRideDTO;
 import com.example.topgoback.Rides.DTO.RideDTO;
 import com.example.topgoback.Rides.DTO.UserRideDTO;
 import com.example.topgoback.Rides.Model.Ride;
 import com.example.topgoback.Rides.Repository.RideRepository;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
+import com.example.topgoback.Routes.DTO.RouteForCreateRideDTO;
 import com.example.topgoback.Routes.Model.Route;
 import com.example.topgoback.Routes.Repository.RouteRepository;
 import com.example.topgoback.Tools.DistanceCalculator;
@@ -34,19 +37,25 @@ import com.example.topgoback.Users.Repository.PassengerRepository;
 import com.example.topgoback.Users.Service.PassengerService;
 import com.example.topgoback.Users.Service.UserService;
 import com.example.topgoback.Vehicles.Model.Vehicle;
+import com.example.topgoback.Vehicles.Repository.VehicleRepository;
 import com.example.topgoback.Vehicles.Repository.VehicleTypeRepository;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class RideService {
@@ -54,10 +63,16 @@ public class RideService {
     private RideRepository rideRepository;
     @Autowired
     private VehicleTypeRepository vehicleTypeRepository;
+
+    @Autowired
+    private VehicleRepository vehicleRepository;
     @Autowired
     PassengerRepository passengerRepository;
     @Autowired
     RouteRepository routeRepository;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
     @Autowired
     GeoLocationRepository geoLocationRepository;
     @Autowired
@@ -119,9 +134,18 @@ public class RideService {
         return userRidesListDTO;
     }
 
+    public RideDTO findRideByPassengerAndIsPending(int passengerId){
+        List<Ride> rides = rideRepository.findRidesByPassengeridAndIsPending(passengerId);
+        return new RideDTO(rides.get(0));
+    }
 
+    public RideDTO getPassengersAcceptedRide(int passengerId){
+        List<Ride> rides = rideRepository.findRidesByPassengeridAndIsAccepted(passengerId);
+        return new RideDTO(rides.get(0));
+    }
     public RideDTO createRide(CreateRideDTO createRideDTO) {
         Ride ride = new Ride();
+
 
 
         ride.setForBabies(createRideDTO.getBabyTransport());
@@ -143,7 +167,12 @@ public class RideService {
         routeRepository.save(route);
 
         ride.setRoute(route);
-        ride.setStart(LocalDateTime.now());
+        if(createRideDTO.getScheduledTime() != null) {
+            ride.setStart(createRideDTO.getScheduledTime());
+        }
+        else{
+            ride.setStart(LocalDateTime.now());
+        }
 
         ride.setStatus(Status.PENDING);
 
@@ -167,10 +196,14 @@ public class RideService {
 
         }
 
-
+        if(doPassengersHavePendingRide(createRideDTO.getPassengers())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot create a ride while you have one already pending!");
+        };
         Driver driver = this.DriverSelection(ride, DistanceCalculator.getEstimatedTimeInMinutes(60, ride.getRoute().getLenght()));
-        if (driver == null)
+        if (driver == null) {
+            sendNoMoreDriversUpdateToPassenger(createRideDTO.getPassengers());
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No avaliable drivers at this moment");
+        }
 
         ride.setDriver(driver);
         UserRef driverRef = new UserRef();
@@ -180,16 +213,74 @@ public class RideService {
 
         rideRepository.save(ride);
         RideDTO response = new RideDTO(ride);
+        WebSocketSession webSocketSession = CreateRideHandler.driverSessions.get(response.getDriver().getId().toString());
+        if(webSocketSession != null) {
+            CreateRideHandler.notifyDriverAboutCreatedRide(webSocketSession,response);
+        }
+        else {
+            sendDriverRideUpdate(response);
+        }
         return response;
 
 
     }
 
+    private boolean doPassengersHavePendingRide(List<RidePassengerDTO> passengers) {
+        for (RidePassengerDTO passengerDTO:passengers){
+            Passenger passenger = passengerRepository.findById(passengerDTO.getId()).get();
+            for(Ride r:passenger.getRides()){
+                if(r.getStatus() == Status.PENDING){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    public void sendDriverRideUpdate(RideDTO update) {
+        messagingTemplate.convertAndSend("/topic/driver/ride/"+update.driver.getId(), update);
+    }
+
+
+    public void sendNoMoreDriversUpdateToPassenger(List<RidePassengerDTO> passengers){
+        List<WebSocketSession> sessions = new ArrayList<>();
+        for(RidePassengerDTO p:passengers){
+            WebSocketSession webSocketSession = CreateRideHandler.passengerSessions.get(p.getId().toString());
+            if(webSocketSession != null){
+                sessions.add(webSocketSession);
+            }
+        }
+        if(!sessions.isEmpty()) {
+            CreateRideHandler.notifyPassengerAboutNoDriversLeft(sessions,new Error());
+        }
+        sendPassengerNoDriversLeftUpdate(passengers);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    public void sendPassengerNoDriversLeftUpdate(List<RidePassengerDTO> passengers) {
+        for(RidePassengerDTO p: passengers){
+            messagingTemplate.convertAndSend("/topic/passenger/ride/"+p.getId(), "No drivers left!");
+        }
+    }
+
     private Driver DriverSelection(Ride ride, float estimatedTime) {
         List<Driver> drivers = driverRepository.findAll();
+        List<Ride> rides = rideRepository.findRidesByStatus(Status.REJECTED);
         List<Driver> viableDrivers = new ArrayList<Driver>();
         for (Driver driver : drivers
         ) {
+            boolean hasRejected = false;
+            for (Ride rejectedRide: rides){
+                if(Objects.equals(rejectedRide.getDriver().getId(), driver.getId()) && arePassengerListsEqual(rejectedRide.getPassenger(),ride.getPassenger())
+                   && (ride.getStart().isAfter(LocalDateTime.now().minusMinutes(20)) && ride.getStart().isBefore(LocalDateTime.now()))) {
+                    hasRejected = true;
+                    break;
+                }
+            }
+            if(hasRejected){
+                continue;
+            }
             Vehicle vehicle = driver.getVehicle();
             if (!driver.isActive()) continue;
             if (!vehicle.getVehicleType().getVehicleName().equals(ride.getVehicleName().toString()))
@@ -205,6 +296,7 @@ public class RideService {
             viableDrivers.add(driver);
 
         }
+
         double minimumDistance = Double.MAX_VALUE;
         Driver bestDriver = null;
         for (Driver driver : viableDrivers) {
@@ -219,6 +311,13 @@ public class RideService {
         }
 
         return bestDriver;
+    }
+
+
+    public static boolean arePassengerListsEqual(List<Passenger> list1, List<Passenger> list2) {
+        Set<Integer> set1 = list1.stream().map(Passenger::getId).collect(Collectors.toSet());
+        Set<Integer> set2 = list2.stream().map(Passenger::getId).collect(Collectors.toSet());
+        return set1.equals(set2);
     }
 
     private boolean checkForAcceptedRide(Driver driver, float estimatedTime) {
@@ -257,8 +356,8 @@ public class RideService {
         }
 
         Ride ride = optionalRide.get();
-        if (ride.getStatus() != Status.PENDING) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot cancel a ride that is not in status PENDING!");
+        if (ride.getStatus() != Status.PENDING && ride.getStatus() != Status.ACCEPTED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot cancel a ride that is not in status PENDING or ACCEPTED!");
         }
         ride.setStatus(Status.REJECTED);
         RejectionLetter rejectionLetter = new RejectionLetter();
@@ -462,4 +561,140 @@ public class RideService {
     }
 
 
+    public RideDTO declineRide(Integer id, RejectionTextDTO reason) {
+        Optional<Ride> optionalRide = rideRepository.findById(id);
+        if (optionalRide.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride does not exist!");
+        }
+
+        Ride ride = optionalRide.get();
+        if (ride.getStatus() != Status.PENDING) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot decline a ride that is not in status PENDING!");
+        }
+        ride.setStatus(Status.REJECTED);
+
+        RejectionLetter rejectionLetter = new RejectionLetter();
+        rejectionLetter.setTimeOfRejection(LocalDateTime.now());
+        rejectionLetter.setReason(reason.getReason());
+        rejectionLetter.setRide(ride);
+
+        rejectionLetterRepository.save(rejectionLetter);
+        ride.setRejectionLetter(rejectionLetter);
+
+        rideRepository.save(ride);
+
+        CreateRideDTO createRideDTO = new CreateRideDTO();
+        createRideDTO.setBabyTransport(ride.isForBabies());
+        createRideDTO.setPetTransport(ride.isForAnimals());
+        List<RouteForCreateRideDTO> routeForCreateRideDTOS = new ArrayList<>();
+        RouteForCreateRideDTO routeForCreateRideDTO = new RouteForCreateRideDTO(ride.getRoute());
+        routeForCreateRideDTOS.add(routeForCreateRideDTO);
+        createRideDTO.setLocations(routeForCreateRideDTOS);
+        createRideDTO.setVehicleType(ride.getVehicleName());
+        List<RidePassengerDTO> ridePassengerDTOS = new ArrayList<>();
+        for(Passenger p:ride.getPassenger()){
+            RidePassengerDTO ridePassengerDTO = new RidePassengerDTO();
+            ridePassengerDTO.setEmail(p.getEmail());
+            ridePassengerDTO.setId(p.getId());
+            ridePassengerDTOS.add(ridePassengerDTO);
+        }
+        createRideDTO.setPassengers(ridePassengerDTOS);
+
+        RideDTO newRide = createRide(createRideDTO);
+        return newRide;
+
+    }
+
+    public void simulate(Integer rideId){
+
+        Ride ride = rideRepository.findById(rideId).get();
+        String apiKey = "5b3ce3597851110001cf624865f18297bb26459a9f779c015d573b96";
+        String baseUrl = "https://api.openrouteservice.org/v2/directions/driving-car";
+        String start = ride.getRoute().getStart().getLongitude() + "," + ride.getRoute().getStart().getLatitude();
+        String end = ride.getRoute().getFinish().getLongitude() + "," +  ride.getRoute().getFinish().getLatitude();
+
+        List<GeoLocationDTO> routePoints;
+
+        if(ride.getStatus() == Status.ACCEPTED){
+            end = start;
+            start = ride.getDriver().getVehicle().getCurrentLocation().getLongitude() + "," + ride.getDriver().getVehicle().getCurrentLocation().getLatitude();
+            routePoints = callEndpointForRoute(apiKey,start,end,baseUrl);
+        }
+        else if(ride.getStatus() == Status.ACTIVE){
+            routePoints = callEndpointForRoute(apiKey,start,end,baseUrl);
+        }
+        else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Can't simulate a ride that isnt active or accepted");
+        }
+
+
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            int i = 0;
+            @Override
+            public void run() {
+                if (i < routePoints.size() && (ride.getStatus() == Status.ACCEPTED || ride.getStatus() == Status.ACTIVE)) {
+                    GeoLocation currentLocation = ride.getDriver().getVehicle().getCurrentLocation();
+                    currentLocation.setLatitude(routePoints.get(i).getLatitude());
+                    currentLocation.setLongitude(routePoints.get(i).getLongitude());
+                    geoLocationRepository.save(currentLocation);
+                    ride.getDriver().getVehicle().setCurrentLocation(currentLocation);
+                    vehicleRepository.save(ride.getDriver().getVehicle());
+                    List<WebSocketSession> allsessions = new ArrayList<>();
+                    for(Passenger p:ride.getPassenger()){
+                        WebSocketSession passengerSession = SimulationHandler.passengerSessions.get(p.getId().toString());
+                        if(passengerSession != null) {
+                            allsessions.add(passengerSession);
+                        }
+                    }
+                    WebSocketSession driverSession = SimulationHandler.driverSessions.get(ride.getDriver().getId().toString());
+                    if(driverSession != null ){
+                        allsessions.add(driverSession);
+
+                    }
+                    SimulationHandler.sendNewVehicleLocationData(allsessions,currentLocation);
+                    i++;
+                } else {
+                    // End of route, stop updating the location
+                    timer.cancel();
+                }
+            }
+        }, 5000, 1000);
+
+
+
+    }
+
+    public List<GeoLocationDTO> callEndpointForRoute(String apiKey, String start, String end, String baseUrl){
+        String url = baseUrl+"?api_key="+apiKey+"&start="+start+"&end="+end;
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+
+        HttpEntity<String> request = new HttpEntity<>(headers);
+
+
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                url, HttpMethod.GET, request, String.class);
+
+        String responseString = response.getBody();
+        JSONObject json = new JSONObject(responseString);
+        JSONArray features = json.getJSONArray("features");
+        JSONObject firstFeature = features.getJSONObject(0);
+        JSONObject geometry = firstFeature.getJSONObject("geometry");
+        JSONArray coordinates = geometry.getJSONArray("coordinates");
+        List<GeoLocationDTO> routePoints = new ArrayList<>();
+        for (int i = 0; i < coordinates.length(); i++) {
+            JSONArray coord = coordinates.getJSONArray(i);
+
+            double lon = coord.getDouble(0);
+            double lat = coord.getDouble(1);
+            GeoLocationDTO geoLocationDTO = new GeoLocationDTO();
+            geoLocationDTO.setLongitude(Double.valueOf(lon).floatValue());
+            geoLocationDTO.setLatitude(Double.valueOf(lat).floatValue());
+            routePoints.add(geoLocationDTO);
+        }
+        return routePoints;
+    }
 }

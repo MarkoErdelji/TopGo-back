@@ -147,6 +147,11 @@ public class ReviewService {
         }
         int passengerId = jwtTokenUtil.getUserIdFromToken(jwtToken);
 
+        Optional<Ride> ride = rideRepository.findById(id);
+        if(ride.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Ride does not exist!");
+        }
+
         Optional<Review> passengerVehicleReview = reviewRepository.findByRideIdAndPassengerIdAndReviewType(id,passengerId,ReviewType.VEHICLE);
         Optional<Review> passengerDriverReview = reviewRepository.findByRideIdAndPassengerIdAndReviewType(id,passengerId,ReviewType.DRIVER);
 

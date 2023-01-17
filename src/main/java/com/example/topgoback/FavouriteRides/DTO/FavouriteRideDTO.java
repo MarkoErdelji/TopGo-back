@@ -2,16 +2,29 @@ package com.example.topgoback.FavouriteRides.DTO;
 
 import com.example.topgoback.Routes.DTO.RouteForCreateRideDTO;
 import com.example.topgoback.Users.DTO.UserRef;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
 public class FavouriteRideDTO {
+
+    @NotNull
     private String favoriteName;
+    @Valid
+    @NotNull
     private List<RouteForCreateRideDTO> locations;
+    @Valid
+    @NotNull
     private List<UserRef> passengers;
 
+    @NotNull
     private String vehicleType;
+
+    @NotNull
     private boolean babyTransport;
+
+    @NotNull
     private boolean petTransport;
 
     public FavouriteRideDTO() {

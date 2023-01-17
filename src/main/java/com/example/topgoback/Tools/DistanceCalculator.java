@@ -28,6 +28,6 @@ public class DistanceCalculator {
         return  ((distanceInKm/speedInKmH) * 60);
     }
     public static float getPrice(float distanceInKm, VehicleType vehicleType){
-        return vehicleType.getPriceByKm() * distanceInKm;
+        return (vehicleType.getPriceByKm()+100) * distanceInKm;
     }
 }

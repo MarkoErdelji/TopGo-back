@@ -4,6 +4,10 @@ public class RejectionTextDTO {
 
     private String reason;
 
+    public RejectionTextDTO(String s) {
+        this.reason = s;
+    }
+
     public RejectionTextDTO() {
     }
 

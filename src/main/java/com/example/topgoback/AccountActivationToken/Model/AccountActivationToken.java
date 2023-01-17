@@ -14,7 +14,7 @@ public class AccountActivationToken {
     @Column(name="id")
     private Integer id;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "passenger_id")
     private Passenger passenger;
     @Column

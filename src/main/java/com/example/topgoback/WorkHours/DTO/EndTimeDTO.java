@@ -1,10 +1,10 @@
 package com.example.topgoback.WorkHours.DTO;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 public class EndTimeDTO {
-    @NotNull
+    @NotNull(message ="is required!")
     private LocalDateTime end;
 
     public EndTimeDTO(LocalDateTime end) {

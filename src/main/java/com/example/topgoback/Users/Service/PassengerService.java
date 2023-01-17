@@ -2,6 +2,9 @@ package com.example.topgoback.Users.Service;
 
 import com.example.topgoback.AccountActivationToken.Service.AccountActivationTokenService;
 import com.example.topgoback.Enums.UserType;
+import com.example.topgoback.Rides.DTO.RideDTO;
+import com.example.topgoback.Rides.Model.Ride;
+import com.example.topgoback.Tools.JwtTokenUtil;
 import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.Passenger;
 import com.example.topgoback.Users.Repository.PassengerRepository;
@@ -16,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -24,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +45,11 @@ public class PassengerService {
     private UserRepository userRepository;
     @Autowired
     private final JavaMailSender mailSender;
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public PassengerService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
@@ -56,7 +66,7 @@ public class PassengerService {
             passenger.setPhoneNumber(passengerDTO.getTelephoneNumber());
             passenger.setEmail(passengerDTO.getEmail());
             passenger.setAddress(passengerDTO.getAddress());
-            passenger.setPassword(passengerDTO.getPassword());
+            passenger.setPassword(passwordEncoder.encode(passengerDTO.getPassword()));
             passenger.setUserType(UserType.USER);
             passengerRepository.save(passenger);
             activationTokenService.addOne(passenger.getId());
@@ -87,8 +97,14 @@ public class PassengerService {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Passenger does not exist!");
     }
 
-    public Passenger update(CreatePassengerDTO createPassengerDTO, Integer id){
+    public Passenger update(UpdatePassengerDTO createPassengerDTO, Integer id){
         Passenger passenger = findById(id);
+        passenger.setFirstName(createPassengerDTO.getName());
+        passenger.setLastName(createPassengerDTO.getSurname());
+        passenger.setProfilePicture(createPassengerDTO.getProfilePicture());
+        passenger.setPhoneNumber(createPassengerDTO.getTelephoneNumber());
+        passenger.setAddress(createPassengerDTO.getAddress());
+        passenger.setEmail(createPassengerDTO.getEmail());
         passengerRepository.save(passenger);
         return passenger;
     }
@@ -113,5 +129,19 @@ public class PassengerService {
     }
 
 
+    public List<RideDTO> getPassengerFinishedRides(String authorization) {
+        String jwtToken = null;
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            jwtToken = authorization.substring(7);
+        }
+        int id = jwtTokenUtil.getUserIdFromToken(jwtToken);
+        List<Ride> rides = passengerRepository.findRidesByPassengerIdAndIsFinished(id);
+        List<RideDTO> ridesDTO = new ArrayList<>();
+        for (Ride ride:rides)
+        {
+            ridesDTO.add(new RideDTO(ride));
+        }
+        return ridesDTO;
 
+    }
 }
