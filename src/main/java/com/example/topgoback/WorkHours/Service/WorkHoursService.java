@@ -74,7 +74,7 @@ public class WorkHoursService {
         }
         LocalDateTime now = LocalDateTime.now();
         System.out.println(now.toLocalDate());
-        LocalDateTime startInterval = now.minusDays(1);
+        LocalDateTime startInterval = LocalDateTime.now().minusDays(1);
         List<WorkHours> workHoursWithinLast24Hours = workHoursRepository.findWorkHoursWithinLast24Hours(startInterval,
                 now, driver.get());
 

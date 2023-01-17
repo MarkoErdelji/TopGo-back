@@ -67,23 +67,23 @@ public class MessageService {
     }
 
 
-    public UserMessagesDTO addOne(int senderId,SendMessageDTO sendMessageDTO) {
+    public UserMessagesDTO addOne(int receiverId,SendMessageDTO sendMessageDTO,String authorization) {
         Message message = new Message();
 
-        Optional<User> sender = userRepository.findById(senderId);
-        if(sender.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User does not exist!");
+        String jwtToken = null;
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            jwtToken = authorization.substring(7);
         }
-        Optional<User> receiver = userRepository.findById(sendMessageDTO.getReceiverId());
+        int id = jwtTokenUtil.getUserIdFromToken(jwtToken);
+        Optional<User> sender = userRepository.findById(id);
+        if(sender.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Sender does not exist!");
+        }
+
+        Optional<User> receiver = userRepository.findById(receiverId);
         if(receiver.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Receiver does not exist!");
         }
-
-        message.setReceiver(receiver.get());
-        message.setSender(sender.get());
-        message.setType(sendMessageDTO.getType());
-        message.setTimeOfSending(LocalDateTime.now());
-        message.setMessage(sendMessageDTO.getMessage());
 
         if(sendMessageDTO.getType() == MessageType.RIDE) {
             Optional<Ride> ride = rideRepository.findById(sendMessageDTO.getRideId());
@@ -97,6 +97,13 @@ public class MessageService {
         else{
             message.setRideId(null);
         }
+
+        message.setReceiver(receiver.get());
+        message.setSender(sender.get());
+        message.setType(sendMessageDTO.getType());
+        message.setTimeOfSending(LocalDateTime.now());
+        message.setMessage(sendMessageDTO.getMessage());
+
         messageRepository.save(message);
         return new UserMessagesDTO(message);
 

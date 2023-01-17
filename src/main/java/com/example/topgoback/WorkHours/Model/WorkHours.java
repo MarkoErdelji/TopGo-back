@@ -14,7 +14,7 @@ public class WorkHours {
     private Integer id;
     private LocalDateTime startHours;
     private LocalDateTime endHours;
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "driver_id")
     private Driver driver;
 
