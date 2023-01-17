@@ -9,6 +9,7 @@ import com.example.topgoback.Rides.DTO.RideDTO;
 import com.example.topgoback.Rides.Service.RideService;
 import com.example.topgoback.Users.DTO.UserRef;
 import com.example.topgoback.Users.Model.Passenger;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
@@ -39,9 +40,9 @@ public class RideController {
 
 
     @PostMapping(consumes = "application/json")
-    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('USER')")
+    @PreAuthorize("hasAnyRole('USER')")
     @Valid
-    public ResponseEntity<RideDTO> createRide(@Valid @RequestBody CreateRideDTO createRideDTO){
+    public ResponseEntity<RideDTO> createRide(@Valid @Nullable @RequestBody CreateRideDTO createRideDTO){
         RideDTO response = rideService.createRide(createRideDTO);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -96,7 +97,7 @@ public class RideController {
     @PreAuthorize("hasAnyRole('USER')")
     public ResponseEntity<PanicDTO> panic(@RequestHeader("Authorization") String authorization,
                                           @PathVariable Integer id,
-                                          @Valid @RequestBody RejectionTextDTO reason)
+                                          @Valid @Nullable @RequestBody RejectionTextDTO reason)
     {
 
         PanicDTO response = rideService.panic(id,reason,authorization);
@@ -142,7 +143,7 @@ public class RideController {
     @PutMapping(value = "/{id}/cancel")
     @Valid
     @PreAuthorize("hasAnyRole('DRIVER')")
-    public ResponseEntity<RideDTO> cancelRide(@PathVariable Integer id, @RequestBody RejectionTextDTO reason){
+    public ResponseEntity<RideDTO> cancelRide(@PathVariable Integer id, @Nullable @RequestBody RejectionTextDTO reason){
         RideDTO ride = rideService.cancelRide(id,reason);
         WebSocketSession webSocketSession = CreateRideHandler.passengerSessions.get(ride.getDriver().getId().toString());
         sendRideUpdateToPassenger(ride);
@@ -153,7 +154,7 @@ public class RideController {
     @PutMapping(value = "/{id}/decline")
     @Valid
     @PreAuthorize("hasAnyRole('DRIVER')")
-    public ResponseEntity<RideDTO> declineRide(@PathVariable Integer id, @RequestBody RejectionTextDTO rejectionTextDTO){
+    public ResponseEntity<RideDTO> declineRide(@PathVariable Integer id, @Nullable @RequestBody RejectionTextDTO rejectionTextDTO){
         RideDTO ride = rideService.declineRide(id, rejectionTextDTO);
         sendRideUpdateToPassenger(ride);
         return new ResponseEntity<>(ride, HttpStatus.OK);
@@ -179,7 +180,7 @@ public class RideController {
     @PostMapping(value = "/favorites", consumes = "application/json")
     @Valid
     @PreAuthorize("hasAnyRole('USER')")
-    public ResponseEntity<FavouriteRideInfoDTO> addFavouriteRide(@Valid @RequestBody FavouriteRideDTO favouriteRide){
+    public ResponseEntity<FavouriteRideInfoDTO> addFavouriteRide(@Valid @RequestBody @Nullable FavouriteRideDTO favouriteRide){
         FavouriteRideInfoDTO response = rideService.addFavouriteRide(favouriteRide);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

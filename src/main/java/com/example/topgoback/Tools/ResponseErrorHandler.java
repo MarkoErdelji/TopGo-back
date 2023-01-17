@@ -51,11 +51,6 @@ public class ResponseErrorHandler {
         return new ResponseEntity(paramErrorList, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(ResponseStatusException.class)
-    public final ResponseEntity<?> handleBaseException(ResponseStatusException ex) {
-        return new ResponseEntity(ex.getReason(), HttpStatusCode.valueOf(ex.getBody().getStatus()));
-    }
-
     @ExceptionHandler(MissingRequestHeaderException.class)
     public final ResponseEntity<?> handleHeaderException(MissingRequestHeaderException ex) {
         return new ResponseEntity(ex.getBody().getDetail(), HttpStatus.UNAUTHORIZED);

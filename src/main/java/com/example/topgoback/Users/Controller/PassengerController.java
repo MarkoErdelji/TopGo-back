@@ -5,6 +5,7 @@ import com.example.topgoback.Enums.AllowedSortFields;
 import com.example.topgoback.Rides.DTO.RideDTO;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
 import com.example.topgoback.Rides.Service.RideService;
+import com.example.topgoback.Tools.JwtCheckAnnotation;
 import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.Passenger;
 import com.example.topgoback.Users.Service.PassengerService;
@@ -52,7 +53,7 @@ public class PassengerController {
     @GetMapping(value = "/{id}")
     @Valid
     @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('USER')")
-    public  ResponseEntity<CreatePassengerResponseDTO> getOne(@PathVariable Integer id){
+    public  ResponseEntity<CreatePassengerResponseDTO> getOne(@PathVariable(value = "id") Integer id){
         Passenger passenger = passengerService.findById(id);
 
         return new ResponseEntity<>(new CreatePassengerResponseDTO(passenger), HttpStatus.OK);
