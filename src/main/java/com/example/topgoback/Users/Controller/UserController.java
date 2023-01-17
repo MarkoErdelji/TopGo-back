@@ -65,13 +65,13 @@ public class UserController {
     UserController(){}
 
     @GetMapping(value = "{id}/ride")
-    @Valid
-    public ResponseEntity<?> getUserRides(@PathVariable Integer id,
-                                          @RequestParam(required = false,defaultValue = "0") Integer page,
-                                          @RequestParam(required = false,defaultValue = "10") Integer size,
-                                          @RequestParam(required = false,defaultValue = "id")  String sort,
-                                          @RequestParam(required = false,defaultValue = "0001-01-01T00:00:00") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beginDateInterval,
-                                          @RequestParam(required = false,defaultValue = "9999-12-31T23:59:59.999999") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateInterval,
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<?> getUserRides(@Valid @PathVariable Integer id,
+                                          @Valid @RequestParam(required = false,defaultValue = "0") Integer page,
+                                          @Valid @RequestParam(required = false,defaultValue = "10") Integer size,
+                                          @Valid @RequestParam(required = false,defaultValue = "id")  String sort,
+                                          @Valid @RequestParam(required = false,defaultValue = "0001-01-01T00:00:00") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beginDateInterval,
+                                          @Valid @RequestParam(required = false,defaultValue = "9999-12-31T23:59:59.999999") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateInterval,
                                          Pageable pageable)
     {
         if(sort!=null){
@@ -97,9 +97,8 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN')")
-    @Valid
-    public ResponseEntity<?> getUsers(@RequestParam(required = false,defaultValue = "0") Integer page,
-                                      @RequestParam(required = false,defaultValue = "10") Integer size,
+    public ResponseEntity<?> getUsers(@Valid @RequestParam(required = false,defaultValue = "0") Integer page,
+                                      @Valid @RequestParam(required = false,defaultValue = "10") Integer size,
                                       Pageable pageable)
     {
         pageable = (Pageable) PageRequest.of(page, size, Sort.by("id").ascending());
@@ -128,6 +127,7 @@ public class UserController {
 
     @PutMapping(value = "{id}/changePassword",consumes = MediaType.APPLICATION_JSON_VALUE)
     @Valid
+    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('DRIVER') || hasAnyRole('USER')")
     public ResponseEntity<?> changeUserPassword(@PathVariable Integer id,@Valid @RequestBody ChangePasswordDTO changePasswordDTO)
     {
         userService.changeUserPassword(id, changePasswordDTO);
@@ -142,6 +142,7 @@ public class UserController {
 
     @GetMapping(value = "{id}/message")
     @Valid
+    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('DRIVER') || hasAnyRole('USER')")
     public ResponseEntity<?> getUsersMessages(@PathVariable Integer id,
                                               @RequestParam(required = false,defaultValue = "0") Integer page,
                                               @RequestParam(required = false,defaultValue =  "0") Integer size,
@@ -161,6 +162,7 @@ public class UserController {
 
     @GetMapping(value = "/{userId}/messages")
     @Valid
+    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('DRIVER') || hasAnyRole('USER')")
     public ResponseEntity<?> getMessagesBeetwenUsers(@PathVariable Integer userId,
                                                      @RequestHeader("Authorization") String authorization)
     {
@@ -175,15 +177,17 @@ public class UserController {
 
     @PostMapping(value = "{id}/message")
     @Valid
-    public ResponseEntity<?> sendUsersMessage(@PathVariable Integer id,@Valid @RequestBody SendMessageDTO sendMessageDTO)
+    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('DRIVER') || hasAnyRole('USER')")
+    public ResponseEntity<?> sendUsersMessage(@PathVariable Integer id,@Valid @RequestBody SendMessageDTO sendMessageDTO,@RequestHeader("Authorization") String authorization)
     {
-        UserMessagesDTO message = messageService.addOne(id,sendMessageDTO);
+        UserMessagesDTO message = messageService.addOne(id,sendMessageDTO,authorization);
         return new ResponseEntity<>(message,HttpStatus.OK);
 
     }
 
     @PutMapping(value = "{id}/block")
     @Valid
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<?> blockUser(@PathVariable Integer id)
     {
         userService.blockUser(id);
@@ -193,6 +197,7 @@ public class UserController {
 
     @PutMapping(value = "{id}/unblock")
     @Valid
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<?> unblockUser(@PathVariable Integer id)
     {
         userService.unblockUser(id);
@@ -202,6 +207,7 @@ public class UserController {
 
     @PostMapping(value = "{id}/note")
     @Valid
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<?> addNote(@PathVariable Integer id,@Valid @RequestBody CreateNoteDTO note)
     {
         NoteResponseDTO noteResponseDTO = noteService.addOne(id,note);
@@ -213,6 +219,7 @@ public class UserController {
 
     @GetMapping(value = "{id}/note")
     @Valid
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<?> getUserNotes(@PathVariable Integer id,
                                           @RequestParam(required = false,defaultValue = "0") Integer page,
                                           @RequestParam(required = false,defaultValue = "10") Integer size,

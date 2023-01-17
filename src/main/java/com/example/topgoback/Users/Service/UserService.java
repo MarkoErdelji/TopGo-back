@@ -134,10 +134,10 @@ public class UserService implements UserDetailsService {
 
     public void changeUserPassword(int userId,ChangePasswordDTO changePasswordDTO) {
         User user = findOne(userId);
-        if (!passwordEncoder.matches(changePasswordDTO.getOld_password(),user.getPassword())){
+        if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(),user.getPassword())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Current password is not matching!");
         }
-        user.setPassword(passwordEncoder.encode(changePasswordDTO.getNew_password()));
+        user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
         userRepository.save(user);
     }
 
@@ -190,7 +190,7 @@ public class UserService implements UserDetailsService {
             tokenRepository.delete(passwordResetToken.get());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Code is expired or not correct!");
         }
-        user.setPassword(passwordEncoder.encode(resetPasswordDTO.getNew_password()));
+        user.setPassword(passwordEncoder.encode(resetPasswordDTO.getNewPassword()));
         userRepository.save(user);
     }
 
