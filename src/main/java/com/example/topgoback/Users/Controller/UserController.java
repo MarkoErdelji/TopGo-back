@@ -10,6 +10,7 @@ import com.example.topgoback.Notes.DTO.UserNoteListDTO;
 import com.example.topgoback.Notes.Model.Note;
 import com.example.topgoback.Notes.Service.NoteService;
 import com.example.topgoback.PasswordResetTokens.Service.PasswordResetTokenService;
+import com.example.topgoback.Rides.DTO.RideDTO;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
 import com.example.topgoback.Rides.Service.RideService;
 import com.example.topgoback.Users.DTO.*;
@@ -31,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -58,6 +60,8 @@ public class UserController {
 
     @Autowired
     private NoteService noteService;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     private PasswordResetTokenService passwordResetTokenService;
@@ -181,7 +185,16 @@ public class UserController {
     public ResponseEntity<?> sendUsersMessage(@PathVariable Integer id,@Valid @RequestBody SendMessageDTO sendMessageDTO,@RequestHeader("Authorization") String authorization)
     {
         UserMessagesDTO message = messageService.addOne(id,sendMessageDTO,authorization);
+        sendUserMessage(message);
         return new ResponseEntity<>(message,HttpStatus.OK);
+
+
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    public void sendUserMessage(UserMessagesDTO update) {
+        messagingTemplate.convertAndSend("/topic/user/message/"+update.receiverId, update);
+        messagingTemplate.convertAndSend("/topic/user/message/"+update.senderId, update);
 
     }
 
