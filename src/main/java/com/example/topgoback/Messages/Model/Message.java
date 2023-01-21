@@ -13,7 +13,8 @@ import java.util.Collection;
 public class Message {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "mySeqGenMessage", sequenceName = "mySeqGenMessage", initialValue = 10, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenMessage")
     private Integer id;
     private String message;
     @Column(columnDefinition = "TIMESTAMP")

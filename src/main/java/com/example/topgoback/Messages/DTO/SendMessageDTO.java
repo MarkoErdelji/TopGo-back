@@ -1,6 +1,7 @@
 package com.example.topgoback.Messages.DTO;
 
 import com.example.topgoback.Enums.MessageType;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 
@@ -12,8 +13,7 @@ public class SendMessageDTO {
 
     @NotNull(message = "is required!")
     private MessageType type;
-
-    @NotNull(message = "is required!")
+    @Nullable
     private Integer rideId;
 
 
