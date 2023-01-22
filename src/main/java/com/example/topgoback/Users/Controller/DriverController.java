@@ -75,7 +75,7 @@ public class DriverController {
 
     @GetMapping(value = "/{driverId}")
     @Valid
-    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('DRIVER')")
+    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('DRIVER') || hasAnyRole('USER')")
     public ResponseEntity<DriverInfoDTO> getDriver(@PathVariable Integer driverId)
     {
 
@@ -146,7 +146,7 @@ public class DriverController {
 
     @GetMapping(value = "/{driverId}/vehicle")
     @Valid
-    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('DRIVER')" )
+    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('DRIVER') || hasAnyRole('USER')" )
     public ResponseEntity<?> getDriverVehicle(@PathVariable Integer driverId)
     {
 
