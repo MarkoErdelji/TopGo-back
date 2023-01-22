@@ -89,6 +89,7 @@ public class RideController {
     @PreAuthorize("hasAnyRole('USER')")
     public ResponseEntity<RideDTO> withdrawRoute(@PathVariable Integer id){
         RideDTO response = rideService.withdrawRide(id);
+        sendRideUpdateToPassenger(response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

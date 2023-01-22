@@ -136,11 +136,15 @@ public class RideService {
 
     public RideDTO findRideByPassengerAndIsPending(int passengerId){
         List<Ride> rides = rideRepository.findRidesByPassengeridAndIsPending(passengerId);
+        if (rides.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Pending ride does not exist!");
         return new RideDTO(rides.get(0));
     }
 
     public RideDTO getPassengersAcceptedRide(int passengerId){
         List<Ride> rides = rideRepository.findRidesByPassengeridAndIsAccepted(passengerId);
+        if (rides.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Accepted ride does not exist!");
         return new RideDTO(rides.get(0));
     }
     public RideDTO createRide(CreateRideDTO createRideDTO) {
