@@ -3,7 +3,9 @@ package com.example.topgoback.Enums;
 public enum AllowedSortFields {
     ID("id"),
     START("start"),
-    PRICE("price");
+    END("end"),
+    PRICE("price"),
+    ROUTE("route");
 
     private final String field;
 
