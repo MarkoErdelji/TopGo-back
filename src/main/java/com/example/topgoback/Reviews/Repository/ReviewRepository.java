@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review,Integer> {
-    Page<Review> findByRideDriverVehicleId(int vehicleId, Pageable pageable);
+    Page<Review> findByRideDriverVehicleIdAndReviewType(int vehicleId, Pageable pageable,ReviewType reviewType);
 
-    Page<Review> findByRideDriverId(int vehicleId, Pageable pageable);
+    Page<Review> findByRideDriverIdAndReviewType(int driverId, Pageable pageable,ReviewType reviewType);
 
     Optional<Review> findByPassengerIdAndReviewType(int passengerId,ReviewType reviewType);
     Optional<Review> findByRideIdAndPassengerIdAndReviewType(int rideId, int passengerId, ReviewType reviewType);
