@@ -701,7 +701,10 @@ public class RideService {
                         allsessions.add(driverSession);
 
                     }
-                    SimulationHandler.sendNewVehicleLocationData(allsessions,currentLocation);
+                    if(!allsessions.isEmpty()) {
+                        SimulationHandler.sendNewVehicleLocationData(allsessions, currentLocation);
+                    }
+                    sendNewVehicleLocationUpdate(rideId,new GeoLocationDTO(currentLocation));
                     i++;
                 } else {
                     // End of route, stop updating the location
@@ -848,6 +851,16 @@ public class RideService {
         for(UserRef p: update.getPassengers()){
             messagingTemplate.convertAndSend("/topic/passenger/ride/"+p.getId(), update);
         }
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    public void sendNewVehicleLocationUpdate(Integer rideId,GeoLocationDTO update) {
+        Ride r = rideRepository.findById(rideId).get();
+        for(Passenger p: r.getPassenger()){
+            messagingTemplate.convertAndSend("/topic/vehicleLocation/ride/user/"+p.getId(), update);
+        }
+        messagingTemplate.convertAndSend("/topic/vehicleLocation/ride/user/"+r.getDriver().getId(), update);
+
     }
 
     public void sendRideUpdateToPassenger(RideDTO ride){
