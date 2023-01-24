@@ -19,7 +19,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
                 "/topic/passenger/ride/",
                 "/topic/user/message/",
                 "/topic/passenger/scheduledNotification/",
-                "/topic/vehicleLocation/ride/user/");
+                "/topic/vehicleLocation/ride/user/",
+                "/topic/passenger/invites/");
+
         registry.setApplicationDestinationPrefixes("/app");
     }
 

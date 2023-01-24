@@ -18,9 +18,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
@@ -50,6 +52,8 @@ public class PassengerService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     public PassengerService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
@@ -142,6 +146,26 @@ public class PassengerService {
             ridesDTO.add(new RideDTO(ride));
         }
         return ridesDTO;
+
+    }
+
+    public InviteFriendDTO inviteFriend(String authorization, int id) {
+        String jwtToken = null;
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            jwtToken = authorization.substring(7);
+        }
+        int userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
+        InviteFriendDTO response = new InviteFriendDTO();
+        response.setInvitedId(id);
+        response.setUserId(userId);
+        response.setStatus("PENDING");
+        sendFriendInvite(response);
+        return response;
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    public void sendFriendInvite(InviteFriendDTO update) {
+        messagingTemplate.convertAndSend("/topic/passenger/invites/"+update.getInvitedId(), update);
 
     }
 }
