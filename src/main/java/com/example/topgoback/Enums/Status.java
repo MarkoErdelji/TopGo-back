@@ -7,5 +7,6 @@ public enum Status {
     ACTIVE,
     FINISHED,
     CANCELED,
-    PANIC
+    PANIC,
+    SCHEDULED
 }

@@ -52,7 +52,7 @@ public class RideDTO {
         this.setLocations(new ArrayList<RouteForCreateRideDTO>());
         this.getLocations().add(new RouteForCreateRideDTO(r.getRoute()));
 
-        this.setStartTime(LocalDateTime.now());
+        this.setStartTime(r.getStart());
         this.setStatus(r.getStatus());
 
         this.setVehicleType(VehicleName.valueOf(r.getDriver().getVehicle().getVehicleType().getVehicleName()));
