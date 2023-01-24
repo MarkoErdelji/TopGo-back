@@ -168,4 +168,14 @@ public class PassengerService {
         messagingTemplate.convertAndSend("/topic/passenger/invites/"+update.getInvitedId(), update);
 
     }
+    @CrossOrigin(origins = "http://localhost:4200")
+    public void sendFriendInviteResponse(InviteFriendDTO update) {
+        messagingTemplate.convertAndSend("/topic/passenger/response/"+update.getUserId(), update);
+
+    }
+
+    public InviteFriendDTO inviteResponse(InviteFriendDTO response) {
+        sendFriendInviteResponse(response);
+        return response;
+    }
 }
