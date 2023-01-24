@@ -686,6 +686,7 @@ public class RideService {
                     GeoLocation currentLocation = ride.getDriver().getVehicle().getCurrentLocation();
                     currentLocation.setLatitude(routePoints.get(i).getLatitude());
                     currentLocation.setLongitude(routePoints.get(i).getLongitude());
+                    currentLocation.setAddress(getUpdatedVehicleAddressWithCoordinates(currentLocation.getLatitude(),currentLocation.getLongitude()));
                     geoLocationRepository.save(currentLocation);
                     ride.getDriver().getVehicle().setCurrentLocation(currentLocation);
                     vehicleRepository.save(ride.getDriver().getVehicle());
@@ -707,13 +708,33 @@ public class RideService {
                     sendNewVehicleLocationUpdate(rideId,new GeoLocationDTO(currentLocation));
                     i++;
                 } else {
-                    // End of route, stop updating the location
                     timer.cancel();
                 }
             }
         }, 5000, 1000);
 
 
+
+    }
+
+    public String getUpdatedVehicleAddressWithCoordinates(float lat, float lon){
+        String url="https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat="+lat+"&lon="+lon;
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+
+        HttpEntity<String> request = new HttpEntity<>(headers);
+
+
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                url, HttpMethod.GET, request, String.class);
+
+        String responseString = response.getBody();
+        JSONObject json = new JSONObject(responseString);
+        String address = json.getString("display_name");
+        return address;
 
     }
 
