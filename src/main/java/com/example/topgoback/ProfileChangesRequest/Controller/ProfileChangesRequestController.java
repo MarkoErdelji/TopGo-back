@@ -33,4 +33,10 @@ public class ProfileChangesRequestController {
         return new ResponseEntity<>(profileChangesRequestService.getAll(), HttpStatus.OK);
     }
 
+    @DeleteMapping(value="{id}/delete")
+    public ResponseEntity<?>deleteRequest(@PathVariable Integer id){
+        profileChangesRequestService.deleteRequest(id);
+        return  new ResponseEntity<>("Request deleted succesfully", HttpStatus.OK);
+    }
+
 }

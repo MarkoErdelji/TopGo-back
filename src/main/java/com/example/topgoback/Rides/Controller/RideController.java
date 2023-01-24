@@ -6,6 +6,7 @@ import com.example.topgoback.Panic.DTO.PanicDTO;
 import com.example.topgoback.RejectionLetters.DTO.RejectionTextDTO;
 import com.example.topgoback.Rides.DTO.CreateRideDTO;
 import com.example.topgoback.Rides.DTO.RideDTO;
+import com.example.topgoback.Rides.Model.Ride;
 import com.example.topgoback.Rides.Service.RideService;
 import com.example.topgoback.Users.DTO.UserRef;
 import com.example.topgoback.Users.Model.Passenger;
@@ -16,6 +17,7 @@ import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -89,7 +91,6 @@ public class RideController {
     @PreAuthorize("hasAnyRole('USER')")
     public ResponseEntity<RideDTO> withdrawRoute(@PathVariable Integer id){
         RideDTO response = rideService.withdrawRide(id);
-        sendRideUpdateToPassenger(response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -111,23 +112,9 @@ public class RideController {
     @PreAuthorize("hasAnyRole('DRIVER')")
     public ResponseEntity<RideDTO> acceptRide(@PathVariable Integer id){
         RideDTO ride = rideService.acceptRide(id);
-        sendRideUpdateToPassenger(ride);
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
 
-    public void sendRideUpdateToPassenger(RideDTO ride){
-        List<WebSocketSession> sessions = new ArrayList<>();
-        for(UserRef p:ride.getPassengers()){
-            WebSocketSession webSocketSession = CreateRideHandler.passengerSessions.get(p.getId().toString());
-            if(webSocketSession != null){
-                sessions.add(webSocketSession);
-            }
-        }
-        if(!sessions.isEmpty()) {
-            CreateRideHandler.notifyPassengerAboutAcceptedRide(sessions,ride);
-        }
-        sendPassengerRideUpdate(ride);
-    }
 
     @GetMapping(value = "passenger/{id}/pending")
     public ResponseEntity<?> getPassengerPendingRides(@PathVariable Integer id){
@@ -146,8 +133,6 @@ public class RideController {
     @PreAuthorize("hasAnyRole('DRIVER')")
     public ResponseEntity<RideDTO> cancelRide(@PathVariable Integer id, @Nullable @RequestBody RejectionTextDTO reason){
         RideDTO ride = rideService.cancelRide(id,reason);
-        WebSocketSession webSocketSession = CreateRideHandler.passengerSessions.get(ride.getDriver().getId().toString());
-        sendRideUpdateToPassenger(ride);
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
 
@@ -157,7 +142,6 @@ public class RideController {
     @PreAuthorize("hasAnyRole('DRIVER')")
     public ResponseEntity<RideDTO> declineRide(@PathVariable Integer id, @Nullable @RequestBody RejectionTextDTO rejectionTextDTO){
         RideDTO ride = rideService.declineRide(id, rejectionTextDTO);
-        sendRideUpdateToPassenger(ride);
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
 
@@ -166,7 +150,6 @@ public class RideController {
     @PreAuthorize("hasAnyRole('DRIVER')")
     public ResponseEntity<RideDTO> finishRoute(@PathVariable Integer id){
         RideDTO ride = rideService.endRide(id);
-        sendRideUpdateToPassenger(ride);
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
 
@@ -175,7 +158,6 @@ public class RideController {
     @PreAuthorize("hasAnyRole('DRIVER')")
     public ResponseEntity<RideDTO> startRoute(@PathVariable Integer id){
         RideDTO ride = rideService.startRide(id);
-        sendRideUpdateToPassenger(ride);
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
     @PostMapping(value = "/favorites", consumes = "application/json")
@@ -213,10 +195,6 @@ public class RideController {
     }
 
 
-    @CrossOrigin(origins = "http://localhost:4200")
-    public void sendPassengerRideUpdate(RideDTO update) {
-        for(UserRef p: update.getPassengers()){
-            messagingTemplate.convertAndSend("/topic/passenger/ride/"+p.getId(), update);
-        }
-    }
+
+
 }
