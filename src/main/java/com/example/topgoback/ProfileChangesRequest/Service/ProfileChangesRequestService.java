@@ -61,4 +61,7 @@ public class ProfileChangesRequestService {
         allProfileChangesRequestsDTO.setCount(pcrDTOS.size());
         return allProfileChangesRequestsDTO;
     }
+    public void deleteRequest(Integer id){
+        profileChangesRequestRepository.deleteById(id);
+    }
 }

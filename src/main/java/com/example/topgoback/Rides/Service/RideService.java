@@ -389,6 +389,7 @@ public class RideService {
         rideRepository.save(ride);
         RideDTO dto = new RideDTO(ride);
         sendRideUpdateToPassenger(dto);
+        sendDriverRideUpdate(dto);
         return dto;
     }
 
@@ -518,6 +519,7 @@ public class RideService {
         rideRepository.save(ride);
         RideDTO dto = new RideDTO(ride);
         sendRideUpdateToPassenger(dto);
+        sendDriverRideUpdate(dto);
         return dto;
     }
 
