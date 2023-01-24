@@ -147,6 +147,15 @@ public class PassengerController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PutMapping(value = "/ride/invite/{id}")
+    @Valid
+    public ResponseEntity<InviteFriendDTO> invitePassengerForRide(@RequestHeader("Authorization") String authorization
+    ,@PathVariable int id){
+        InviteFriendDTO response = passengerService.inviteFriend(authorization,id);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 
 
 
