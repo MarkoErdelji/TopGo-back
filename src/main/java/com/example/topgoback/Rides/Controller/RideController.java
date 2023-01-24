@@ -96,7 +96,7 @@ public class RideController {
 
     @PutMapping(value = "/{id}/panic", consumes = "application/json")
     @Valid
-    @PreAuthorize("hasAnyRole('USER')")
+    @PreAuthorize("hasAnyRole('USER') || hasAnyRole('DRIVER')")
     public ResponseEntity<PanicDTO> panic(@RequestHeader("Authorization") String authorization,
                                           @PathVariable Integer id,
                                           @Valid @Nullable @RequestBody RejectionTextDTO reason)

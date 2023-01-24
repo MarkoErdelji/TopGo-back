@@ -507,9 +507,9 @@ public class RideService {
         panic.setTime(LocalDateTime.now());
         panic.setReason(reason.getReason());
         panicRepository.save(panic);
-
-
-
+        RideDTO dto = new RideDTO(ride);
+        sendDriverRideUpdate(dto);
+        sendPassengerRideUpdate(dto);
 
         return new PanicDTO(panic);
     }
