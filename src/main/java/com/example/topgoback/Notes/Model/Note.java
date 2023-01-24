@@ -11,7 +11,8 @@ import java.time.LocalDateTime;
 public class Note {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "mySeqGenNote", sequenceName = "mySeqGenNote", initialValue = 3, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenNote")
     private Integer id;
 
     @ManyToOne(optional = true)

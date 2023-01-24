@@ -94,6 +94,13 @@ INSERT INTO PASSENGER_RIDES (PASSENGER_ID, RIDE_ID)
 VALUES (21, 1),(22, 1),(23, 1),(21,3),(21,2);
 INSERT INTO MESSAGES (ID,MESSAGE,RIDE_ID,TIME_OF_SENDING,TYPE,RECEIVER_ID,SENDER_ID)
 VALUES (1,'ALO BRE',1,'2023-01-03T12:00:01',1,21,4),(2,'BUDALOO',1,'2023-01-03T12:00:02',1,4,21),(3,'STA JE',1,'2023-01-03T12:00:00',1,4,22),(5,'MA NEMOJ!',1,'2023-01-03T12:00:01',1,4,23),(4,'PREBICU TE!',1,'2023-01-03T12:00:00',1,23,4),(6,'LOPOVE!',1,'2023-01-03T12:00:00',1,21,22),(7,'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam vitae dui mattis, malesuada sem vel, molestie nulla.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam vitae dui mattis, malesuada sem vel, molestie nulla.',1,'2023-01-03T12:00:01',1,21,4),(8,'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam vitae dui mattis, malesuada sem vel, molestie nulla.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam vitae dui mattis, malesuada sem vel, molestie nulla.',1,'2023-01-03T12:00:01',1,21,23);
+INSERT INTO NOTES (ID,USER_ID,TIME_OF_WRITING,MESSAGE) VALUES (1,1,'2023-01-03T12:00:00','This user is not good !');
+INSERT INTO NOTES (ID,USER_ID,TIME_OF_WRITING,MESSAGE) VALUES (2,1,'2023-01-03T12:00:00','This is a very long message to see how the text wraps in case of overflow test tes test test test test test test test test test test test test test test tes');
+
+
+
+
+
 -- alter table if exists messages add constraint sender_id_fk foreign key (sender_id) references users;
 -- alter table if exists messages add constraint receiver_id_fk foreign key (receiver_id) references users;
 --
