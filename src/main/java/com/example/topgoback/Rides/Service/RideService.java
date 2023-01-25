@@ -102,7 +102,7 @@ public class RideService {
     public UserRidesListDTO findRidesByUserId(int userId, Pageable pageable, LocalDateTime beginDateTimeInterval, LocalDateTime endDateTimeInterval) {
 
         User user = userService.findOne(userId);
-        Page<Ride> rides = rideRepository.findByDriverOrPassengerAndBeginBetween(user.getId(), beginDateTimeInterval, endDateTimeInterval, pageable);
+        Page<Ride> rides = rideRepository.findByDriverOrPassengerAndStartBetween(user.getId(),beginDateTimeInterval,endDateTimeInterval,pageable);
         List<UserRideDTO> userRideDTOList = UserRideDTO.convertToUserRideDTO(rides.getContent());
         UserRidesListDTO userRidesListDTO = new UserRidesListDTO(new PageImpl<>(userRideDTOList, pageable, rides.getTotalElements()));
         userRidesListDTO.setTotalCount((int) rides.getTotalElements());
@@ -177,7 +177,7 @@ public class RideService {
             if(createRideDTO.getScheduledTime().isAfter(LocalDateTime.now().plusHours(5))){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Can not order a ride thats more than 5 hours from now!");
             }
-            ride.setStart(createRideDTO.getScheduledTime());
+            ride.setStart(createRideDTO.getScheduledTime().plusMinutes(10));
             ride.setStatus(Status.SCHEDULED);
         }
         else{

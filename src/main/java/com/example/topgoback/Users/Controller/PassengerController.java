@@ -88,12 +88,11 @@ public class PassengerController {
     }
 
     @GetMapping(value = "{id}/ride")
-    @Valid
     @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('USER')")
     public ResponseEntity<?> getRides(@PathVariable Integer id,
-                                      @RequestParam(required = false) Integer page,
-                                      @RequestParam(required = false) Integer size,
-                                      @RequestParam(required = false) String sort,
+                                      @Valid @RequestParam(required = false) Integer page,
+                                      @Valid @RequestParam(required = false) Integer size,
+                                      @Valid @RequestParam(required = false) String sort,
                                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime beginDateInterval,
                                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateInterval,
                                       Pageable pageable)
