@@ -773,28 +773,19 @@ public class RideService {
 
 
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 300000)
     public void sendScheduledNotification(){
         List<Ride> allrides = rideRepository.findAll();
-        LocalDateTime halfHour = LocalDateTime.now().plusMinutes(30);
         LocalDateTime fifteenMinutesHour = LocalDateTime.now().plusMinutes(15);
         LocalDateTime Hour = LocalDateTime.now().plusMinutes(60);
 
         for(Ride r:allrides){
+            if(r.getStatus() != Status.SCHEDULED){
+                continue;
+            }
             LocalDateTime rideDate = r.getStart();
 
-            boolean sameDate = halfHour.toLocalDate().equals(rideDate.toLocalDate());
-            boolean sameHour = halfHour.getHour() == rideDate.getHour();
-            boolean sameMinute = halfHour.getMinute() == rideDate.getMinute();
-
-            boolean sameDatefifteen = fifteenMinutesHour.toLocalDate().equals(rideDate.toLocalDate());
-            boolean sameHourfifteen = fifteenMinutesHour.getHour() == rideDate.getHour();
-            boolean sameMinutefifteen = fifteenMinutesHour.getMinute() == rideDate.getMinute();
-
-            boolean sameDatehour = Hour.toLocalDate().equals(rideDate.toLocalDate());
-            boolean sameHourhour = Hour.getHour() == rideDate.getHour();
-            boolean sameMinutehour = Hour.getMinute() == rideDate.getMinute();
-            if( (sameMinute && sameHour && sameDate) || (sameDatefifteen && sameHourfifteen && sameMinutefifteen) || (sameDatehour && sameHourhour && sameMinutehour)){
+            if( rideDate.isBefore(fifteenMinutesHour) || rideDate.isBefore(Hour) ){
                 sendPassengerScheduledUpdate(r);
             }
         }
@@ -809,7 +800,6 @@ public class RideService {
             LocalDateTime rideDate = r.getStart();
 
             if(r.getStart().isBefore(fiveMinutesLeft)){
-                if(r.getDriver().isActive()) {
                     r.setStatus(Status.REJECTED);
                     RejectionLetter rl = new RejectionLetter();
                     rl.setRide(r);
@@ -819,7 +809,6 @@ public class RideService {
                     r.setRejectionLetter(rl);
                     rideRepository.save(r);
                     sendPassengerRideUpdate(new RideDTO(r));
-                }
             }
             else if(r.getStart().isBefore(tenMinutesLeft)){
                 if(r.getDriver().isActive()) {
