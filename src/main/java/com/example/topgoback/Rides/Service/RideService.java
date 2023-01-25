@@ -773,7 +773,7 @@ public class RideService {
 
 
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 300000)
     public void sendScheduledNotification(){
         List<Ride> allrides = rideRepository.findAll();
         LocalDateTime fifteenMinutesHour = LocalDateTime.now().plusMinutes(15);
