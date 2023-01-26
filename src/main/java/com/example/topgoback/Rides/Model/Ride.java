@@ -16,7 +16,7 @@ import java.util.List;
 public class
 Ride {
     @Id
-    @SequenceGenerator(name = "mySeqGenRide", sequenceName = "mySeqGenRide", initialValue = 7, allocationSize = 1)
+    @SequenceGenerator(name = "mySeqGenRide", sequenceName = "mySeqGenRide", initialValue = 500, allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenRide")
     private int id;
 
