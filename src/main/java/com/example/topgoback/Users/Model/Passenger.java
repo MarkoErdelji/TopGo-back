@@ -28,7 +28,13 @@ public class Passenger extends  User{
 
     }
 
+    public List<FavouriteRide> getFavouriteRoutes() {
+        return favouriteRoutes;
+    }
 
+    public void setFavouriteRoutes(List<FavouriteRide> favouriteRoutes) {
+        this.favouriteRoutes = favouriteRoutes;
+    }
 
     public List<Payment> getPayments() {
         return payments;

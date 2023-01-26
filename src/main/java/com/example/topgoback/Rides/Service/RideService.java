@@ -554,6 +554,7 @@ public class RideService {
     }
 
     public FavouriteRideInfoDTO addFavouriteRide(FavouriteRideDTO ride) {
+
         FavouriteRide favouriteRide = new FavouriteRide();
 
         favouriteRide.setBabyTransport(ride.isBabyTransport());
