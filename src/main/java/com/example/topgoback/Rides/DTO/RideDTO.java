@@ -78,6 +78,14 @@ public class RideDTO {
     }
 
 
+    public static List<RideDTO> convertToRideDTO(List<Ride> rides){
+        List<RideDTO> userRideDTOList = new ArrayList<RideDTO>();
+        for(Ride r:rides){
+            userRideDTOList.add(new RideDTO(r));
+        }
+        return userRideDTOList;
+    }
+
     public Integer getId() {
         return id;
     }

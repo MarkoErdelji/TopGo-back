@@ -14,6 +14,8 @@ public class RouteForCreateRideDTO {
     @NotNull
     private GeoLocationDTO destination;
 
+    @Valid
+    private float lenght;
 
     public RouteForCreateRideDTO(){
 
@@ -21,7 +23,16 @@ public class RouteForCreateRideDTO {
     public RouteForCreateRideDTO(Route route) {
         this.departure = new GeoLocationDTO(route.getStart());
         this.destination = new GeoLocationDTO(route.getFinish());
+        this.lenght = route.getLenght();
+    }
 
+
+    public float getLenght() {
+        return lenght;
+    }
+
+    public void setLenght(float lenght) {
+        this.lenght = lenght;
     }
 
     public GeoLocationDTO getDeparture() {

@@ -77,7 +77,9 @@ public class UserController {
                                           @Valid @RequestParam(required = false,defaultValue = "0001-01-01T00:00:00") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beginDateInterval,
                                           @Valid @RequestParam(required = false,defaultValue = "9999-12-31T23:59:59.999999") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateInterval,
                                          Pageable pageable)
-    {
+        {if(sort == null){
+            sort = "start";
+        }
         if(sort!=null){
             boolean isValidSortField = false;
             for (AllowedSortFields allowedField : AllowedSortFields.values()) {

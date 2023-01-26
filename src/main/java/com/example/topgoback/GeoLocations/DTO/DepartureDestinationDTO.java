@@ -14,7 +14,6 @@ public class DepartureDestinationDTO {
     @NotNull(message = "is required!")
     GeoLocationDTO destination;
 
-
     public static DepartureDestinationDTO getMockedData(){
         DepartureDestinationDTO departureDestinationDTO = new DepartureDestinationDTO();
 
