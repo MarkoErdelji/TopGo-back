@@ -90,7 +90,7 @@ public class UserController {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid sort field. Allowed fields: " + Arrays.toString(AllowedSortFields.values()));
             }
         }
-        pageable = (Pageable) PageRequest.of(page, size, Sort.by(sort).ascending());
+        pageable = (Pageable) PageRequest.of(page, size, Sort.by(sort).descending());
 
         UserRidesListDTO rides = rideService.findRidesByUserId(id,pageable,beginDateInterval,endDateInterval);
 
