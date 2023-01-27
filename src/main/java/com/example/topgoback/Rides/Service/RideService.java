@@ -102,13 +102,10 @@ public class RideService {
     public UserRidesListDTO findRidesByUserId(int userId, Pageable pageable, LocalDateTime beginDateTimeInterval, LocalDateTime endDateTimeInterval) {
 
         User user = userService.findOne(userId);
-<<<<<<< Updated upstream
-        Page<Ride> rides = rideRepository.findByDriverOrPassengerAndStartBetween(user.getId(),beginDateTimeInterval,endDateTimeInterval,pageable);
-        List<UserRideDTO> userRideDTOList = UserRideDTO.convertToUserRideDTO(rides.getContent());
-=======
-        Page<Ride> rides = rideRepository.findByDriverOrPassengerAndBeginBetween(user.getId(), beginDateTimeInterval, endDateTimeInterval, pageable);
+
+        Page<Ride> rides = rideRepository.findByDriverOrPassengerAndStartBetween(user.getId(), beginDateTimeInterval, endDateTimeInterval, pageable);
         List<RideDTO> userRideDTOList = RideDTO.convertToRideDTO(rides.getContent());
->>>>>>> Stashed changes
+
         UserRidesListDTO userRidesListDTO = new UserRidesListDTO(new PageImpl<>(userRideDTOList, pageable, rides.getTotalElements()));
         userRidesListDTO.setTotalCount((int) rides.getTotalElements());
 
