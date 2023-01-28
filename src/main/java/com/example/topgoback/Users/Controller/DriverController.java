@@ -72,6 +72,11 @@ public class DriverController {
         return new ResponseEntity<>(activeDrivers, HttpStatus.OK);
     }
 
+    @PutMapping(value="/{driverId}/activity", consumes = "application/json")
+    public ResponseEntity<DriverInfoDTO> updateDriverActivity(@PathVariable Integer driverId, @RequestBody DriverActivityDTO newDriverACtivity){
+        DriverInfoDTO driverInfoDTO = this.driverService.updateDriverActivity(newDriverACtivity, driverId);
+        return new ResponseEntity<>(driverInfoDTO, HttpStatus.OK);
+    }
 
     @GetMapping(value = "/{driverId}")
     @Valid
@@ -179,7 +184,7 @@ public class DriverController {
     @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('DRIVER')")
     public ResponseEntity<?> getDriverWorkingHours(@PathVariable Integer id,
                                                    @RequestParam(required = false, defaultValue = "0") Integer page,
-                                                   @RequestParam(required = false, defaultValue = "10") Integer size,
+                                                   @RequestParam(required = false, defaultValue = "1000000") Integer size,
                                                    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beginDateInterval,
                                                    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateInterval,
                                                    Pageable pageable)

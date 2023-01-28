@@ -105,6 +105,17 @@ public class DriverService {
         return (driverdto);
     }
 
+    public DriverInfoDTO updateDriverActivity(DriverActivityDTO driverActivityDTO, Integer id){
+        Optional<Driver> driver  = driverRepository.findById(id);
+        if(driver.isPresent()){
+            System.out.println("###################\n"+driverActivityDTO.isActive()+"\n###########################");
+            driver.get().setActive(driverActivityDTO.isActive());
+            driverRepository.save(driver.get());
+            return new DriverInfoDTO(driver.get());
+
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Driver does not exist!");
+    }
     public DriverInfoDTO updateOne(UpdateDriverDTO newDriver, Integer driverId) {
 
         Optional<Driver> driver = driverRepository.findById(driverId);
