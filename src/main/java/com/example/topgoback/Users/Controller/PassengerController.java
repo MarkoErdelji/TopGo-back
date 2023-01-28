@@ -125,7 +125,7 @@ public class PassengerController {
         if(endDateInterval == null){
             endDateInterval = LocalDateTime.of(9999, 12, 31, 23, 59, 59, 999999);
         }
-        pageable = (Pageable) PageRequest.of(page, size, Sort.by(sort).ascending());
+        pageable = (Pageable) PageRequest.of(page, size, Sort.by(sort).descending());
 
         UserRidesListDTO rides = rideService.findRidesByPassengerId(id,pageable,beginDateInterval,endDateInterval);
 

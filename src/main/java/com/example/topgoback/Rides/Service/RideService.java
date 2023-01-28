@@ -377,11 +377,15 @@ public class RideService {
         if (optionalRide.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ride does not exist!");
         }
+        if(!optionalRide.get().getDriver().isActive()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot accept ride when u are offline!");
+        }
         if(optionalRide.get().getStatus() == Status.SCHEDULED){
             RideDTO dto = new RideDTO(optionalRide.get());
             sendPassengerRideUpdate(dto);
             return dto;
         }
+
         Ride ride = optionalRide.get();
         return ChangeRideStatus(ride, Status.ACCEPTED, "Cannot accept a ride that is not in status PENDING!");
     }
