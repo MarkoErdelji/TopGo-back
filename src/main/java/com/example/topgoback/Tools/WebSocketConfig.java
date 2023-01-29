@@ -1,7 +1,9 @@
 package com.example.topgoback.Tools;
 
 import com.example.topgoback.Rides.Controller.CreateRideHandler;
+import com.example.topgoback.Rides.Controller.RideNotificationHandler;
 import com.example.topgoback.Rides.Controller.SimulationHandler;
+import com.example.topgoback.Rides.Model.Ride;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.WebSocketHandler;
@@ -31,6 +33,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(new CreateRideHandler(), "/websocket");
         registry.addHandler(new SimulationHandler(),"/simulation");
+        registry.addHandler(new RideNotificationHandler(),"/notificationSocket");
     }
 
     @Override
