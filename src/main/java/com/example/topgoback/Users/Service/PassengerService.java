@@ -7,6 +7,7 @@ import com.example.topgoback.Rides.Model.Ride;
 import com.example.topgoback.Tools.JwtTokenUtil;
 import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.Passenger;
+import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Repository.PassengerRepository;
 import com.example.topgoback.Users.Repository.UserRepository;
 import jakarta.mail.MessagingException;
@@ -61,23 +62,23 @@ public class PassengerService {
 
 
     public Passenger addOne(CreatePassengerDTO passengerDTO) throws MessagingException, IOException {
-        Optional<Passenger> user = Optional.ofNullable(passengerRepository.findByEmail(passengerDTO.getEmail()));
-        if(user.isEmpty()){
-            Passenger passenger = new Passenger();
-            passenger.setFirstName(passengerDTO.getName());
-            passenger.setLastName(passengerDTO.getSurname());
-            passenger.setProfilePicture(passengerDTO.getProfilePicture());
-            passenger.setPhoneNumber(passengerDTO.getTelephoneNumber());
-            passenger.setEmail(passengerDTO.getEmail());
-            passenger.setAddress(passengerDTO.getAddress());
-            passenger.setPassword(passwordEncoder.encode(passengerDTO.getPassword()));
-            passenger.setUserType(UserType.USER);
-            passengerRepository.save(passenger);
-            activationTokenService.addOne(passenger.getId());
-            sendEmail(passenger.getId());
-            return passenger;
+        Optional<User> userExists = Optional.ofNullable(userRepository.findByEmail(passengerDTO.getEmail()));
+        if(userExists.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User with that email already exists!");
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User with that email already exists!");
+        Passenger passenger = new Passenger();
+        passenger.setFirstName(passengerDTO.getName());
+        passenger.setLastName(passengerDTO.getSurname());
+        passenger.setProfilePicture(passengerDTO.getProfilePicture());
+        passenger.setPhoneNumber(passengerDTO.getTelephoneNumber());
+        passenger.setEmail(passengerDTO.getEmail());
+        passenger.setAddress(passengerDTO.getAddress());
+        passenger.setPassword(passwordEncoder.encode(passengerDTO.getPassword()));
+        passenger.setUserType(UserType.USER);
+        passengerRepository.save(passenger);
+        activationTokenService.addOne(passenger.getId());
+        sendEmail(passenger.getId());
+        return passenger;
 
     }
     public void sendEmail(int passengerId) throws IOException, MessagingException {
