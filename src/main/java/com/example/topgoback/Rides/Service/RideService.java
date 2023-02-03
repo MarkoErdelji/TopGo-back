@@ -612,7 +612,7 @@ public class RideService {
     public void deleteFavouriteRides(Integer id) {
         Optional<FavouriteRide> fr = favouriteRideRepository.findById(id);
         if (fr.isEmpty()) throw  new ResponseStatusException(HttpStatus.NOT_FOUND,"Favorite location does not exist!");
-        favouriteRideRepository.delete(fr.get());
+        favouriteRideRepository.deleteById(fr.get().getId());
     }
 
 

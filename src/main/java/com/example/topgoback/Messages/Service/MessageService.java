@@ -7,11 +7,15 @@ import com.example.topgoback.Messages.DTO.UserMessagesDTO;
 import com.example.topgoback.Messages.Model.Message;
 import com.example.topgoback.Messages.Repository.MessageRepository;
 import com.example.topgoback.Notes.DTO.UserNoteListDTO;
+import com.example.topgoback.Rides.Controller.CreateRideHandler;
+import com.example.topgoback.Rides.DTO.RideDTO;
 import com.example.topgoback.Rides.Model.Ride;
 import com.example.topgoback.Rides.Repository.RideRepository;
 import com.example.topgoback.Tools.JwtTokenUtil;
 import com.example.topgoback.Tools.PaginatedResponse;
 import com.example.topgoback.Users.DTO.UserMessagesListDTO;
+import com.example.topgoback.Users.DTO.UserRef;
+import com.example.topgoback.Users.Handlers.UserMessageHandler;
 import com.example.topgoback.Users.Model.User;
 import com.example.topgoback.Users.Repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -20,8 +24,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.MessageHandler;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.socket.WebSocketSession;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,6 +53,8 @@ public class MessageService {
 
     @Autowired
     JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     public List<Message> findAll() {
         List<Message> users =  messageRepository.findAll();
@@ -105,9 +115,13 @@ public class MessageService {
         message.setMessage(sendMessageDTO.getMessage());
 
         messageRepository.save(message);
-        return new UserMessagesDTO(message);
+        UserMessagesDTO msg = new UserMessagesDTO(message);
+        sendUserMessageBoth(msg);
+        return  msg;
 
     }
+
+
 
 
     public UserMessagesListDTO findBySenderandReceiver(Integer userId,String authorization) {
@@ -143,5 +157,28 @@ public class MessageService {
         response.setTotalCount(new PaginatedResponse(userMessagesListDTO.size()));
 
         return response;
+    }
+
+    public void sendUserMessageBoth(UserMessagesDTO update){
+        List<WebSocketSession> sessions = new ArrayList<>();
+            WebSocketSession webSocketSession = UserMessageHandler.userSession.get(update.receiverId.toString());
+            WebSocketSession webSocketSession2 = UserMessageHandler.userSession.get(update.senderId.toString());
+            if(webSocketSession != null){
+                sessions.add(webSocketSession);
+            }
+            if(webSocketSession2 != null){
+                sessions.add(webSocketSession2);
+            }
+            if(!sessions.isEmpty()) {
+                UserMessageHandler.sendUserMessage(sessions,update);
+            }
+        sendUserMessage(update);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    public void sendUserMessage(UserMessagesDTO update) {
+        messagingTemplate.convertAndSend("/topic/user/message/"+update.receiverId, update);
+        messagingTemplate.convertAndSend("/topic/user/message/"+update.senderId, update);
+
     }
 }
