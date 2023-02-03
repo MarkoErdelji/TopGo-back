@@ -60,8 +60,6 @@ public class UserController {
 
     @Autowired
     private NoteService noteService;
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     private PasswordResetTokenService passwordResetTokenService;
@@ -187,18 +185,12 @@ public class UserController {
     public ResponseEntity<?> sendUsersMessage(@PathVariable Integer id,@Valid @RequestBody SendMessageDTO sendMessageDTO,@RequestHeader("Authorization") String authorization)
     {
         UserMessagesDTO message = messageService.addOne(id,sendMessageDTO,authorization);
-        sendUserMessage(message);
         return new ResponseEntity<>(message,HttpStatus.OK);
 
 
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
-    public void sendUserMessage(UserMessagesDTO update) {
-        messagingTemplate.convertAndSend("/topic/user/message/"+update.receiverId, update);
-        messagingTemplate.convertAndSend("/topic/user/message/"+update.senderId, update);
 
-    }
 
     @PutMapping(value = "{id}/block")
     @Valid
