@@ -515,6 +515,7 @@ public class RideService {
         panicRepository.save(panic);
         RideDTO dto = new RideDTO(ride);
         sendDriverRideUpdate(dto);
+        sendRideUpdateToPassenger(dto);
         sendPassengerRideUpdate(dto);
 
         return new PanicDTO(panic);
