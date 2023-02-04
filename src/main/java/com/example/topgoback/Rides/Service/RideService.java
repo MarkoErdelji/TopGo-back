@@ -521,9 +521,12 @@ public class RideService {
         panic.setReason(reason.getReason());
         panicRepository.save(panic);
         RideDTO dto = new RideDTO(ride);
+        WebSocketSession webSocketSession = CreateRideHandler.driverSessions.get(dto.getDriver().getId().toString());
+        if(webSocketSession != null) {
+            CreateRideHandler.notifyDriverAboutCreatedRide(webSocketSession,dto);
+        }
         sendDriverRideUpdate(dto);
         sendRideUpdateToPassenger(dto);
-        sendPassengerRideUpdate(dto);
 
         return new PanicDTO(panic);
     }
