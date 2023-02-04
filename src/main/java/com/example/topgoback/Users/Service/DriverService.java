@@ -180,10 +180,10 @@ public class DriverService {
         if(x>5000000){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is bigger than 5mb");
         }
-
+        String base64img = "data:image/jpeg;base64,"+newDTO.getDocumentImage();
 
         Document document = new Document();
-        document.setDocumentImage(newDTO.getDocumentImage());
+        document.setDocumentImage(base64img);
         document.setDriver(driver.get());
         document.setName(newDTO.getName());
         documentRepository.save(document);
