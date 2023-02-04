@@ -105,7 +105,7 @@ public class PassengerController {
             size = 10;
         }
         if(sort == null){
-            sort = "id";
+            sort = "start";
         }
         else{
             boolean isValidSortField = false;

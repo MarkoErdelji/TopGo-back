@@ -1,11 +1,14 @@
 package com.example.topgoback.Users.Service;
 
+import com.example.topgoback.Enums.UserType;
 import com.example.topgoback.PasswordResetTokens.Model.PasswordResetToken;
 import com.example.topgoback.PasswordResetTokens.Repository.PasswordResetTokenRepository;
 import com.example.topgoback.Tools.JwtTokenUtil;
 import com.example.topgoback.Users.DTO.*;
 import com.example.topgoback.Users.Model.Driver;
+import com.example.topgoback.Users.Model.Passenger;
 import com.example.topgoback.Users.Model.User;
+import com.example.topgoback.Users.Repository.PassengerRepository;
 import com.example.topgoback.Users.Repository.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -51,6 +54,9 @@ public class UserService implements UserDetailsService {
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
     private final JavaMailSender mailSender;
+
+    @Autowired
+    private PassengerRepository passengerRepository;
 
     @Autowired
     private PasswordResetTokenRepository tokenRepository;
@@ -120,6 +126,16 @@ public class UserService implements UserDetailsService {
         }
         if(userRes.isBlocked()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Wrong username or password!");
+        }
+        if(userRes.getUserType() == UserType.USER){
+            Optional<Passenger> passenger = passengerRepository.findById(userRes.getId());
+            if(passenger.isPresent()) {
+                Passenger p = passenger.get();
+                if(!p.isActive()){
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Wrong username or password!");
+                }
+            }
+
         }
         final String token = jwtTokenUtil.generateToken(userRes);
         final String refreshToken = jwtTokenUtil.generateRefreshToken(userRes);
