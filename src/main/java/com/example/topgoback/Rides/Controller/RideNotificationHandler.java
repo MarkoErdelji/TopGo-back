@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class CreateRideHandler implements WebSocketHandler {
+public class RideNotificationHandler implements WebSocketHandler {
 
 
     public static final ConcurrentHashMap<String, WebSocketSession> driverSessions = new ConcurrentHashMap<>();
@@ -43,23 +43,12 @@ public class CreateRideHandler implements WebSocketHandler {
 
 
 
-    public static void notifyDriverAboutCreatedRide(WebSocketSession session, RideDTO rideDTO) {
+
+    public static void notifyPassengerAboutScheduledRide(List<WebSocketSession> sessions, String message) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JSR310Module());
         try {
-            TextMessage textMessage = new TextMessage(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rideDTO));
-            session.sendMessage(textMessage);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    public static void notifyPassengerAboutAcceptedRide(List<WebSocketSession> sessions, RideDTO rideDTO) {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JSR310Module());
-        try {
-            TextMessage textMessage = new TextMessage(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(rideDTO));
+            TextMessage textMessage = new TextMessage(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(message));
             for(WebSocketSession webSocketSession:sessions){
                 webSocketSession.sendMessage(textMessage);
             }
@@ -68,21 +57,6 @@ public class CreateRideHandler implements WebSocketHandler {
         }
 
     }
-
-    public static void notifyPassengerAboutNoDriversLeft(List<WebSocketSession> sessions, Error error) {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JSR310Module());
-        try {
-            TextMessage textMessage = new TextMessage(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(error));
-            for(WebSocketSession webSocketSession:sessions){
-                webSocketSession.sendMessage(textMessage);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {

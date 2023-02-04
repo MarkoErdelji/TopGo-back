@@ -15,6 +15,7 @@ import com.example.topgoback.RejectionLetters.DTO.RejectionTextDTO;
 import com.example.topgoback.RejectionLetters.Model.RejectionLetter;
 import com.example.topgoback.RejectionLetters.Repository.RejectionLetterRepository;
 import com.example.topgoback.Rides.Controller.CreateRideHandler;
+import com.example.topgoback.Rides.Controller.RideNotificationHandler;
 import com.example.topgoback.Rides.Controller.SimulationHandler;
 import com.example.topgoback.Rides.DTO.CreateRideDTO;
 import com.example.topgoback.Rides.DTO.RideDTO;
@@ -179,8 +180,14 @@ public class RideService {
             if(createRideDTO.getScheduledTime().isAfter(LocalDateTime.now().plusHours(5))){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Can not order a ride thats more than 5 hours from now!");
             }
-            ride.setStart(createRideDTO.getScheduledTime().plusMinutes(10));
-            ride.setStatus(Status.SCHEDULED);
+            if(createRideDTO.getScheduledTime().isBefore(LocalDateTime.now().plusMinutes(15))){
+                ride.setStart(LocalDateTime.now());
+                ride.setStatus(Status.PENDING);
+            }
+            else {
+                ride.setStart(createRideDTO.getScheduledTime());
+                ride.setStatus(Status.SCHEDULED);
+            }
         }
         else{
             ride.setStart(LocalDateTime.now());
@@ -382,7 +389,7 @@ public class RideService {
         }
         if(optionalRide.get().getStatus() == Status.SCHEDULED){
             RideDTO dto = new RideDTO(optionalRide.get());
-            sendPassengerRideUpdate(dto);
+            sendRideUpdateToPassenger(dto);
             return dto;
         }
 
@@ -816,14 +823,19 @@ public class RideService {
                     rejectionLetterRepository.save(rl);
                     r.setRejectionLetter(rl);
                     rideRepository.save(r);
-                    sendPassengerRideUpdate(new RideDTO(r));
+
+                sendRideUpdateToPassenger(new RideDTO(r));
             }
             else if(r.getStart().isBefore(tenMinutesLeft)){
                 if(r.getDriver().isActive()) {
                     r.setStatus(Status.ACTIVE);
                     rideRepository.save(r);
+                    WebSocketSession webSocketSession = CreateRideHandler.driverSessions.get(r.getDriver().getId().toString());
+                    if(webSocketSession != null) {
+                        CreateRideHandler.notifyDriverAboutCreatedRide(webSocketSession,new RideDTO(r));
+                    }
                     sendDriverRideUpdate(new RideDTO(r));
-                    sendPassengerRideUpdate(new RideDTO(r));
+                    sendRideUpdateToPassenger(new RideDTO(r));
                 }
             }
         }
@@ -858,8 +870,19 @@ public class RideService {
         if(hour.length() == 1){
             hour = "0"+hour;
         }
+        String message ="Your have a scheduled ride in: " + hour + ":"+minutes;
         for(Passenger p: update.getPassenger()){
-            messagingTemplate.convertAndSend("/topic/passenger/scheduledNotification/"+p.getId(), "Your have a scheduled ride in: " + hour + ":"+minutes);
+            messagingTemplate.convertAndSend("/topic/passenger/scheduledNotification/"+p.getId(), message);
+        }
+        List<WebSocketSession> sessions = new ArrayList<>();
+        for(Passenger p:update.getPassenger()){
+            WebSocketSession webSocketSession = RideNotificationHandler.passengerSessions.get(p.getId().toString());
+            if(webSocketSession != null){
+                sessions.add(webSocketSession);
+            }
+        }
+        if(!sessions.isEmpty()) {
+            RideNotificationHandler.notifyPassengerAboutScheduledRide(sessions,message);
         }
     }
 
