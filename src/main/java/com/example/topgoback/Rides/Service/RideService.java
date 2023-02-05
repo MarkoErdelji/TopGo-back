@@ -500,13 +500,31 @@ public class RideService {
         if (authorization != null && authorization.startsWith("Bearer ")) {
             jwtToken = authorization.substring(7);
         }
+        else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Header is invalid!");
+        }
         int userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
         String type = jwtTokenUtil.getRoleFromToken(jwtToken);
 
         Panic panic = new Panic();
-        if (type.equals("USER")) panic.setUser(passengerRepository.findById(userId).get());
-        if (type.equals("DRIVER")) panic.setUser(driverRepository.findById(userId).get());
-        System.out.print(jwtToken);
+        if (type.equals("USER")) {
+            Optional<Passenger> passenger = passengerRepository.findById(userId);
+            if(passenger.isEmpty()){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Passenger does not exist!");
+            }
+            panic.setUser(passenger.get());
+        }
+        else if (type.equals("DRIVER")) {
+            Optional<Driver> driver = driverRepository.findById(userId);
+
+            if(driver.isEmpty()){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Driver does not exist!");
+            }
+            panic.setUser(driver.get());
+        }
+        else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Header has no correct role!");
+        }
         Optional<Ride> optionalRide = rideRepository.findById(id);
         if (optionalRide.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Ride does not exist!");
         Ride ride = optionalRide.get();
@@ -517,6 +535,9 @@ public class RideService {
         rideRepository.save(ride);
         panic.setRide(ride);
         panic.setTime(LocalDateTime.now());
+        if(reason==null || reason.getReason() == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reason can not be null!");
+        }
         panic.setReason(reason.getReason());
         panicRepository.save(panic);
         RideDTO dto = new RideDTO(ride);
@@ -571,6 +592,9 @@ public class RideService {
 
     public FavouriteRideInfoDTO addFavouriteRide(FavouriteRideDTO ride) {
 
+        if(ride == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"You cannot use a null input for request body!");
+        }
         FavouriteRide favouriteRide = new FavouriteRide();
 
         favouriteRide.setBabyTransport(ride.isBabyTransport());
@@ -579,6 +603,9 @@ public class RideService {
         favouriteRide.setFavoriteName(ride.getFavoriteName());
 
         favouriteRide.setPassengers(new ArrayList<>());
+        if(ride.getPassengers().isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Favorite route must consist of at least one passenger!");
+        }
         for (UserRef p : ride.getPassengers()
         ) {
             Optional<Passenger> passenger = passengerRepository.findById(p.getId());
@@ -597,7 +624,7 @@ public class RideService {
 
         routeRepository.save(route);
         favouriteRide.setRoute(route);
-        favouriteRideRepository.save(favouriteRide);
+        favouriteRide = favouriteRideRepository.save(favouriteRide);
         return new FavouriteRideInfoDTO(favouriteRide);
 
 
