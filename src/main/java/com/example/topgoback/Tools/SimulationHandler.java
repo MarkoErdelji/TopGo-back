@@ -1,6 +1,6 @@
-package com.example.topgoback.Rides.Controller;
+package com.example.topgoback.Tools;
 
-import com.example.topgoback.Rides.DTO.RideDTO;
+import com.example.topgoback.GeoLocations.Model.GeoLocation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import org.springframework.http.HttpHeaders;
@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class RideNotificationHandler implements WebSocketHandler {
+public class SimulationHandler implements WebSocketHandler {
 
 
     public static final ConcurrentHashMap<String, WebSocketSession> driverSessions = new ConcurrentHashMap<>();
@@ -42,15 +42,18 @@ public class RideNotificationHandler implements WebSocketHandler {
     }
 
 
-
-
-    public static void notifyPassengerAboutScheduledRide(List<WebSocketSession> sessions, String message) {
+    public static void sendNewVehicleLocationData(List<WebSocketSession> sessions, GeoLocation geoLocationDTO){
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JSR310Module());
+        if(sessions.isEmpty()){
+            return;
+        }
         try {
-            TextMessage textMessage = new TextMessage(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(message));
+            TextMessage textMessage = new TextMessage(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(geoLocationDTO));
             for(WebSocketSession webSocketSession:sessions){
-                webSocketSession.sendMessage(textMessage);
+                if(webSocketSession.isOpen()) {
+                    webSocketSession.sendMessage(textMessage);
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
