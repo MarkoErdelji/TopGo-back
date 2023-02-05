@@ -72,10 +72,15 @@ public class DriverController {
         return new ResponseEntity<>(activeDrivers, HttpStatus.OK);
     }
 
+    @PutMapping(value="/{driverId}/activity", consumes = "application/json")
+    public ResponseEntity<DriverInfoDTO> updateDriverActivity(@PathVariable Integer driverId, @RequestBody DriverActivityDTO newDriverACtivity){
+        DriverInfoDTO driverInfoDTO = this.driverService.updateDriverActivity(newDriverACtivity, driverId);
+        return new ResponseEntity<>(driverInfoDTO, HttpStatus.OK);
+    }
 
     @GetMapping(value = "/{driverId}")
     @Valid
-    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('DRIVER')")
+    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('DRIVER') || hasAnyRole('USER')")
     public ResponseEntity<DriverInfoDTO> getDriver(@PathVariable Integer driverId)
     {
 
@@ -146,7 +151,7 @@ public class DriverController {
 
     @GetMapping(value = "/{driverId}/vehicle")
     @Valid
-    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('DRIVER')" )
+    @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('DRIVER') || hasAnyRole('USER')" )
     public ResponseEntity<?> getDriverVehicle(@PathVariable Integer driverId)
     {
 
@@ -179,7 +184,7 @@ public class DriverController {
     @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('DRIVER')")
     public ResponseEntity<?> getDriverWorkingHours(@PathVariable Integer id,
                                                    @RequestParam(required = false, defaultValue = "0") Integer page,
-                                                   @RequestParam(required = false, defaultValue = "10") Integer size,
+                                                   @RequestParam(required = false, defaultValue = "1000000") Integer size,
                                                    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beginDateInterval,
                                                    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateInterval,
                                                    Pageable pageable)
@@ -207,7 +212,7 @@ public class DriverController {
                                                            Pageable pageable)
     {
         if(sort == null){
-            sort = "id";
+            sort = "start";
         }
         else{
             boolean isValidSortField = false;
@@ -227,7 +232,7 @@ public class DriverController {
         if(endDateInterval == null){
             endDateInterval = LocalDateTime.of(9999, 12, 31, 23, 59, 59, 999999);
         }
-        pageable = (Pageable) PageRequest.of(page, size, Sort.by(sort).ascending());
+        pageable = (Pageable) PageRequest.of(page, size, Sort.by(sort).descending());
 
         UserRidesListDTO rides = rideService.findRidesByDriversId(id,pageable,beginDateInterval,endDateInterval);
 

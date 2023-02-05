@@ -1,5 +1,11 @@
 package com.example.topgoback.WorkHours.Service;
 
+import com.example.topgoback.Enums.Status;
+import com.example.topgoback.RejectionLetters.DTO.RejectionTextDTO;
+import com.example.topgoback.Rides.DTO.RideDTO;
+import com.example.topgoback.Rides.Model.Ride;
+import com.example.topgoback.Users.DTO.DriverInfoDTO;
+import com.example.topgoback.Users.DTO.UserRef;
 import com.example.topgoback.Users.Model.Driver;
 import com.example.topgoback.Users.Repository.DriverRepository;
 import com.example.topgoback.Users.Service.DriverService;
@@ -14,7 +20,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -28,6 +37,8 @@ public class WorkHoursService {
     WorkHoursRepository workHoursRepository;
     @Autowired
     DriverRepository driverRepository;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
 
     public DriverWorkHoursDTO getAllWorkHours(Integer driverId) {
@@ -50,10 +61,16 @@ public class WorkHoursService {
     public boolean checkIfDriverExceeded8Hours(List<WorkHours> workHours){
         long fullWorkTime = 0;
         for (WorkHours workHour: workHours){
-            fullWorkTime += workHour.getDifferenceInSeconds();
+            if(workHour.getEndHours() == null){
+                workHour.setEndHours(LocalDateTime.now());
+                fullWorkTime += workHour.getDifferenceInSeconds();
+            }
+            else{
+                fullWorkTime += workHour.getDifferenceInSeconds();
+            }
         }
         long hoursInSeconds = 8 * 60 * 60;
-        return fullWorkTime > hoursInSeconds;
+        return fullWorkTime >= hoursInSeconds;
     }
 
     public boolean isShiftAlreadyOngoing(List<WorkHours> workHours){
@@ -127,4 +144,24 @@ public class WorkHoursService {
         driverWorkHoursDTO.setTotalCount((int) workHoursPage.getTotalElements());
         return driverWorkHoursDTO;
     }
+
+    @Scheduled(cron = "* * * * * ?")
+    public void checkIfExceededWorkHours(){
+        List<Driver> allDrivers = driverRepository.findByIsActiveTrue();
+        for(Driver driver : allDrivers){
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime startInterval = LocalDateTime.now().minusDays(1);
+            List<WorkHours> workHoursWithin24hours = workHoursRepository.findWorkHoursWithinLast24Hours(startInterval, now, driver);
+            if(checkIfDriverExceeded8Hours(workHoursWithin24hours)){
+                sendDriverWorkHourUpdate(new DriverInfoDTO(driver));
+            }
+        }
+
+    }
+    @CrossOrigin(origins = "http://localhost:4200")
+    public void sendDriverWorkHourUpdate(DriverInfoDTO update) {
+        messagingTemplate.convertAndSend("/topic/work-hour/driver/"+update.getId(), update);
+
+    }
+
 }

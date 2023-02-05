@@ -20,20 +20,21 @@ import java.util.List;
 
 
 public interface RideRepository extends JpaRepository<Ride,Integer> {
-    @Query("SELECT DISTINCT r FROM Ride r INNER JOIN r.passenger p WHERE (r.driver.id = :userId OR p.id = :userId) AND (r.start BETWEEN :startDate AND :endDate)")
-    Page<Ride> findByDriverOrPassengerAndBeginBetween(@Param("userId") int userId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
 
-    @Query("SELECT DISTINCT r FROM Ride r INNER JOIN r.passenger p WHERE  p.id = :userId AND (r.start BETWEEN :startDate AND :endDate)")
+    @Query("SELECT DISTINCT r FROM Ride r LEFT JOIN r.passenger p WHERE (r.driver.id = :userId OR p.id = :userId) AND (r.start BETWEEN :startDate AND :endDate)")
+    Page<Ride> findByDriverOrPassengerAndStartBetween(@Param("userId") int userId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
+
+    @Query("SELECT DISTINCT r FROM Ride r LEFT JOIN r.passenger p WHERE  p.id = :userId AND (r.start BETWEEN :startDate AND :endDate)")
     Page<Ride> findByPassengerAndBeginBetween(@Param("userId") int userId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
 
-    @Query("SELECT DISTINCT r FROM Ride r INNER JOIN r.driver p WHERE  p.id = :userId AND (r.start BETWEEN :startDate AND :endDate)")
+    @Query("SELECT DISTINCT r FROM Ride r LEFT JOIN r.driver p WHERE  p.id = :userId AND (r.start BETWEEN :startDate AND :endDate)")
     Page<Ride> findByDriverAndBeginBetween(@Param("userId") int userId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
-    @Query("SELECT DISTINCT r FROM Ride r  INNER JOIN r.passenger p WHERE (p.id = :passengerId) AND (r.status = 3)")
+    @Query("SELECT DISTINCT r FROM Ride r  LEFT JOIN r.passenger p WHERE (p.id = :passengerId) AND (r.status = 3)")
     List<Ride> findRidesByPassengeridAndIsActive(@Param("passengerId") int passengerId);
-    @Query("SELECT DISTINCT r FROM Ride r  INNER JOIN r.passenger p WHERE (p.id = :passengerId) AND (r.status = 1)")
+    @Query("SELECT DISTINCT r FROM Ride r  LEFT JOIN r.passenger p WHERE (p.id = :passengerId) AND (r.status = 1)")
     List<Ride> findRidesByPassengeridAndIsAccepted(@Param("passengerId") int passengerId);
 
-    @Query("SELECT DISTINCT r FROM Ride r  INNER JOIN r.passenger p WHERE (p.id = :passengerId) AND (r.status = 0)")
+    @Query("SELECT DISTINCT r FROM Ride r  LEFT JOIN r.passenger p WHERE (p.id = :passengerId) AND (r.status = 0)")
     List<Ride> findRidesByPassengeridAndIsPending(@Param("passengerId") int passengerId);
     
     @Query("SELECT DISTINCT r FROM Ride r  WHERE (r.driver.id = :driverId) AND (r.status = 3)")

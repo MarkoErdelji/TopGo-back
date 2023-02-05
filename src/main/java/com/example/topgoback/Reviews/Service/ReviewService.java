@@ -82,7 +82,7 @@ public class ReviewService {
         if(vehicle.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Vehicle does not exist!");
         }
-        Page<Review> page = reviewRepository.findByRideDriverVehicleId(vehicleId,pageable);
+        Page<Review> page = reviewRepository.findByRideDriverVehicleIdAndReviewType(vehicleId,pageable,ReviewType.VEHICLE);
         List<CreateReviewResponseDTO> createReviewResponseDTOS = CreateReviewResponseDTO.convertToCreateReviewResponseDTO(page.getContent());
         VehicleReviewListDTO vehicleReviewListDTO = new VehicleReviewListDTO(new PageImpl<>(createReviewResponseDTOS, pageable, page.getTotalElements()));
 
@@ -123,7 +123,7 @@ public class ReviewService {
         if(driver.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Driver does not exist!");
         }
-        Page<Review> page = reviewRepository.findByRideDriverId(driverId,pageable);
+        Page<Review> page = reviewRepository.findByRideDriverIdAndReviewType(driverId,pageable,ReviewType.DRIVER);
         List<CreateReviewResponseDTO> createReviewResponseDTOS = CreateReviewResponseDTO.convertToCreateReviewResponseDTO(page.getContent());
         DriverReviewListDTO driverReviewListDTO = new DriverReviewListDTO(new PageImpl<>(createReviewResponseDTOS, pageable, page.getTotalElements()));
         return driverReviewListDTO;

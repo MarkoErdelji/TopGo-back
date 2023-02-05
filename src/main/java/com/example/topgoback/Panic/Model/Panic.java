@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 @Entity
 public class Panic {
     @Id
-    @SequenceGenerator(name = "mySeqGenRide", sequenceName = "mySeqGenRide", initialValue = 7, allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenRide")
+    @SequenceGenerator(name = "mySeqGenPanic", sequenceName = "mySeqGenPanic", initialValue = 7, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mySeqGenPanic")
     private int id;
 
     @ManyToOne

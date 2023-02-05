@@ -1,5 +1,6 @@
 package com.example.topgoback.Rides.DTO;
 
+import com.example.topgoback.Enums.Status;
 import com.example.topgoback.GeoLocations.DTO.DepartureDestinationDTO;
 import com.example.topgoback.GeoLocations.DTO.GeoLocationDTO;
 import com.example.topgoback.RejectionLetters.DTO.RejectionLetterDTO;
@@ -39,9 +40,19 @@ public class UserRideDTO {
 
     public UserRejectionLetterDTO rejection;
 
+    public Status status;
+
     ArrayList<DepartureDestinationDTO> locations;
 
     public UserRideDTO() {
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public UserRideDTO(Ride ride){
@@ -70,6 +81,7 @@ public class UserRideDTO {
         this.setPetTransport(ride.isForAnimals());
         this.setBabyTransport(ride.isForBabies());
         this.setVehicleType(ride.getVehicleName().toString());
+        this.setStatus(ride.getStatus());
     }
     public static List<UserRideDTO> convertToUserRideDTO(List<Ride> rides){
         List<UserRideDTO> userRideDTOList = new ArrayList<UserRideDTO>();

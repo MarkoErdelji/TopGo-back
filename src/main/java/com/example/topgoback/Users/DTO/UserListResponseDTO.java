@@ -14,6 +14,16 @@ public class UserListResponseDTO {
     private String email;
     private String address;
 
+    private boolean isBlocked;
+
+    public boolean isBlocked() {
+        return isBlocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        isBlocked = blocked;
+    }
+
     public UserListResponseDTO() {
     }
 
@@ -25,6 +35,7 @@ public class UserListResponseDTO {
         telephoneNumber = u.getPhoneNumber();
         email = u.getEmail();
         address = u.getAddress();
+        isBlocked = u.isBlocked();
     }
 
     public static UserListResponseDTO getMockupData(){

@@ -56,7 +56,7 @@ public class NoteService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"User does not exist!");
 
         }
-        Page<Note> page = noteRepository.findAll(pageable);
+        Page<Note> page = noteRepository.findByUser(user.get(),pageable);
         List<NoteResponseDTO> noteResponseDTOList = NoteResponseDTO.convertToNoteResponseDTO(page.getContent());
 
         UserNoteListDTO notes = new UserNoteListDTO(new PageImpl<>(noteResponseDTOList, pageable, page.getTotalElements()));

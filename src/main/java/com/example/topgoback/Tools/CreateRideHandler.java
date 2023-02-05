@@ -1,4 +1,4 @@
-package com.example.topgoback.Rides.Controller;
+package com.example.topgoback.Tools;
 
 import com.example.topgoback.Rides.DTO.RideDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,7 +69,7 @@ public class CreateRideHandler implements WebSocketHandler {
 
     }
 
-    public static void notifyPassengerAboutNoDriversLeft(List<WebSocketSession> sessions, Error error) {
+    public static void notifyPassengerAboutNoDriversLeft(List<WebSocketSession> sessions, java.lang.Error error) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JSR310Module());
         try {
@@ -82,6 +82,7 @@ public class CreateRideHandler implements WebSocketHandler {
         }
 
     }
+
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {

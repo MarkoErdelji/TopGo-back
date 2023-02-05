@@ -105,6 +105,17 @@ public class DriverService {
         return (driverdto);
     }
 
+    public DriverInfoDTO updateDriverActivity(DriverActivityDTO driverActivityDTO, Integer id){
+        Optional<Driver> driver  = driverRepository.findById(id);
+        if(driver.isPresent()){
+            System.out.println("###################\n"+driverActivityDTO.isActive()+"\n###########################");
+            driver.get().setActive(driverActivityDTO.isActive());
+            driverRepository.save(driver.get());
+            return new DriverInfoDTO(driver.get());
+
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Driver does not exist!");
+    }
     public DriverInfoDTO updateOne(UpdateDriverDTO newDriver, Integer driverId) {
 
         Optional<Driver> driver = driverRepository.findById(driverId);
@@ -169,10 +180,10 @@ public class DriverService {
         if(x>5000000){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File is bigger than 5mb");
         }
-
+        String base64img = "data:image/jpeg;base64,"+newDTO.getDocumentImage();
 
         Document document = new Document();
-        document.setDocumentImage(newDTO.getDocumentImage());
+        document.setDocumentImage(base64img);
         document.setDriver(driver.get());
         document.setName(newDTO.getName());
         documentRepository.save(document);

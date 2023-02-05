@@ -1,5 +1,6 @@
 package com.example.topgoback.Reviews.DTO;
 
+import com.example.topgoback.Enums.ReviewType;
 import com.example.topgoback.Reviews.Model.Review;
 import com.example.topgoback.Users.DTO.UserListResponseDTO;
 import com.example.topgoback.Users.DTO.UserRef;
@@ -9,10 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CreateReviewResponseDTO {
-    int id;
-    Float rating;
-    String comment;
-    UserRef passenger;
+        int id;
+        Float rating;
+        String comment;
+        UserRef passenger;
+
+        ReviewType type;
 
     public CreateReviewResponseDTO() {
     }
@@ -22,6 +25,16 @@ public class CreateReviewResponseDTO {
         this.rating = r.getRating();
         this.passenger = new UserRef(r.getPassenger());
         this.comment = r.getComment();
+        this.type = r.getReviewType();
+    }
+
+
+    public ReviewType getType() {
+        return type;
+    }
+
+    public void setType(ReviewType type) {
+        this.type = type;
     }
 
     public static List<CreateReviewResponseDTO> convertToCreateReviewResponseDTO(List<Review> content) {

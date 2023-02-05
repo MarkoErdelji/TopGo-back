@@ -10,6 +10,7 @@ import com.example.topgoback.Notes.DTO.UserNoteListDTO;
 import com.example.topgoback.Notes.Model.Note;
 import com.example.topgoback.Notes.Service.NoteService;
 import com.example.topgoback.PasswordResetTokens.Service.PasswordResetTokenService;
+import com.example.topgoback.Rides.DTO.RideDTO;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
 import com.example.topgoback.Rides.Service.RideService;
 import com.example.topgoback.Users.DTO.*;
@@ -31,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -73,7 +75,9 @@ public class UserController {
                                           @Valid @RequestParam(required = false,defaultValue = "0001-01-01T00:00:00") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime beginDateInterval,
                                           @Valid @RequestParam(required = false,defaultValue = "9999-12-31T23:59:59.999999") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateInterval,
                                          Pageable pageable)
-    {
+        {if(sort == null){
+            sort = "start";
+        }
         if(sort!=null){
             boolean isValidSortField = false;
             for (AllowedSortFields allowedField : AllowedSortFields.values()) {
@@ -86,7 +90,7 @@ public class UserController {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Invalid sort field. Allowed fields: " + Arrays.toString(AllowedSortFields.values()));
             }
         }
-        pageable = (Pageable) PageRequest.of(page, size, Sort.by(sort).ascending());
+        pageable = (Pageable) PageRequest.of(page, size, Sort.by(sort).descending());
 
         UserRidesListDTO rides = rideService.findRidesByUserId(id,pageable,beginDateInterval,endDateInterval);
 
@@ -183,7 +187,10 @@ public class UserController {
         UserMessagesDTO message = messageService.addOne(id,sendMessageDTO,authorization);
         return new ResponseEntity<>(message,HttpStatus.OK);
 
+
     }
+
+
 
     @PutMapping(value = "{id}/block")
     @Valid

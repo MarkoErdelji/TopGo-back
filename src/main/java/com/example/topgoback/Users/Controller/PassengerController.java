@@ -88,12 +88,11 @@ public class PassengerController {
     }
 
     @GetMapping(value = "{id}/ride")
-    @Valid
     @PreAuthorize("hasAnyRole('ADMIN') || hasAnyRole('USER')")
     public ResponseEntity<?> getRides(@PathVariable Integer id,
-                                      @RequestParam(required = false) Integer page,
-                                      @RequestParam(required = false) Integer size,
-                                      @RequestParam(required = false) String sort,
+                                      @Valid @RequestParam(required = false) Integer page,
+                                      @Valid @RequestParam(required = false) Integer size,
+                                      @Valid @RequestParam(required = false) String sort,
                                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)LocalDateTime beginDateInterval,
                                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateInterval,
                                       Pageable pageable)
@@ -106,7 +105,7 @@ public class PassengerController {
             size = 10;
         }
         if(sort == null){
-            sort = "id";
+            sort = "start";
         }
         else{
             boolean isValidSortField = false;
@@ -126,7 +125,7 @@ public class PassengerController {
         if(endDateInterval == null){
             endDateInterval = LocalDateTime.of(9999, 12, 31, 23, 59, 59, 999999);
         }
-        pageable = (Pageable) PageRequest.of(page, size, Sort.by(sort).ascending());
+        pageable = (Pageable) PageRequest.of(page, size, Sort.by(sort).descending());
 
         UserRidesListDTO rides = rideService.findRidesByPassengerId(id,pageable,beginDateInterval,endDateInterval);
 
@@ -143,6 +142,22 @@ public class PassengerController {
     @Valid
     public ResponseEntity<List<RideDTO>> getPassengerFinishedRides(@RequestHeader("Authorization") String authorization){
         List<RideDTO> response = passengerService.getPassengerFinishedRides(authorization);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/ride/invite/{id}")
+    @Valid
+    public ResponseEntity<InviteFriendDTO> invitePassengerForRide(@RequestHeader("Authorization") String authorization
+    ,@PathVariable int id){
+        InviteFriendDTO response = passengerService.inviteFriend(authorization,id);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @PutMapping(value = "/ride/response",consumes = "application/json")
+    @Valid
+    public ResponseEntity<InviteFriendDTO> inviteReponse(@RequestBody InviteFriendDTO res){
+        InviteFriendDTO response = passengerService.inviteResponse(res);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

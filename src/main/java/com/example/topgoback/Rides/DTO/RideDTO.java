@@ -52,7 +52,7 @@ public class RideDTO {
         this.setLocations(new ArrayList<RouteForCreateRideDTO>());
         this.getLocations().add(new RouteForCreateRideDTO(r.getRoute()));
 
-        this.setStartTime(LocalDateTime.now());
+        this.setStartTime(r.getStart());
         this.setStatus(r.getStatus());
 
         this.setVehicleType(VehicleName.valueOf(r.getDriver().getVehicle().getVehicleType().getVehicleName()));
@@ -77,6 +77,14 @@ public class RideDTO {
         this.setId(r.getId());
     }
 
+
+    public static List<RideDTO> convertToRideDTO(List<Ride> rides){
+        List<RideDTO> userRideDTOList = new ArrayList<RideDTO>();
+        for(Ride r:rides){
+            userRideDTOList.add(new RideDTO(r));
+        }
+        return userRideDTOList;
+    }
 
     public Integer getId() {
         return id;

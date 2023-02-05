@@ -12,11 +12,11 @@ public class UserRidesListDTO {
 
     private PaginatedResponse totalCount;
 
-    private List<UserRideDTO> results;
+    private List<RideDTO> results;
 
     public UserRidesListDTO(){}
 
-    public UserRidesListDTO(Page<UserRideDTO> page){
+    public UserRidesListDTO(Page<RideDTO> page){
         totalCount = new PaginatedResponse();
         totalCount.setTotalCount((int) page.getTotalElements());
         this.results = page.getContent();
@@ -30,11 +30,11 @@ public class UserRidesListDTO {
         this.totalCount.setTotalCount(totalCount);
     }
 
-    public List<UserRideDTO> getResults() {
+    public List<RideDTO> getResults() {
         return results;
     }
 
-    public void setResults(ArrayList<UserRideDTO> results) {
+    public void setResults(ArrayList<RideDTO> results) {
         this.results = results;
     }
 

@@ -33,14 +33,14 @@ public class ResponseErrorHandler {
             String message = e.getDefaultMessage();
             paramErrorList.add("Field " + field + " " + message);
         }
-        return new ResponseEntity(paramErrorList, HttpStatus.BAD_REQUEST);
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, paramErrorList.toString());
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public final ResponseEntity<?> handleParamWrongFormatException(MethodArgumentTypeMismatchException ex)
     {
         String paramErrorList = "Field " + ex.getName() + " " + "format is not valid!";
-        return new ResponseEntity(paramErrorList, HttpStatus.BAD_REQUEST);
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, paramErrorList.toString());
     }
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public final ResponseEntity<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex)
@@ -48,11 +48,11 @@ public class ResponseErrorHandler {
         JsonMappingException cause = (JsonMappingException) ex.getCause();
         String fieldName = cause.getPath().get(0).getFieldName();
         String paramErrorList = "Field " + fieldName + " " + "format is not valid!";
-        return new ResponseEntity(paramErrorList, HttpStatus.BAD_REQUEST);
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, paramErrorList.toString());
     }
 
     @ExceptionHandler(MissingRequestHeaderException.class)
     public final ResponseEntity<?> handleHeaderException(MissingRequestHeaderException ex) {
-        return new ResponseEntity(ex.getBody().getDetail(), HttpStatus.UNAUTHORIZED);
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,ex.getBody().getDetail());
     }
 }
