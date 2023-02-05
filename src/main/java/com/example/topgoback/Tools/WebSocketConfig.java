@@ -1,12 +1,8 @@
 package com.example.topgoback.Tools;
 
-import com.example.topgoback.Rides.Controller.CreateRideHandler;
-import com.example.topgoback.Rides.Controller.RideNotificationHandler;
-import com.example.topgoback.Rides.Controller.SimulationHandler;
 import com.example.topgoback.Users.Handlers.UserMessageHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.*;
 
 @Configuration
