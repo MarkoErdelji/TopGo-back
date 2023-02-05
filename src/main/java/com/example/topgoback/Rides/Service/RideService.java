@@ -664,6 +664,7 @@ public class RideService {
             ridePassengerDTOS.add(ridePassengerDTO);
         }
         createRideDTO.setPassengers(ridePassengerDTOS);
+        createRideDTO.setVehicleType(ride.getVehicleName());
 
         RideDTO newRide = createRide(createRideDTO);
         sendRideUpdateToPassenger(newRide);
