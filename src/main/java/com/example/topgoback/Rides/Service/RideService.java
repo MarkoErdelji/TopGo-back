@@ -346,7 +346,7 @@ public class RideService {
     }
 
 
-    public static boolean arePassengerListsEqual(List<Passenger> list1, List<Passenger> list2) {
+    private static boolean arePassengerListsEqual(List<Passenger> list1, List<Passenger> list2) {
         Set<Integer> set1 = list1.stream().map(Passenger::getId).collect(Collectors.toSet());
         Set<Integer> set2 = list2.stream().map(Passenger::getId).collect(Collectors.toSet());
         return set1.equals(set2);
@@ -393,7 +393,7 @@ public class RideService {
         }
 
         Ride ride = optionalRide.get();
-        return ChangeRideStatus(ride, Status.ACCEPTED, "Cannot accept a ride that is not in status PENDING!");
+        return changeRideStatus(ride, Status.ACCEPTED, "Cannot accept a ride that is not in status PENDING!");
     }
 
     public RideDTO cancelRide(Integer id, RejectionTextDTO reason) {
@@ -422,7 +422,7 @@ public class RideService {
 
     }
 
-    private RideDTO ChangeRideStatus(Ride ride, Status status, String badRequest) {
+    private RideDTO changeRideStatus(Ride ride, Status status, String badRequest) {
         if (ride.getStatus() != Status.PENDING) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, badRequest);
         }
@@ -734,7 +734,7 @@ public class RideService {
 
     }
 
-    public String getUpdatedVehicleAddressWithCoordinates(float lat, float lon){
+    private String getUpdatedVehicleAddressWithCoordinates(float lat, float lon){
         String url="https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat="+lat+"&lon="+lon;
 
         RestTemplate restTemplate = new RestTemplate();
@@ -755,7 +755,7 @@ public class RideService {
 
     }
 
-    public List<GeoLocationDTO> callEndpointForRoute(String apiKey, String start, String end, String baseUrl){
+    private List<GeoLocationDTO> callEndpointForRoute(String apiKey, String start, String end, String baseUrl){
         String url = baseUrl+"?api_key="+apiKey+"&start="+start+"&end="+end;
         RestTemplate restTemplate = new RestTemplate();
 

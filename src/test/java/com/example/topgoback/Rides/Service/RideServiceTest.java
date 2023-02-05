@@ -48,6 +48,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -86,6 +87,7 @@ public class RideServiceTest {
     PanicRepository panicRepository;
     @Mock
     JwtTokenUtil jwtTokenUtil;
+
 
     @Autowired
     @InjectMocks
@@ -271,13 +273,12 @@ public class RideServiceTest {
 
         assertEquals(2,userRidesListDTO.getTotalCount());
         assertEquals(1,userRidesListDTO.getResults().get(0).getId());
-        assertEquals(mockCorrectPassenger().getId(),userRidesListDTO.getResults().get(0).getPassengers().get(0).getId());
-        assertEquals(mockCorrectPassenger().getEmail(),userRidesListDTO.getResults().get(0).getPassengers().get(0).getEmail());
+        assertEquals(mockCorrectDriver().getId(),userRidesListDTO.getResults().get(0).getDriver().getId());
+        assertEquals(mockCorrectDriver().getEmail(),userRidesListDTO.getResults().get(0).getDriver().getEmail());
 
 
 
     }
-
 
     @Test
     public void testfindRidesByUserId_incorrectId() {
@@ -311,7 +312,123 @@ public class RideServiceTest {
         assertTrue(userRidesListDTO.getResults().isEmpty());
 
 
+    }
 
+
+    @Test
+    public void testFindRidesByPassengerId_correctData() {
+        int passengerId = 1;
+        LocalDateTime startDate = LocalDateTime.of(2023, 1, 1, 8, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(2023, 1, 1, 19, 0, 0);
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Mockito.when(passengerService.findById(passengerId)).thenReturn(mockCorrectPassenger());
+
+        List<Ride> rides = new ArrayList<>();
+        rides.add(mockCorrectRide_Finished());
+        Ride ride_2 = mockCorrectRide_Finished();
+        ride_2.setId(2);
+        ride_2.setStart(LocalDateTime.of(2023, 1, 2, 0, 0));
+        ride_2.setEnd(LocalDateTime.of(2023, 1, 2, 0, 10));
+        rides.add(ride_2);
+
+        Page<Ride> ridesPage = new PageImpl<>(rides,pageable,rides.size());
+
+        Mockito.when(rideRepository.findByPassengerAndBeginBetween(passengerId, startDate, endDate, pageable)).thenReturn(ridesPage);
+
+        UserRidesListDTO userRidesListDTO = rideService.findRidesByPassengerId(passengerId,pageable,startDate,endDate);
+
+
+        assertEquals(2,userRidesListDTO.getTotalCount());
+        assertEquals(1,userRidesListDTO.getResults().get(0).getId());
+        assertEquals(mockCorrectPassenger().getId(),userRidesListDTO.getResults().get(0).getPassengers().get(0).getId());
+        assertEquals(mockCorrectPassenger().getEmail(),userRidesListDTO.getResults().get(0).getPassengers().get(0).getEmail());
+    }
+
+    @Test
+    public void testFindRidesByPassengerId_incorrectData() {
+        int passengerId = -1;
+        LocalDateTime startDate = LocalDateTime.of(2023, 1, 1, 8, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(2023, 1, 1, 19, 0, 0);
+        Pageable pageable = PageRequest.of(0, 10);
+        Mockito.when(passengerService.findById(passengerId)).thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Passenger does not exist!"));
+
+        assertThrows(ResponseStatusException.class,()->rideService.findRidesByPassengerId(passengerId,pageable,startDate,endDate));
+    }
+
+
+    @Test
+    public void testFindRidesByPassengerId_incorrectDate() {
+        int passengerId = 1;
+        LocalDateTime startDate = LocalDateTime.of(2023, 1, 1, 8, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(2020, 1, 1, 19, 0, 0);
+        Pageable pageable = PageRequest.of(0, 10);
+        Mockito.when(passengerService.findById(passengerId)).thenReturn(mockCorrectPassenger());
+
+
+        Page<Ride> ridesPage = new PageImpl<>(new ArrayList<>(),pageable,0);
+
+        Mockito.when(rideRepository.findByPassengerAndBeginBetween(passengerId, startDate, endDate, pageable)).thenReturn(ridesPage);
+
+        UserRidesListDTO userRidesListDTO = rideService.findRidesByPassengerId(passengerId,pageable,startDate,endDate);
+
+
+        assertEquals(0,userRidesListDTO.getTotalCount());
+        assertTrue(userRidesListDTO.getResults().isEmpty());
+
+
+    }
+    @Test
+    public void testFindRidesByPassengerId_incorrectData_DriverId() {
+        int passengerId = 100;
+        LocalDateTime startDate = LocalDateTime.of(2023, 1, 1, 8, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(2023, 1, 1, 19, 0, 0);
+        Pageable pageable = PageRequest.of(0, 10);
+        Mockito.when(passengerService.findById(passengerId)).thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Passenger does not exist!"));
+
+        assertThrows(ResponseStatusException.class,()->rideService.findRidesByPassengerId(passengerId,pageable,startDate,endDate));
+
+
+    }
+
+    @Test
+    public void testGetPassengersAcceptedRide_correctData_hasAccepted() {
+        int passengerId = 100;
+
+        LocalDateTime startTime = LocalDateTime.now();
+        Ride acceptedRide = mockCorrectRide_Finished();
+        acceptedRide.setStatus(Status.ACCEPTED);
+        acceptedRide.setStart(startTime);
+        acceptedRide.setEnd(null);
+        List<Ride> rides = new ArrayList<>();
+        rides.add(acceptedRide);
+        Mockito.when(rideRepository.findRidesByPassengeridAndIsAccepted(passengerId)).thenReturn(rides);
+
+        RideDTO acceptedRideDTO = rideService.getPassengersAcceptedRide(passengerId);
+        assertEquals(Status.ACCEPTED,acceptedRideDTO.status);
+        assertEquals(startTime,acceptedRideDTO.startTime);
+        assertNull(acceptedRideDTO.endTime);
+    }
+
+
+    @Test
+    public void testGetPassengersAcceptedRide_correctData_noAcceptedRides() {
+        int passengerId = 100;
+
+
+        Mockito.when(rideRepository.findRidesByPassengeridAndIsAccepted(passengerId)).thenReturn(new ArrayList<>());
+
+        assertThrows(ResponseStatusException.class,()->rideService.getPassengersAcceptedRide(passengerId));
+
+    }
+
+    @Test
+    public void testGetPassengersAcceptedRide_incorrectData() {
+        int passengerId = -1;
+
+        Mockito.when(rideRepository.findRidesByPassengeridAndIsAccepted(passengerId)).thenReturn(new ArrayList<>());
+
+        assertThrows(ResponseStatusException.class,()->rideService.getPassengersAcceptedRide(passengerId));
 
     }
 
