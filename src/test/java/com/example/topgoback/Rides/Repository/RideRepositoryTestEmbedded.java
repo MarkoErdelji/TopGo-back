@@ -1,6 +1,7 @@
 package com.example.topgoback.Rides.Repository;
 
 import com.example.topgoback.Enums.Status;
+import com.example.topgoback.Enums.VehicleName;
 import com.example.topgoback.Rides.Model.Ride;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @TestPropertySource(locations="classpath:application-test.properties")
@@ -39,6 +39,7 @@ public class RideRepositoryTestEmbedded {
         Page<Ride> rides = rideRepository.findByDriverOrPassengerAndStartBetween(driverId, startDate, endDate, pageable);
         assertThat(rides.getTotalElements()).isEqualTo(2);
         assertThat(rides.getContent().get(0).getId()).isEqualTo(1);
+
     }
 
 
@@ -149,4 +150,67 @@ public class RideRepositoryTestEmbedded {
 
         assertEquals(0, rides.getTotalElements());
     }
+    @Test
+    void findRidesByDriveridAndIsActiveWithValidInputReturnsExpectedResult() {
+        int driverId = 4;
+        List<Ride> rides = rideRepository.findRidesByDriveridAndIsActive(driverId);
+
+        assertEquals(1, rides.size());
+        assertEquals(Status.ACTIVE, rides.get(0).getStatus());
+    }
+    @Test
+    public void testFindRidesByDriveridAndIsActiveNoRidesFound() {
+        int driverId = 6;
+
+        List<Ride> rides = rideRepository.findRidesByDriveridAndIsActive(driverId);
+
+        assertTrue(rides.isEmpty(), "No rides should be found for this driver and status");
+    }
+    @Test
+    void findRidesByDriveridAndIsAcceptedWithValidInputReturnsExpectedResult() {
+        int driverId = 4;
+        List<Ride> rides = rideRepository.findRidesByDriveridAndIsAccepted(driverId);
+
+        assertEquals(1, rides.size());
+        assertEquals(Status.ACCEPTED, rides.get(0).getStatus());
+    }
+    @Test
+    public void testFindRidesByDriveridAndIsAcceptedNoRidesFound() {
+        int driverId = 6;
+
+        List<Ride> rides = rideRepository.findRidesByDriveridAndIsAccepted(driverId);
+
+        assertTrue(rides.isEmpty(), "No rides should be found for this driver and status");
+    }
+    @Test
+    void findRidesByDriveridAndIsFinishedWithValidInputReturnsExpectedResult() {
+        int driverId = 4;
+        List<Ride> rides = rideRepository.findRidesByDriveridAndIsFinished(driverId);
+
+        assertEquals(2, rides.size());
+        assertEquals(Status.FINISHED, rides.get(0).getStatus());
+    }
+    @Test
+    public void testFindRidesByDriveridAndIsFinishedNoRidesFound() {
+        int driverId = 5;
+
+        List<Ride> rides = rideRepository.findRidesByDriveridAndIsFinished(driverId);
+
+        assertTrue(rides.isEmpty(), "No rides should be found for this driver and status");
+    }
+    @Test
+    public void testFindRidesByStatus() {
+        List<Ride> rides = rideRepository.findRidesByStatus(Status.ACTIVE);
+        assertEquals(1, rides.size());
+
+        Ride ride = rides.get(0);
+        assertEquals(4, ride.getId());
+        assertTrue(ride.isForAnimals());
+        assertTrue(ride.isForBabies());
+        assertFalse(ride.isPanic());
+        assertEquals(1433.00, ride.getPrice());
+        assertEquals(Status.ACTIVE, ride.getStatus());
+        assertEquals(VehicleName.VAN, ride.getVehicleName());
+    }
+
 }
