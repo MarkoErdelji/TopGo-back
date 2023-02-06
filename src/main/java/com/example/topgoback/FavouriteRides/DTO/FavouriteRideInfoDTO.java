@@ -22,7 +22,9 @@ public class FavouriteRideInfoDTO {
     private boolean babyTransport;
     private boolean petTransport;
 
-    public FavouriteRideInfoDTO(){}
+    public FavouriteRideInfoDTO() {
+    }
+
     public FavouriteRideInfoDTO(FavouriteRide favouriteRide) {
         this.id = favouriteRide.getId();
         this.setFavoriteName(favouriteRide.getFavoriteName());
