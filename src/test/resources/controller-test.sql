@@ -1,7 +1,7 @@
 insert into vehicle_type(id,price_by_km,vehicle_name) values (1,100,0);
 
 
-
+insert into users (id,address,email,first_name,last_name,password,phone_number,profile_picture,is_blocked,user_type) values  (15,'test','admin@gmail.com','test','test','$2a$10$Wn4A5JzgizcMBttHv/MA7Omunwewqv5h6Wn1dbLmR9lp40bmxY0y6','test','test',FALSE,2);
 insert into drivers (id,address,email,first_name,last_name,password,phone_number,profile_picture,is_blocked,user_type,is_active,vehicle_id) values (4,'test','ognjen34@gmail.com','Zoran','Budala','$2a$10$Wn4A5JzgizcMBttHv/MA7Omunwewqv5h6Wn1dbLmR9lp40bmxY0y6','test','',FALSE,1,TRUE,null);
 
 
@@ -60,7 +60,11 @@ VALUES (14, '2024-01-01T15:00:00', true, true, false, 1433.00, '2024-01-01T14:00
 INSERT INTO RIDE (ID, END_TIME, FOR_ANIMALS, FOR_BABIES, PANIC, PRICE, START_TIME, STATUS, VEHICLE_NAME, REJECTION_ID, DRIVER_ID, PAYMENT_ID, ROUTE_ID)
 VALUES (16, '2024-01-09T15:00:00', true, true, false, 1433.00, '2024-01-09T14:00:00', 4, 2, NULL, 4, NULL, 1);
 
+INSERT INTO FAVOURITE_RIDE  (ID, PET_TRANSPORT, BABY_TRANSPORT, VEHICLE_TYPE, ROUTE_ID)
+VALUES (1,  true, true, 2, 1);
 
+INSERT INTO PASSENGER_FAVOURITE_RIDES (PASSENGER_ID,FAVOURITE_RIDE_ID)
+VALUES (21,1);
 
 INSERT INTO PASSENGER_RIDES (PASSENGER_ID, RIDE_ID)
 VALUES (21, 1),(21, 2),(21, 3),(21, 4),(21, 5),(21, 6), (23, 9), (23, 10), (23, 11), (23, 12), (23, 13), (23, 14);
