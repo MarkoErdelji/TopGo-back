@@ -45,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -598,6 +599,9 @@ public class RideService {
         routeRepository.save(route);
         favouriteRide.setRoute(route);
         favouriteRideRepository.save(favouriteRide);
+        favouriteRideRepository.flush();
+        FavouriteRide latestFavouriteRide =  favouriteRideRepository.findAll(Sort.by(Sort.Direction.DESC, "id")).get(0);
+        favouriteRide.setId(latestFavouriteRide.getId());
         return new FavouriteRideInfoDTO(favouriteRide);
 
 

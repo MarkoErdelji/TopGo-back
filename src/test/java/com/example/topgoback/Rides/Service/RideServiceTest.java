@@ -3,19 +3,26 @@ package com.example.topgoback.Rides.Service;
 import com.example.topgoback.Enums.Status;
 import com.example.topgoback.Enums.UserType;
 import com.example.topgoback.Enums.VehicleName;
+import com.example.topgoback.FavouriteRides.DTO.FavouriteRideDTO;
+import com.example.topgoback.FavouriteRides.DTO.FavouriteRideInfoDTO;
+import com.example.topgoback.FavouriteRides.Model.FavouriteRide;
 import com.example.topgoback.FavouriteRides.Repository.FavouriteRideRepository;
+import com.example.topgoback.GeoLocations.DTO.GeoLocationDTO;
 import com.example.topgoback.GeoLocations.Model.GeoLocation;
 import com.example.topgoback.GeoLocations.Repository.GeoLocationRepository;
 import com.example.topgoback.Panic.Repository.PanicRepository;
+import com.example.topgoback.RejectionLetters.DTO.RejectionTextDTO;
 import com.example.topgoback.RejectionLetters.Repository.RejectionLetterRepository;
 import com.example.topgoback.Rides.DTO.RideDTO;
 import com.example.topgoback.Rides.DTO.UserRidesListDTO;
 import com.example.topgoback.Rides.Model.Ride;
 import com.example.topgoback.Rides.Repository.RideRepository;
+import com.example.topgoback.Routes.DTO.RouteForCreateRideDTO;
 import com.example.topgoback.Routes.Model.Route;
 import com.example.topgoback.Routes.Repository.RouteRepository;
 import com.example.topgoback.Tools.DistanceCalculator;
 import com.example.topgoback.Tools.JwtTokenUtil;
+import com.example.topgoback.Users.DTO.UserRef;
 import com.example.topgoback.Users.Model.Driver;
 import com.example.topgoback.Users.Model.Passenger;
 import com.example.topgoback.Users.Model.User;
@@ -27,6 +34,8 @@ import com.example.topgoback.Vehicles.Model.Vehicle;
 import com.example.topgoback.Vehicles.Model.VehicleType;
 import com.example.topgoback.Vehicles.Repository.VehicleRepository;
 import com.example.topgoback.Vehicles.Repository.VehicleTypeRepository;
+import org.junit.jupiter.api.Assertions;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,10 +45,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.data.geo.Distance;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -48,7 +54,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import static org.assertj.core.api.ClassBasedNavigableIterableAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -311,10 +319,211 @@ public class RideServiceTest {
         assertTrue(userRidesListDTO.getResults().isEmpty());
 
 
+    }
+
+    @Test
+    public void testfindRidesByDriver_correctData_DriverId() {
+        int userId = 100;
+        LocalDateTime startDate = LocalDateTime.of(2023, 1, 1, 8, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(2023, 1, 1, 19, 0, 0);
+        Pageable pageable = PageRequest.of(0, 10);
+        Mockito.when(driverRepository.findById(userId)).thenReturn(Optional.of(mockCorrectDriver()));
+
+        List<Ride> rides = new ArrayList<>();
+        rides.add(mockCorrectRide_Finished());
+        Ride ride_2 = mockCorrectRide_Finished();
+        ride_2.setId(2);
+        ride_2.setStart(LocalDateTime.of(2023, 1, 2, 0, 0));
+        ride_2.setEnd(LocalDateTime.of(2023, 1, 2, 0, 10));
+        rides.add(ride_2);
+
+        Page<Ride> ridesPage = new PageImpl<>(rides,pageable,rides.size());
+
+        Mockito.when(rideRepository.findByDriverAndBeginBetween(userId, startDate, endDate, pageable)).thenReturn(ridesPage);
+
+        UserRidesListDTO userRidesListDTO = rideService.findRidesByDriversId(userId,pageable,startDate,endDate);
+
+
+        assertEquals(2,userRidesListDTO.getTotalCount());
+        assertEquals(1,userRidesListDTO.getResults().get(0).getId());
+        assertEquals(mockCorrectPassenger().getId(),userRidesListDTO.getResults().get(0).getPassengers().get(0).getId());
+        assertEquals(mockCorrectPassenger().getEmail(),userRidesListDTO.getResults().get(0).getPassengers().get(0).getEmail());
 
 
     }
 
+    @Test
+    public void testfindRidesByDriverId_incorrectId() {
+        int userId = -1;
+        LocalDateTime startDate = LocalDateTime.of(2023, 1, 1, 8, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(2023, 1, 1, 19, 0, 0);
+        Pageable pageable = PageRequest.of(0, 10);
+        Mockito.when(driverRepository.findById(userId)).thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND,"User does not exist!"));
+
+        assertThrows(ResponseStatusException.class,()->rideService.findRidesByDriversId(userId,pageable,startDate,endDate));
+    }
+
+    @Test
+    public void testfindRidesByDriverId_incorrectDate() {
+        int userId = 100;
+        LocalDateTime startDate = LocalDateTime.of(2023, 1, 1, 8, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(2020, 1, 1, 19, 0, 0);
+        Pageable pageable = PageRequest.of(0, 10);
+        Mockito.when(driverRepository.findById(userId)).thenReturn(Optional.ofNullable(mockCorrectDriver()));
+
+
+        Page<Ride> ridesPage = new PageImpl<>(new ArrayList<>(),pageable,0);
+
+        Mockito.when(rideRepository.findByDriverAndBeginBetween(userId, startDate, endDate, pageable)).thenReturn(ridesPage);
+
+        UserRidesListDTO userRidesListDTO = rideService.findRidesByDriversId(userId,pageable,startDate,endDate);
+
+
+        assertEquals(0,userRidesListDTO.getTotalCount());
+        assertTrue(userRidesListDTO.getResults().isEmpty());
+
+
+    }
+
+    @Test
+    public void testCancelRide_RidePending(){
+        Ride ride = mockCorrectRide_Finished();
+        ride.setStatus(Status.PENDING);
+        ride.setEnd(null);
+        Mockito.when(rideRepository.findById(ride.getId())).thenReturn(Optional.of(ride));
+        RejectionTextDTO rejectionTextDTO = new RejectionTextDTO();
+        rejectionTextDTO.setReason("reason");
+        RideDTO rideDTO = rideService.cancelRide(ride.getId(), rejectionTextDTO);
+        assertEquals(ride.getId(), rideDTO.id);
+        assertEquals(Status.REJECTED, rideDTO.status);
+
+    }
+
+    @Test
+    public void testCancelRide_RideAccepted(){
+        Ride ride = mockCorrectRide_Finished();
+        ride.setStatus(Status.ACCEPTED);
+        ride.setEnd(null);
+        Mockito.when(rideRepository.findById(ride.getId())).thenReturn(Optional.of(ride));
+        RejectionTextDTO rejectionTextDTO = new RejectionTextDTO();
+        rejectionTextDTO.setReason("reason");
+        RideDTO rideDTO = rideService.cancelRide(ride.getId(), rejectionTextDTO);
+        assertEquals(ride.getId(), rideDTO.id);
+        assertEquals(Status.REJECTED, rideDTO.status);
+
+    }
+
+    @Test
+    public void testCancleRide_InvalidRideStatus(){
+        RejectionTextDTO rejectionTextDTO = new RejectionTextDTO();
+        rejectionTextDTO.setReason("reason");
+        Ride ride = mockCorrectRide_Finished();
+        Mockito.when(rideRepository.findById(ride.getId())).thenReturn(Optional.of(ride));
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,() -> {
+            rideService.cancelRide(ride.getId(), rejectionTextDTO);
+        });
+
+        assertThat(exception.getMessage()).contains("Cannot cancel a ride that is not in status PENDING or ACCEPTED!");
+        assertEquals(exception.getStatusCode(), HttpStatus.BAD_REQUEST);
+
+    }
+
+    @Test
+    public void testCancelRide_InvalidRide(){
+        RejectionTextDTO rejectionTextDTO = new RejectionTextDTO();
+        rejectionTextDTO.setReason("reason");
+        Mockito.when(rideRepository.findById(-1)).thenReturn(Optional.empty());
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,() -> {
+            rideService.cancelRide(-1, rejectionTextDTO);
+        });
+        assertThat(exception.getMessage()).contains("Ride does not exist!");
+        assertEquals(exception.getStatusCode(), HttpStatus.NOT_FOUND);
+
+    }
+
+    @Test
+    public void testGetDriverAcceptedRide_CorrectDriverId(){
+        List<Ride> rides = new ArrayList<Ride>();
+        Driver driver = mockCorrectDriver();
+        Ride ride1 = mockCorrectRide_Finished();
+        ride1.setStatus(Status.ACCEPTED);
+        ride1.setEnd(null);
+        rides.add(ride1);
+        Ride ride2 = mockCorrectRide_Finished();
+        ride2.setId(2);
+        ride2.setStatus(Status.ACCEPTED);
+        ride2.setEnd(null);
+        rides.add(ride2);
+        Mockito.when(rideRepository.findRidesByDriveridAndIsAccepted(driver.getId())).thenReturn(rides);
+        RideDTO rideDTO = rideService.getDriverAcceptedRide(driver.getId());
+        assertEquals(rideDTO.getId(), rides.get(0).getId());
+        assertEquals(rideDTO.getStatus(), rides.get(0).getStatus());
+    }
+    
+    @Test
+    public void testGetDriverAcceptedRide_NoAcceptedRide(){
+        List<Ride> rides = new ArrayList<Ride>();
+        Driver driver = mockCorrectDriver();
+        Mockito.when(rideRepository.findRidesByDriveridAndIsAccepted(driver.getId())).thenReturn(rides);
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,() -> {
+            rideService.getDriverAcceptedRide(driver.getId());
+        });
+        assertThat(exception.getMessage()).contains("Active ride does not exist!");
+        assertEquals(exception.getStatusCode(), HttpStatus.NOT_FOUND);
+
+    }
+
+    @Test
+    public void testGetRideById_CorrectId(){
+        Ride ride  = mockCorrectRide_Finished();
+        Mockito.when(rideRepository.findById(ride.getId())).thenReturn(Optional.of(ride));
+        RideDTO rideDTO = rideService.getRideById(ride.getId());
+        assertEquals(rideDTO.getId(), ride.getId());
+        assertEquals(rideDTO.getStatus(), ride.getStatus());
+    }
+
+    @Test
+    public void testGetRideById_InCorrectId(){
+        Mockito.when(rideRepository.findById(-1)).thenReturn(Optional.empty());
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,() -> {
+            rideService.getRideById(-1);
+        });
+        assertThat(exception.getMessage()).contains("Ride does not exist!");
+        assertEquals(exception.getStatusCode(), HttpStatus.NOT_FOUND);
+
+    }
+
+    @Test
+    public void testEndRide_CorrectRideId(){
+        Ride ride = mockCorrectRide_Finished();
+        ride.setStatus(Status.ACTIVE);
+        ride.setEnd(null);
+        Mockito.when(rideRepository.findById(ride.getId())).thenReturn(Optional.of(ride));
+        RideDTO rideDTO = rideService.endRide(ride.getId());
+        assertEquals(rideDTO.getId(), ride.getId());
+        assertEquals(Status.FINISHED, rideDTO.getStatus());
+    }
+
+    @Test
+    public void testEndRide_InCorrectRideId(){
+        Mockito.when(rideRepository.findById(-1)).thenReturn(Optional.empty());
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,() -> {
+            rideService.endRide(-1);
+        });
+        assertThat(exception.getMessage()).contains("Ride does not exist!");
+        assertEquals(exception.getStatusCode(), HttpStatus.NOT_FOUND);
+
+    }
+    @Test
+    public void testEndRide_IncorrectRideStatus(){
+        Ride ride = mockCorrectRide_Finished();
+        Mockito.when(rideRepository.findById(ride.getId())).thenReturn(Optional.of(ride));
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,() -> {
+            rideService.endRide(ride.getId());
+        });
+        assertThat(exception.getMessage()).contains("Cannot end a ride that is not in status FINISHED!");
+        assertEquals(exception.getStatusCode(), HttpStatus.BAD_REQUEST);
+    }
 
 
 }
