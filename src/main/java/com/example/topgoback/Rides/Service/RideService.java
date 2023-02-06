@@ -152,7 +152,7 @@ public class RideService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Accepted ride does not exist!");
         return new RideDTO(rides.get(0));
     }
-    public RideDTO createRide(CreateRideDTO createRideDTO) {
+    public RideDTO  createRide(CreateRideDTO createRideDTO) {
         Ride ride = new Ride();
 
 
@@ -436,10 +436,13 @@ public class RideService {
     }
 
     public RideDTO getDriverActiveRide(Integer driverId) {
+        System.out.println("KURCINA");
         List<Ride> activeRides = rideRepository.findRidesByDriveridAndIsActive(driverId);
+        System.out.println("KURCINA 2");
         if (activeRides.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Active ride does not exist!");
 
+        System.out.println(activeRides.get(0).toString());
         return new RideDTO(activeRides.get(0));
 
     }
