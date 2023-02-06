@@ -32,8 +32,9 @@ public class RideRepositoryTest {
         LocalDateTime endDate = LocalDateTime.parse("2023-01-02T00:00:00");
         Pageable pageable = PageRequest.of(0, 10);
 
+
         Page<Ride> rides = rideRepository.findByDriverOrPassengerAndStartBetween(driverId, startDate, endDate, pageable);
-        assertThat(rides.getTotalElements()).isEqualTo(2);
+        assertThat(rides.getTotalElements()).isEqualTo(9);
         assertThat(rides.getContent().get(0).getId()).isEqualTo(1);
 
     }
@@ -47,7 +48,7 @@ public class RideRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         Page<Ride> rides = rideRepository.findByDriverOrPassengerAndStartBetween(passengerId, startDate, endDate, pageable);
-        assertThat(rides.getTotalElements()).isEqualTo(2);
+        assertThat(rides.getTotalElements()).isEqualTo(3);
         assertThat(rides.getContent().get(0).getId()).isEqualTo(1);
     }
 
@@ -72,6 +73,95 @@ public class RideRepositoryTest {
         assertTrue(rides.isEmpty());
     }
 
+
+    @Test
+    public void testFindRidesByPassengerIdAndIsActive() {
+        List<Ride> rides = rideRepository.findRidesByPassengeridAndIsActive(21);
+        assertEquals(1, rides.size());
+        assertEquals(Status.ACTIVE, rides.get(0).getStatus());
+    }
+
+    @Test
+    void testFindRidesByPassengerIdAndIsActive_InvalidPassengerId() {
+        int invalidPassengerId = -1;
+        List<Ride> rides = rideRepository.findRidesByPassengeridAndIsActive(invalidPassengerId);
+        assertTrue(rides.isEmpty());
+    }
+
+    @Test
+    void testFindRidesByPassengerIdAndIsActive_NoActiveRides() {
+        int validPassengerId = 22;
+        List<Ride> rides = rideRepository.findRidesByPassengeridAndIsActive(validPassengerId);
+        assertTrue(rides.isEmpty());
+    }
+
+    @Test
+    void testFindRidesByPassengerIdAndIsActive_MultipleActiveRides() {
+        int validPassengerId = 23;
+        List<Ride> rides = rideRepository.findRidesByPassengeridAndIsActive(validPassengerId);
+        assertFalse(rides.isEmpty());
+        assertEquals(2, rides.size());
+    }
+
+    @Test
+    public void findRidesByPassengeridAndIsAccepted() {
+        List<Ride> rides = rideRepository.findRidesByPassengeridAndIsAccepted(21);
+        assertEquals(1, rides.size());
+        assertEquals(Status.ACCEPTED, rides.get(0).getStatus());
+    }
+
+    @Test
+    void testFindRidesByPassengerIdAndIsAccepted_InvalidPassengerId() {
+        int invalidPassengerId = -1;
+        List<Ride> rides = rideRepository.findRidesByPassengeridAndIsAccepted(invalidPassengerId);
+        assertTrue(rides.isEmpty());
+    }
+
+
+    @Test
+    public void testFindRidesByPassengeridAndIsAccepted_NoRidesFound() {
+        int passengerId = 22;
+        List<Ride> rides = rideRepository.findRidesByPassengeridAndIsAccepted(passengerId);
+        assertEquals(0, rides.size());
+    }
+
+    @Test
+    public void testFindRidesByPassengeridAndIsAccepted_MultipleRidesFound() {
+        int passengerId = 23;
+        List<Ride> rides = rideRepository.findRidesByPassengeridAndIsAccepted(passengerId);
+        assertEquals(2, rides.size());
+
+    }
+
+    @Test
+    public void findRidesByPassengeridAndIsPending() {
+        List<Ride> rides = rideRepository.findRidesByPassengeridAndIsPending(21);
+        assertEquals(1, rides.size());
+        assertEquals(Status.PENDING, rides.get(0).getStatus());
+    }
+
+    @Test
+    void testFindRidesByPassengerIdAndIsPending_InvalidPassengerId() {
+        int invalidPassengerId = -1;
+        List<Ride> rides = rideRepository.findRidesByPassengeridAndIsPending(invalidPassengerId);
+        assertTrue(rides.isEmpty());
+    }
+
+
+    @Test
+    public void testFindRidesByPassengeridAndIsPending_NoRidesFound() {
+        int passengerId = 22;
+        List<Ride> rides = rideRepository.findRidesByPassengeridAndIsPending(passengerId);
+        assertEquals(0, rides.size());
+    }
+
+    @Test
+    public void testFindRidesByPassengeridAndIsPending_MultipleRidesFound() {
+        int passengerId = 23;
+        List<Ride> rides = rideRepository.findRidesByPassengeridAndIsPending(passengerId);
+        assertEquals(2, rides.size());
+
+    }
 
     @Test
     public void testfindByPassengerAndBeginBetween_correctData_returnsPageOfRides() {
@@ -115,10 +205,10 @@ public class RideRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         Page<Ride> rides = rideRepository.findByDriverAndBeginBetween(userId, startDate, endDate, pageable);
-        assertEquals(2, rides.getTotalElements());
+        assertEquals(9, rides.getTotalElements());
 
         List<Ride> rideList = rides.getContent();
-        assertEquals(2, rideList.size());
+        assertEquals(9, rideList.size());
         assertEquals(1, rideList.get(0).getId());
         assertEquals(2, rideList.get(1).getId());
     }
@@ -151,7 +241,7 @@ public class RideRepositoryTest {
         int driverId = 4;
         List<Ride> rides = rideRepository.findRidesByDriveridAndIsActive(driverId);
 
-        assertEquals(1, rides.size());
+        assertEquals(3, rides.size());
         assertEquals(Status.ACTIVE, rides.get(0).getStatus());
     }
     @Test
@@ -167,7 +257,7 @@ public class RideRepositoryTest {
         int driverId = 4;
         List<Ride> rides = rideRepository.findRidesByDriveridAndIsAccepted(driverId);
 
-        assertEquals(1, rides.size());
+        assertEquals(3, rides.size());
         assertEquals(Status.ACCEPTED, rides.get(0).getStatus());
     }
     @Test
@@ -197,7 +287,7 @@ public class RideRepositoryTest {
     @Test
     public void testFindRidesByStatus() {
         List<Ride> rides = rideRepository.findRidesByStatus(Status.ACTIVE);
-        assertEquals(1, rides.size());
+        assertEquals(3, rides.size());
 
         Ride ride = rides.get(0);
         assertEquals(4, ride.getId());
@@ -207,6 +297,7 @@ public class RideRepositoryTest {
         assertEquals(1433.00, ride.getPrice());
         assertEquals(Status.ACTIVE, ride.getStatus());
         assertEquals(VehicleName.VAN, ride.getVehicleName());
+
     }
 
 }

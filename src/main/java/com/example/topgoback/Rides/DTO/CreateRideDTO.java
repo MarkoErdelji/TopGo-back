@@ -28,6 +28,8 @@ public class CreateRideDTO {
     @NotNull(message = "is required!")
     private Boolean petTransport;
 
+
+
     private LocalDateTime scheduledTime;
 
     public List<RouteForCreateRideDTO> getLocations() {
