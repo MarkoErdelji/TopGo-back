@@ -197,6 +197,7 @@ public class RideServiceTest {
         ride.setPayment(null);
         ride.setReviews(new ArrayList<>());
         ride.setRoute(mockCorrectRoute());
+
         return ride;
     }
     public CreateRideDTO mockCreateRideDTO(){

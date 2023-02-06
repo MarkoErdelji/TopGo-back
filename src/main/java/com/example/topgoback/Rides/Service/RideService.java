@@ -151,7 +151,7 @@ public class RideService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Accepted ride does not exist!");
         return new RideDTO(rides.get(0));
     }
-    public RideDTO createRide(CreateRideDTO createRideDTO) {
+    public RideDTO  createRide(CreateRideDTO createRideDTO) {
         Ride ride = new Ride();
 
 

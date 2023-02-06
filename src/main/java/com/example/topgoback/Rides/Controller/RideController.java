@@ -44,7 +44,7 @@ public class RideController {
     @PostMapping(consumes = "application/json")
     @PreAuthorize("hasAnyRole('USER')")
     @Valid
-    public ResponseEntity<RideDTO> createRide(@Valid @Nullable @RequestBody CreateRideDTO createRideDTO){
+    public ResponseEntity<RideDTO> createRide(@Valid  @RequestBody CreateRideDTO createRideDTO){
         RideDTO response = rideService.createRide(createRideDTO);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
