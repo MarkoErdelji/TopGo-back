@@ -44,7 +44,7 @@ public class RideController {
     @PostMapping(consumes = "application/json")
     @PreAuthorize("hasAnyRole('USER')")
     @Valid
-    public ResponseEntity<RideDTO> createRide(@Valid @Nullable @RequestBody CreateRideDTO createRideDTO){
+    public ResponseEntity<RideDTO> createRide(@Valid  @RequestBody CreateRideDTO createRideDTO){
         RideDTO response = rideService.createRide(createRideDTO);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -131,7 +131,7 @@ public class RideController {
     @PutMapping(value = "/{id}/cancel")
     @Valid
     @PreAuthorize("hasAnyRole('DRIVER')")
-    public ResponseEntity<RideDTO> cancelRide(@PathVariable Integer id, @Nullable @RequestBody RejectionTextDTO reason){
+    public ResponseEntity<RideDTO> cancelRide(@PathVariable Integer id, @Valid @RequestBody RejectionTextDTO reason){
         RideDTO ride = rideService.cancelRide(id,reason);
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }
@@ -140,7 +140,7 @@ public class RideController {
     @PutMapping(value = "/{id}/decline")
     @Valid
     @PreAuthorize("hasAnyRole('DRIVER')")
-    public ResponseEntity<RideDTO> declineRide(@PathVariable Integer id, @Nullable @RequestBody RejectionTextDTO rejectionTextDTO){
+    public ResponseEntity<RideDTO> declineRide(@PathVariable Integer id, @Valid @RequestBody RejectionTextDTO rejectionTextDTO){
         RideDTO ride = rideService.declineRide(id, rejectionTextDTO);
         return new ResponseEntity<>(ride, HttpStatus.OK);
     }

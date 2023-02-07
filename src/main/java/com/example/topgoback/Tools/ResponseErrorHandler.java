@@ -53,6 +53,8 @@ public class ResponseErrorHandler {
 
     @ExceptionHandler(MissingRequestHeaderException.class)
     public final ResponseEntity<?> handleHeaderException(MissingRequestHeaderException ex) {
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,ex.getBody().getDetail());
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN,ex.getBody().getDetail());
     }
+
+
 }

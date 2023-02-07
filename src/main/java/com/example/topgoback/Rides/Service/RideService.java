@@ -45,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -151,7 +152,7 @@ public class RideService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Accepted ride does not exist!");
         return new RideDTO(rides.get(0));
     }
-    public RideDTO createRide(CreateRideDTO createRideDTO) {
+    public RideDTO  createRide(CreateRideDTO createRideDTO) {
         Ride ride = new Ride();
 
 
@@ -346,7 +347,7 @@ public class RideService {
     }
 
 
-    public static boolean arePassengerListsEqual(List<Passenger> list1, List<Passenger> list2) {
+    private static boolean arePassengerListsEqual(List<Passenger> list1, List<Passenger> list2) {
         Set<Integer> set1 = list1.stream().map(Passenger::getId).collect(Collectors.toSet());
         Set<Integer> set2 = list2.stream().map(Passenger::getId).collect(Collectors.toSet());
         return set1.equals(set2);
@@ -393,7 +394,7 @@ public class RideService {
         }
 
         Ride ride = optionalRide.get();
-        return ChangeRideStatus(ride, Status.ACCEPTED, "Cannot accept a ride that is not in status PENDING!");
+        return changeRideStatus(ride, Status.ACCEPTED, "Cannot accept a ride that is not in status PENDING!");
     }
 
     public RideDTO cancelRide(Integer id, RejectionTextDTO reason) {
@@ -422,7 +423,7 @@ public class RideService {
 
     }
 
-    private RideDTO ChangeRideStatus(Ride ride, Status status, String badRequest) {
+    private RideDTO changeRideStatus(Ride ride, Status status, String badRequest) {
         if (ride.getStatus() != Status.PENDING) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, badRequest);
         }
@@ -439,6 +440,7 @@ public class RideService {
         if (activeRides.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Active ride does not exist!");
 
+        System.out.println(activeRides.get(0).toString());
         return new RideDTO(activeRides.get(0));
 
     }
@@ -500,13 +502,31 @@ public class RideService {
         if (authorization != null && authorization.startsWith("Bearer ")) {
             jwtToken = authorization.substring(7);
         }
+        else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Header is invalid!");
+        }
         int userId = jwtTokenUtil.getUserIdFromToken(jwtToken);
         String type = jwtTokenUtil.getRoleFromToken(jwtToken);
 
         Panic panic = new Panic();
-        if (type.equals("USER")) panic.setUser(passengerRepository.findById(userId).get());
-        if (type.equals("DRIVER")) panic.setUser(driverRepository.findById(userId).get());
-        System.out.print(jwtToken);
+        if (type.equals("USER")) {
+            Optional<Passenger> passenger = passengerRepository.findById(userId);
+            if(passenger.isEmpty()){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Passenger does not exist!");
+            }
+            panic.setUser(passenger.get());
+        }
+        else if (type.equals("DRIVER")) {
+            Optional<Driver> driver = driverRepository.findById(userId);
+
+            if(driver.isEmpty()){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Driver does not exist!");
+            }
+            panic.setUser(driver.get());
+        }
+        else{
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Header has no correct role!");
+        }
         Optional<Ride> optionalRide = rideRepository.findById(id);
         if (optionalRide.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Ride does not exist!");
         Ride ride = optionalRide.get();
@@ -517,6 +537,9 @@ public class RideService {
         rideRepository.save(ride);
         panic.setRide(ride);
         panic.setTime(LocalDateTime.now());
+        if(reason==null || reason.getReason() == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Reason can not be null!");
+        }
         panic.setReason(reason.getReason());
         panicRepository.save(panic);
         RideDTO dto = new RideDTO(ride);
@@ -571,6 +594,9 @@ public class RideService {
 
     public FavouriteRideInfoDTO addFavouriteRide(FavouriteRideDTO ride) {
 
+        if(ride == null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"You cannot use a null input for request body!");
+        }
         FavouriteRide favouriteRide = new FavouriteRide();
 
         favouriteRide.setBabyTransport(ride.isBabyTransport());
@@ -579,6 +605,9 @@ public class RideService {
         favouriteRide.setFavoriteName(ride.getFavoriteName());
 
         favouriteRide.setPassengers(new ArrayList<>());
+        if(ride.getPassengers().isEmpty()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Favorite route must consist of at least one passenger!");
+        }
         for (UserRef p : ride.getPassengers()
         ) {
             Optional<Passenger> passenger = passengerRepository.findById(p.getId());
@@ -597,7 +626,7 @@ public class RideService {
 
         routeRepository.save(route);
         favouriteRide.setRoute(route);
-        favouriteRideRepository.save(favouriteRide);
+        favouriteRide = favouriteRideRepository.save(favouriteRide);
         return new FavouriteRideInfoDTO(favouriteRide);
 
 
@@ -664,6 +693,7 @@ public class RideService {
             ridePassengerDTOS.add(ridePassengerDTO);
         }
         createRideDTO.setPassengers(ridePassengerDTOS);
+        createRideDTO.setVehicleType(ride.getVehicleName());
 
         RideDTO newRide = createRide(createRideDTO);
         sendRideUpdateToPassenger(newRide);
@@ -734,7 +764,7 @@ public class RideService {
 
     }
 
-    public String getUpdatedVehicleAddressWithCoordinates(float lat, float lon){
+    private String getUpdatedVehicleAddressWithCoordinates(float lat, float lon){
         String url="https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat="+lat+"&lon="+lon;
 
         RestTemplate restTemplate = new RestTemplate();
@@ -755,7 +785,7 @@ public class RideService {
 
     }
 
-    public List<GeoLocationDTO> callEndpointForRoute(String apiKey, String start, String end, String baseUrl){
+    private List<GeoLocationDTO> callEndpointForRoute(String apiKey, String start, String end, String baseUrl){
         String url = baseUrl+"?api_key="+apiKey+"&start="+start+"&end="+end;
         RestTemplate restTemplate = new RestTemplate();
 
